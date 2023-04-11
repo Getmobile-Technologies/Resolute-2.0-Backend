@@ -1,0 +1,26 @@
+from django.urls import path, include
+from . import views
+from rest_framework_simplejwt.views import TokenRefreshView   
+from rest_framework_simplejwt.views import TokenVerifyView
+
+
+
+
+urlpatterns = [
+    path('register/user', views.UserRegisterView.as_view()),
+    path('register/admin', views.AdminRegisterView.as_view()),
+    path('register/superuser', views.SuperAdminRegisterView.as_view()),
+    path('all_users', views.AllUsersView.as_view()),
+    path('user/login', views.UserLoginView.as_view()),
+    path('logout', views.LogoutView.as_view()),
+    path('password', views.ChangePasswordView.as_view()),
+    path('refresh', TokenRefreshView().as_view(), name="refresh_token"),
+    path('auth/', include('djoser.urls')),
+    path('token/verify', TokenVerifyView.as_view(), name='token_verify'),
+    path('djoser/', include('djoser.urls')),
+    path('admin/users', views.GetAdminStaffView.as_view()),
+    path('admin/user/<str:pk>', views.UpdateAdminStaff.as_view()),
+    path('superadmin/admins', views.GetSuperUserAdmins.as_view()),
+    path('superadmin/admin/<str:pk>', views.UpdateSuperuserAdmins.as_view())
+  
+]
