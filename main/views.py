@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer
-from .models import PanicRequest
+from .serializers import PanicSerializer, CallSerializer
+from .models import PanicRequest, CallRequest
 from django.contrib.auth import get_user_model
+from django.http import Http404
 User = get_user_model()
 from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
@@ -21,7 +22,6 @@ class PanicView(APIView):
         data = {
             "message": "panic request sent",
             "user": {
-                "name": request.user.name,
                 "id": request.user.id
             }
         }
@@ -31,7 +31,10 @@ class GetPanicRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
 
     def get(self, request):
-        users = User.objects.filter(user=request.user.id)
+        try:
+            users = User.objects.filter(user=request.user.id)
+        except Http404:
+            return Response({"error": "user not found"}, status=404)
         for user in users:
             objs = PanicRequest.objects.filter(user=user.user)
             serializer = PanicSerializer(objs, many=True)
@@ -39,7 +42,7 @@ class GetPanicRequestAdmin(APIView):
                 "request": serializer.data
             }
 
-            return Response(data, status=200)
+        return Response(data, status=200)
 
 class PanicReview(APIView):
     permission_classes = (IsSuperUser,)
@@ -70,3 +73,32 @@ class SuperAdminPanicView(APIView):
         }
 
         return Response(data, status=200)
+    
+class CallRequestView(APIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        serializer = CallSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        data = {
+            "message": "call request successful",
+            "id": request.user.id
+        }
+        return Response(data, status=200)
+    
+
+class GetCallRequestAdmin(APIView):
+    def get(self, request):
+        try:
+            users = User.objects.filter(user=request.user.id)
+        except Http404:
+            return Response({"error": "user not found"}, status=404)
+        for user in users:
+            objs = CallRequest.objects.filter(user=user.user)
+            serializer = CallSerializer(objs, many=True)
+            data = {
+                "request": serializer.data
+            }
+
+        return Response(data, status=200)
+
