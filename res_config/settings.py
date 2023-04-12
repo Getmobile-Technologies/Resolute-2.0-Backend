@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 from django.utils.timezone import timedelta
+import dj_database_url
 import os
 
 
@@ -31,14 +32,16 @@ SECRET_KEY = os.getenv("MYKEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0:$PORT', 'localhost']
+ALLOWED_HOSTS = ['resolute.herokuapp.com', '127.0.0.1', '0.0.0.0:$PORT', 'localhost']
 
-CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1', 'http://localhost']
+CSRF_TRUSTED_ORIGINS = ['https://resolute.herokuapp.com' ,'https://*.127.0.0.1', 'http://localhost']
 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4000",
-    "http://127.0.0.1:8080"
+    "http://127.0.0.1:8080",
+    "https://resolute.herokuapp.com"
+
 ]
 
 CORS_ALLOW_ALL_ORIGIN = True
@@ -108,13 +111,15 @@ WSGI_APPLICATION = 'res_config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config()
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
