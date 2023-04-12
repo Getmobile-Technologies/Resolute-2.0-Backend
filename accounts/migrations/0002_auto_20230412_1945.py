@@ -7,7 +7,7 @@ def change_foreign_key_type(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('myapp', '0001_initial'),
+        ('accounts', '0001_initial'),
     ]
 
     operations = [
