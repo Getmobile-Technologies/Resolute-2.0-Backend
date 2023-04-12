@@ -7,7 +7,7 @@ from .managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, unique=True, editable=False, blank=False, default=uuid.uuid4)
     full_name = models.CharField(_('name'), max_length=250)
     phone = models.IntegerField(_('phone'), unique=True)
     location = models.CharField(_('location'), max_length=200, null=True)
