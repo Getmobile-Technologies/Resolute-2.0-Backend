@@ -64,7 +64,7 @@ class SuperAdminPanicView(APIView):
 
     def get(self, request):
         try:
-            objs = PanicRequest.objects.all().order_by()
+            objs = PanicRequest.objects.all().order_by('id')
         except PanicRequest.DoesNotExist:
             return Response({"error": "request not found"}, status=404)
         serializer = PanicSerializer(objs, many=True)
