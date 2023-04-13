@@ -9,7 +9,7 @@ from .managers import UserManager
 class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(_('name'), max_length=250)
     phone = models.IntegerField(_('phone'), unique=True, null=True)
-    email = models.EmailField(_('email'), unique=True, null=True, blank=False)
+    email = models.EmailField(_('email'), unique=True, null=True, blank=True)
     location = models.CharField(_('location'), max_length=200, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
     password = models.CharField(_('password'), max_length=100, null=True, blank=False)
@@ -21,7 +21,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     timestamp = models.DateTimeField(auto_now_add=True, null=True)
 
     USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = ['full_name', 'password']
+    REQUIRED_FIELDS = ['full_name', 'password', 'email']
 
     objects = UserManager()
 
