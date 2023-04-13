@@ -7,7 +7,6 @@ User = get_user_model()
 
 
 class PanicRequest(models.Model):
-    id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="user_request")
     status = models.CharField(max_length=100, null=True, default='panic')
     IsReviewed = models.BooleanField(default=False)
@@ -16,7 +15,6 @@ class PanicRequest(models.Model):
 
 
 class CallRequest(models.Model):
-    id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="call_request")
     phone = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=100, null=True, default='call_request')

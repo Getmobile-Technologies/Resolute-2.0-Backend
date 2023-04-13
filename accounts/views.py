@@ -41,7 +41,7 @@ class AdminRegisterView(APIView):
         data = {}
         serializer.is_valid(raise_exception=True)
         account = serializer.save(user=request.user)
-        data['response'] = 'successfully registered a new Admin.'
+        data['response'] = 'successfully registered a new user.'
         data['fullname'] = account.full_name
         data['id'] = account.id
 
