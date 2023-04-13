@@ -12,6 +12,7 @@ urlpatterns = [
     path('register/superuser', views.SuperAdminRegisterView.as_view()),
     path('all_users', views.AllUsersView.as_view()),
     path('user/login', views.UserLoginView.as_view()),
+    path('admins/login', views.AdminLoginView.as_view()),
     path('logout', views.LogoutView.as_view()),
     path('password', views.ChangePasswordView.as_view()),
     path('refresh', TokenRefreshView().as_view(), name="refresh_token"),
