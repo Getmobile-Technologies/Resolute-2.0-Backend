@@ -19,8 +19,8 @@ urlpatterns = [
     path('token/verify', TokenVerifyView.as_view(), name='token_verify'),
     path('djoser/', include('djoser.urls')),
     path('admin/users', views.GetAdminStaffView.as_view()),
-    path('admin/user/<str:pk>', views.UpdateAdminStaff.as_view()),
+    path('admin/user/<int:pk>', views.UpdateAdminStaff.as_view()),
     path('superadmin/admins', views.GetSuperUserAdmins.as_view()),
-    path('superadmin/admin/<str:pk>', views.UpdateSuperuserAdmins.as_view())
+    path('superadmin/admin/<int:pk>', views.UpdateSuperuserAdmins.as_view())
   
 ]
