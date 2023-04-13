@@ -8,7 +8,7 @@ from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import permissions, status
-from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, AdminRegistrationSerializer, SuperAdminSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, AdminRegistrationSerializer, SuperAdminSerializer, AdminLoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
@@ -217,23 +217,7 @@ class UserLoginView(APIView):
                     except Exception as e:
                         raise e
                 else:
-                    try:
-                        refresh = RefreshToken.for_user(user)
-                        user_details = {}
-                        user_details['id'] = user.id
-                        user_details['role'] = user.role
-                        user_details['access_token'] = str(refresh.access_token)
-                        user_details['refresh_token'] = str(refresh)
-                        user_logged_in.send(sender=user.__class__,
-                                            request=request, user=user)
-
-                        data = {
-                            'message' : "User Login successful",
-                            'data' : user_details,
-                        }
-                        return Response(data, status=status.HTTP_200_OK)
-                    except Exception as e:
-                        raise e
+                    return Response({"error": "unathourized login"}, status=403)
             else:
                 data = {
                     'message'  : "failed",
@@ -242,4 +226,39 @@ class UserLoginView(APIView):
                 return Response(data, status=status.HTTP_403_FORBIDDEN)
         except Http404:
             return Response({"error": "invalid login data"}, status=400)
-       
+
+
+class AdminLoginView(APIView):
+
+    def post(self, request):
+        serializer = AdminLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = authenticate(request, email = serializer.validated_data['email'], password = serializer.validated_data['password'])
+        if user and user.is_active:
+            if not user.is_staff:
+                try:
+                    refresh = RefreshToken.for_user(user)
+                    user_details = {}
+                    user_details['id'] = user.id
+                    user_details['email'] = user.email
+                    user_details['role'] = user.role
+                    user_details['access_token'] = str(refresh.access_token)
+                    user_details['refresh_token'] = str(refresh)
+                    user_logged_in.send(sender=user.__class__,
+                                        request=request, user=user)
+
+                    data = {
+                        'message' : "Admin Login successful",
+                        'data' : user_details,
+                    }
+                    return Response(data, status=status.HTTP_200_OK)
+                except Exception as e:
+                    raise e
+            else:
+                return Response({"error": "unathorized login"}, status=403)
+        else:
+            data = {
+                'message'  : "failed",
+                'errors': 'The account is not active'
+                }
+            return Response(data, status=status.HTTP_403_FORBIDDEN)

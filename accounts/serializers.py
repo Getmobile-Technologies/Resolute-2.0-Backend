@@ -11,11 +11,12 @@ User = get_user_model()
 class UserRegisterationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='staff')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
+    email = serializers.CharField(max_length=200, required=False)
 
 
     class Meta():
         model = User
-        fields = ['id', "full_name", 'phone', 'location', 'role', "password"]
+        fields = ['id', "full_name", 'phone', "email", 'location', 'role', "password"]
 
     def create(self, validate_data):
 
@@ -28,7 +29,7 @@ class AdminRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "full_name", "phone", 'location', "role", "password"]
+        fields = ["id", "full_name", "phone", "email", 'location', "role", "password"]
 
     def create(self, validate_data):
 
@@ -39,7 +40,7 @@ class SuperAdminSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = User
-        fields = ["id", "full_name", "phone", "role", "password"]
+        fields = ["id", "full_name", "phone", "email", "role", "password"]
 
     def create(self, validate_data):
 
@@ -59,6 +60,10 @@ class LoginSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=700)
     password = serializers.CharField(max_length=700)
 
+   
+class AdminLoginSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=700)
+    password = serializers.CharField(max_length=700)
 
 
 

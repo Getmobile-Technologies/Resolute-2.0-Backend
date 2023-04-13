@@ -8,7 +8,8 @@ from .managers import UserManager
 
 class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(_('name'), max_length=250)
-    phone = models.IntegerField(_('phone'), unique=True)
+    phone = models.IntegerField(_('phone'), unique=True, null=True)
+    email = models.EmailField(_('email'), unique=True, null=True)
     location = models.CharField(_('location'), max_length=200, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
     password = models.CharField(_('password'), max_length=100, null=True, blank=False)
