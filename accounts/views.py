@@ -233,32 +233,37 @@ class AdminLoginView(APIView):
     def post(self, request):
         serializer = AdminLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = authenticate(request, email = serializer.validated_data['email'], password = serializer.validated_data['password'])
-        if user and user.is_active:
-            if not user.is_staff:
-                try:
-                    refresh = RefreshToken.for_user(user)
-                    user_details = {}
-                    user_details['id'] = user.id
-                    user_details['email'] = user.email
-                    user_details['role'] = user.role
-                    user_details['access_token'] = str(refresh.access_token)
-                    user_details['refresh_token'] = str(refresh)
-                    user_logged_in.send(sender=user.__class__,
-                                        request=request, user=user)
+        try:
+            user = get_object_or_404(User, email=serializer.validated_data['email'])
+            password = user.check_password(serializer.validated_data['password'])
+            if user and password:
+                if user.is_staff:
+                    try:
+                        refresh = RefreshToken.for_user(user)
+                        user_details = {}
+                        user_details['id'] = user.id
+                        user_details['email'] = user.email
+                        user_details['role'] = user.role
+                        user_details['access_token'] = str(refresh.access_token)
+                        user_details['refresh_token'] = str(refresh)
+                        user_logged_in.send(sender=user.__class__,
+                                            request=request, user=user)
 
-                    data = {
-                        'message' : "Admin Login successful",
-                        'data' : user_details,
-                    }
-                    return Response(data, status=status.HTTP_200_OK)
-                except Exception as e:
-                    raise e
+                        data = {
+                            'message' : "Admin Login successful",
+                            'data' : user_details,
+                        }
+                        return Response(data, status=status.HTTP_200_OK)
+                    except Exception as e:
+                        raise e
+        
+                else:
+                    return Response({"error": "unathorized login"}, status=403)
             else:
-                return Response({"error": "unathorized login"}, status=403)
-        else:
-            data = {
-                'message'  : "failed",
-                'errors': 'The account is not active'
-                }
-            return Response(data, status=status.HTTP_403_FORBIDDEN)
+                data = {
+                    'message'  : "failed",
+                    'errors': 'The account is not active'
+                    }
+                return Response(data, status=status.HTTP_403_FORBIDDEN)
+        except Http404:
+                return Response({"error": "invalid data"}, status=400)
