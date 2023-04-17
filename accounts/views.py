@@ -17,7 +17,6 @@ from .permissions import IsAdmin, IsSuperUser
 User = get_user_model()
 
 
-
 class UserRegisterView(APIView):
     permission_classes = (IsAdmin,)
 
@@ -32,7 +31,7 @@ class UserRegisterView(APIView):
         data['id'] = account.id
 
         return Response(data)
-    
+
 class AdminRegisterView(APIView):
     permission_classes = (IsAdmin,)
     def post(self, request):
@@ -46,7 +45,7 @@ class AdminRegisterView(APIView):
         data['id'] = account.id
 
         return Response(data)
-    
+
 class GetAdminStaffView(APIView):
     permission_classes = (IsAdmin,)
 
@@ -54,14 +53,14 @@ class GetAdminStaffView(APIView):
     def get(self, request):
         try:
             objs = User.objects.filter(user=request.user)
-        except Http404:
+        except User.DoesNotExist:
             return Response({"error": "users not found"}, status=404)
         serializer = UserDetailSerializer(objs, many=True)
         data = {
             "staffs": serializer.data
         }
         return Response(data, status=200)
-    
+
 class UpdateAdminStaff(APIView):
 
     def put(self, request, pk):
@@ -74,7 +73,7 @@ class UpdateAdminStaff(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
-    
+
     def delete(self, request, pk):
         try:
             obj = get_object_or_404(User, id=pk)
@@ -82,7 +81,7 @@ class UpdateAdminStaff(APIView):
             return Response({"error": "user not found"}, status=404)
         obj.delete()
         return Response({"message": "user deleted"}, status=200)
-    
+
 
 
 
@@ -101,21 +100,21 @@ class SuperAdminRegisterView(APIView):
         data['id'] = account.id
 
         return Response(data)
-    
+
 class GetSuperUserAdmins(APIView):
     permission_classes = (IsSuperUser,)
 
     def get(self, request):
         try:
             objs = User.objects.filter(user=request.user)
-        except Http404:
+        except User.DoesNotExist:
             return Response({"error": "admins not found"}, status=404)
         serializer = UserDetailSerializer(objs, many=True)
         data = {
             "admins": serializer.data
         }
         return Response(data, status=200)
-    
+
 
 class UpdateSuperuserAdmins(APIView):
     permission_classes = (IsSuperUser,)
@@ -130,7 +129,7 @@ class UpdateSuperuserAdmins(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
-    
+
     def delete(self, request, pk):
         try:
             obj = get_object_or_404(User, id=pk)
@@ -138,14 +137,14 @@ class UpdateSuperuserAdmins(APIView):
             return Response({"error": "admin not found"}, status=404)
         obj.delete()
         return Response({"message": "admin deleted"}, status=200)
-        
+
 
 
 class AllUsersView(ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer
 
-    
+
 class ChangePasswordView(generics.GenericAPIView):
         """
         An endpoint for changing password.
@@ -164,7 +163,7 @@ class ChangePasswordView(generics.GenericAPIView):
             if serializer.is_valid():
                 if not self.object.check_password(serializer.data.get("old_password")):
                     return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
-                
+
                 self.object.set_password(serializer.data.get("new_password"))
                 self.object.save()
                 data = {
@@ -178,7 +177,7 @@ class ChangePasswordView(generics.GenericAPIView):
 
 class LogoutView(APIView):
     serializer_class = UserLogoutSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -186,11 +185,11 @@ class LogoutView(APIView):
         serializer.save()
 
         return Response({"Status": "Successfully logged out!"}, status=status.HTTP_204_NO_CONTENT)
-    
+
 
 
 class UserLoginView(APIView):
-    
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -256,7 +255,7 @@ class AdminLoginView(APIView):
                         return Response(data, status=status.HTTP_200_OK)
                     except Exception as e:
                         raise e
-        
+
                 else:
                     return Response({"error": "unathorized login"}, status=403)
             else:

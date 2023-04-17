@@ -33,7 +33,7 @@ class GetPanicRequestAdmin(APIView):
     def get(self, request):
         try:
             users = User.objects.filter(user=request.user.id)
-        except Http404:
+        except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
         for user in users:
             objs = PanicRequest.objects.filter(user=user.user)
@@ -91,7 +91,7 @@ class GetCallRequestAdmin(APIView):
     def get(self, request):
         try:
             users = User.objects.filter(user=request.user.id)
-        except Http404:
+        except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
         for user in users:
             objs = CallRequest.objects.filter(user=user.user)
@@ -102,14 +102,3 @@ class GetCallRequestAdmin(APIView):
 
         return Response(data, status=200)
 
-
-
-[1, 2, 3, 4, 5, 6, 7 ]
-
-
-
-{
-    2:{
-    2, 3, 4, 
-    }
-}
