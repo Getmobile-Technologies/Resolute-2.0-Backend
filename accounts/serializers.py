@@ -2,10 +2,9 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.response import Response
 from rest_framework import status
-# from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-
 User = get_user_model()
+
 
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
@@ -13,26 +12,22 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     email = serializers.CharField(max_length=200, required=False)
 
-
     class Meta():
         model = User
-        fields = ['id', "full_name", 'phone', "email", 'location', 'role', "password"]
+        fields = ['id', "first_name", "last_name", "phone", "email", 'location', "role", "password"]
 
     def create(self, validate_data):
-
         return User.objects.create_user(**validate_data)
 
 class AdminRegistrationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='admin')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
    
-
     class Meta:
         model = User
-        fields = ["id", "full_name", "phone", "email", 'location', "role", "password"]
+        fields = ["id", "first_name", "last_name", "phone", "email", "location", "role", "password"]
 
     def create(self, validate_data):
-
         return User.objects.create_admin(**validate_data)
 
 class SuperAdminSerializer(serializers.ModelSerializer):
@@ -40,13 +35,10 @@ class SuperAdminSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = User
-        fields = ["id", "full_name", "phone", "email", "role", "password"]
+        fields = ["id", "first_name", "last_name", "phone", "email", "location", "role", "password"]
 
     def create(self, validate_data):
-
         return User.objects.create_superuser(**validate_data)
-
-
 
 
 

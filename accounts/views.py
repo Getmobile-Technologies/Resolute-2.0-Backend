@@ -19,21 +19,20 @@ User = get_user_model()
 
 class UserRegisterView(APIView):
     permission_classes = (IsAdmin,)
-
-
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
         data = {}
         serializer.is_valid(raise_exception=True)
         account = serializer.save(user=request.user)
         data['response'] = 'successfully registered a new user.'
-        data['fullname'] = account.full_name
+        data['first_name'] = account.first_name
+        data['last_name'] = account.last_name
         data['id'] = account.id
 
         return Response(data)
 
 class AdminRegisterView(APIView):
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsSuperUser,)
     def post(self, request):
         serializer = AdminRegistrationSerializer(data=request.data)
 
@@ -41,18 +40,17 @@ class AdminRegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         account = serializer.save(user=request.user)
         data['response'] = 'successfully registered a new user.'
-        data['fullname'] = account.full_name
+        data['first_name'] = account.first_name
+        data['last_name'] = account.last_name
         data['id'] = account.id
 
         return Response(data)
 
 class GetAdminStaffView(APIView):
     permission_classes = (IsAdmin,)
-
-
     def get(self, request):
         try:
-            objs = User.objects.filter(user=request.user)
+            objs = User.objects.filter(user=request.user.id)
         except User.DoesNotExist:
             return Response({"error": "users not found"}, status=404)
         serializer = UserDetailSerializer(objs, many=True)
@@ -61,35 +59,13 @@ class GetAdminStaffView(APIView):
         }
         return Response(data, status=200)
 
-class UpdateAdminStaff(APIView):
-
-    def put(self, request, pk):
-        try:
-            obj = get_object_or_404(User, id=pk)
-        except Http404:
-            return Response({"error": "user account not found"}, status=404)
-        serializer = UserDetailSerializer(obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-
-    def delete(self, request, pk):
-        try:
-            obj = get_object_or_404(User, id=pk)
-        except Http404:
-            return Response({"error": "user not found"}, status=404)
-        obj.delete()
-        return Response({"message": "user deleted"}, status=200)
-
-
-
-
-
-
+class UserActions(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAdmin,)
+    queryset = User.objects.all()
+    serializer_class = UserDetailSerializer
+    
 class SuperAdminRegisterView(APIView):
     permission_classes = (IsSuperUser,)
-
     def post(self, request):
         serializer = SuperAdminSerializer(data=request.data)
         data = {}
@@ -98,12 +74,10 @@ class SuperAdminRegisterView(APIView):
         data['response'] = 'successfully registered a new super admin.'
         data['fullname'] = account.full_name
         data['id'] = account.id
-
         return Response(data)
 
 class GetSuperUserAdmins(APIView):
     permission_classes = (IsSuperUser,)
-
     def get(self, request):
         try:
             objs = User.objects.filter(user=request.user)
@@ -114,30 +88,6 @@ class GetSuperUserAdmins(APIView):
             "admins": serializer.data
         }
         return Response(data, status=200)
-
-
-class UpdateSuperuserAdmins(APIView):
-    permission_classes = (IsSuperUser,)
-
-    def put(self, request, pk):
-        try:
-            obj = get_object_or_404(User, id=pk)
-        except Http404:
-            return Response({"error": "admin not found"}, status=404)
-        serializer = UserDetailSerializer(obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-
-    def delete(self, request, pk):
-        try:
-            obj = get_object_or_404(User, id=pk)
-        except Http404:
-            return Response({"error": "admin not found"}, status=404)
-        obj.delete()
-        return Response({"message": "admin deleted"}, status=200)
-
 
 
 class AllUsersView(ListAPIView):

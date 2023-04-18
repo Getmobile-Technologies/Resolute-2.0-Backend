@@ -2,12 +2,15 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import PanicSerializer, CallSerializer
-from .models import PanicRequest, CallRequest
+from .models import PanicRequest, CallRequest, TrackMeRequest
 from django.contrib.auth import get_user_model
+from rest_framework import status, generics
+
 from django.http import Http404
 User = get_user_model()
 from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
+from .helpers.location import user_location
 
 
 
@@ -18,11 +21,18 @@ class PanicView(APIView):
     def post(self, request):
         serializer = PanicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
+        location = user_location()
+
+        serializer.save(user=request.user,
+                        longitude=location['lon'],
+                        latitude=location['lat'],
+                        location=location['regionName']
+                        )
         data = {
             "message": "panic request sent",
             "user": {
-                "id": request.user.id
+                "phone": request.user.phone,
+                "status": location['status']
             }
         }
         return Response(data, status=200)
@@ -45,41 +55,43 @@ class GetPanicRequestAdmin(APIView):
         return Response(data, status=200)
 
 class PanicReview(APIView):
-    permission_classes = (IsSuperUser,)
+    # permission_classes = (IsAdmin,)
     def post(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
         except PanicRequest.DoesNotExist:
             return Response({"error": "reqeust not found"}, status=404)
-        if not obj.IsReviewed:
-            obj.IsReviewed = True
+        if not obj.is_reviewed:
+            obj.is_reviewed = True
             obj.save()
             return Response({"message": "review success"}, status=200)
         else:
             return Response({"error": "request already reviewed"}, status=400)
-
-
-class SuperAdminPanicView(APIView):
-    permission_classes = (IsSuperUser,)
-
-    def get(self, request):
+    def delete(self, request, pk):
         try:
-            objs = PanicRequest.objects.all().order_by('id')
+            obj = PanicRequest.objects.get(id=pk)
         except PanicRequest.DoesNotExist:
-            return Response({"error": "request not found"}, status=404)
-        serializer = PanicSerializer(objs, many=True)
-        data = {
-            "all request": serializer.data
-        }
+            return Response({"error": "reqeust not found"}, status=404)
+        if obj.is_reviewed:
+            obj.is_reviewed = False
+            obj.save()
+            return Response({"message": "unreviewed!"}, status=200)
+        else:
+            return Response({"error": "request not reviewed"}, status=400)
 
-        return Response(data, status=200)
+
+class AllPanicRequest(generics.ListAPIView):
+    queryset = PanicRequest.objects.all().order_by('-id')
+    permission_classes = (IsAdmin,)
+    serializer_class = PanicSerializer
+
     
 class CallRequestView(APIView):
     permission_classes = (IsAuthenticated,)
     def post(self, request):
         serializer = CallSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
+        serializer.save(user=request.user, phone=request.user.phone)
         data = {
             "message": "call request successful",
             "id": request.user.id
@@ -101,4 +113,49 @@ class GetCallRequestAdmin(APIView):
             }
 
         return Response(data, status=200)
+    
+    
+class CallReview(APIView):
+    permission_classes = (IsAdmin,)
+    def post(self, request, pk):
+        try:
+            obj = CallRequest.objects.get(id=pk)
+        except CallRequest.DoesNotExist:
+            return Response({"error": "reqeust not found"}, status=404)
+        if not obj.is_reviewed:
+            obj.is_reviewed = True
+            obj.save()
+            return Response({"message": "review success"}, status=200)
+        else:
+            return Response({"error": "request already reviewed"}, status=400)
+        
+    def delete(self, request, pk):
+        try:
+            obj = CallRequest.objects.get(id=pk)
+        except CallRequest.DoesNotExist:
+            return Response({"error": "reqeust not found"}, status=404)
+        if obj.is_reviewed:
+            obj.is_reviewed = False
+            obj.save()
+            return Response({"message": "unreviewed!"}, status=200)
+        else:
+            return Response({"error": "request not reviewed"}, status=400)
 
+
+class TotalIncidentView(APIView):
+    def get(self, request):
+        calls = CallRequest.objects.count()
+        panic = PanicRequest.objects.count()
+
+        total = calls + panic
+        return Response({"total incident": total}, status=200)
+
+class ReviewedIncident(APIView):
+    def get(self, request):
+        calls = CallRequest.objects.filter(is_reviewed=True).count()
+        panic = PanicRequest.objects.filter(is_reviewed=True).count()
+        track_me = TrackMeRequest.objects.filter(is_reviewed=True).count()
+
+        total = calls + panic + track_me
+
+        return Response({"total": total}, status=200)

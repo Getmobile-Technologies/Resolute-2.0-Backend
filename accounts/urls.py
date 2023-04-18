@@ -11,6 +11,7 @@ urlpatterns = [
     path('register/admin', views.AdminRegisterView.as_view()),
     path('register/superuser', views.SuperAdminRegisterView.as_view()),
     path('all_users', views.AllUsersView.as_view()),
+    path('single/user/<int:pk>', views.UserActions.as_view()),
     path('user/login', views.UserLoginView.as_view()),
     path('admins/login', views.AdminLoginView.as_view()),
     path('logout', views.LogoutView.as_view()),
@@ -20,8 +21,5 @@ urlpatterns = [
     path('token/verify', TokenVerifyView.as_view(), name='token_verify'),
     path('djoser/', include('djoser.urls')),
     path('admin/users', views.GetAdminStaffView.as_view()),
-    path('admin/user/<int:pk>', views.UpdateAdminStaff.as_view()),
-    path('superadmin/admins', views.GetSuperUserAdmins.as_view()),
-    path('superadmin/admin/<int:pk>', views.UpdateSuperuserAdmins.as_view())
-  
+    path('superadmin/admins', views.GetSuperUserAdmins.as_view())  
 ]
