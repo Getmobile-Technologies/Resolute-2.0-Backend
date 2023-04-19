@@ -165,9 +165,7 @@ class TrackMeRequestView(APIView):
     def post(self, request):
         serializer = TrackMeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        ip = request.META.get('REMOTE_ADDR')
-        print(ip)
-        location = user_location(ip=ip)
+        location = user_location()
 
         serializer.save(user=request.user,
                         longitude=location['lon'],
