@@ -72,9 +72,9 @@ class SuperAdminRegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         account = serializer.save(user=request.user)
         data['response'] = 'successfully registered a new super admin.'
-        data['fullname'] = account.full_name
+        data['first_name'] = account.first_name
+        data['last_name'] = account.last_name
         data['id'] = account.id
-        return Response(data)
 
 class GetSuperUserAdmins(APIView):
     permission_classes = (IsSuperUser,)
