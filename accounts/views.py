@@ -75,6 +75,8 @@ class SuperAdminRegisterView(APIView):
         data['first_name'] = account.first_name
         data['last_name'] = account.last_name
         data['id'] = account.id
+        
+        return Response(data)
 
 class GetSuperUserAdmins(APIView):
     permission_classes = (IsSuperUser,)
