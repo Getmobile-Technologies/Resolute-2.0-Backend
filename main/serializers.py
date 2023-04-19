@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PanicRequest, CallRequest
+from .models import PanicRequest, CallRequest, TrackMeRequest
 
 
 
@@ -25,5 +25,5 @@ class CallSerializer(serializers.ModelSerializer):
 
 class TrackMeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CallRequest
+        model = TrackMeRequest
         fields = '__all__'
