@@ -13,6 +13,11 @@ urlpatterns = [
     path('incidents/total', views.TotalIncidentView.as_view()),
     path('incidents/reviewed/total', views.ReviewedIncident.as_view()),
     path('call/review/<int:pk>', views.CallReview.as_view()),
+    path('create/track/requests', views.TrackMeRequestView.as_view()),
+    path('admin/call/requests', views.GetCallRequestAdmin.as_view()),
+    path('trackme/review/<int:pk>', views.TrackMeReview.as_view())
+
+
     
 
 ]

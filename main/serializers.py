@@ -20,3 +20,10 @@ class CallSerializer(serializers.ModelSerializer):
     class Meta:
         model = CallRequest
         fields = '__all__'
+
+
+
+class TrackMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CallRequest
+        fields = '__all__'

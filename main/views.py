@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer, CallSerializer
+from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer
 from .models import PanicRequest, CallRequest, TrackMeRequest
 from django.contrib.auth import get_user_model
 from rest_framework import status, generics
-
+from accounts.serializers import UserDetailSerializer
 from django.http import Http404
 User = get_user_model()
 from accounts.permissions import IsAdmin, IsSuperUser
@@ -46,7 +46,7 @@ class GetPanicRequestAdmin(APIView):
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
         for user in users:
-            objs = PanicRequest.objects.filter(user=user.user)
+            objs = PanicRequest.objects.filter(user=user)
             serializer = PanicSerializer(objs, many=True)
             data = {
                 "request": serializer.data
@@ -55,7 +55,7 @@ class GetPanicRequestAdmin(APIView):
         return Response(data, status=200)
 
 class PanicReview(APIView):
-    # permission_classes = (IsAdmin,)
+    permission_classes = (IsAdmin,)
     def post(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
@@ -106,7 +106,7 @@ class GetCallRequestAdmin(APIView):
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
         for user in users:
-            objs = CallRequest.objects.filter(user=user.user)
+            objs = CallRequest.objects.filter(user=user)
             serializer = CallSerializer(objs, many=True)
             data = {
                 "request": serializer.data
@@ -159,3 +159,68 @@ class ReviewedIncident(APIView):
         total = calls + panic + track_me
 
         return Response({"total": total}, status=200)
+
+
+class TrackMeRequestView(APIView):
+    def post(self, request):
+        serializer = TrackMeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        location = user_location()
+
+        serializer.save(user=request.user,
+                        longitude=location['lon'],
+                        latitude=location['lat'],
+                        location=location['regionName']
+                        )
+        data = {
+            "message": "tracking request sent",
+            "user": {
+                "phone": request.user.phone,
+                "status": location['status']
+            }
+        }
+        return Response(data, status=200)
+    
+
+class GetTrackMeRequestAdmin(APIView):
+    permission_classes = (IsAdmin,)
+    def get(self, request):
+        try:
+            users = User.objects.filter(user=request.user.id)
+        except User.DoesNotExist:
+            return Response({"error": "user not found"}, status=404)
+        for user in users:
+            objs = TrackMeRequest.objects.filter(user=user)
+            serializer = TrackMeSerializer(objs, many=True)
+            data = {
+                "request": serializer.data
+            }
+
+        return Response(data, status=200)
+    
+
+
+class TrackMeReview(APIView):
+    permission_classes = (IsAdmin,)
+    def post(self, request, pk):
+        try:
+            obj = TrackMeRequest.objects.get(id=pk)
+        except TrackMeRequest.DoesNotExist:
+            return Response({"error": "reqeust not found"}, status=404)
+        if not obj.is_reviewed:
+            obj.is_reviewed = True
+            obj.save()
+            return Response({"message": "review success"}, status=200)
+        else:
+            return Response({"error": "request already reviewed"}, status=400)
+    def delete(self, request, pk):
+        try:
+            obj = TrackMeRequest.objects.get(id=pk)
+        except TrackMeRequest.DoesNotExist:
+            return Response({"error": "reqeust not found"}, status=404)
+        if obj.is_reviewed:
+            obj.is_reviewed = False
+            obj.save()
+            return Response({"message": "unreviewed!"}, status=200)
+        else:
+            return Response({"error": "request not reviewed"}, status=400)
