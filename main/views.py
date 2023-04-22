@@ -43,7 +43,7 @@ class GetPanicRequestAdmin(APIView):
     def get(self, request):
         try:
             users = User.objects.filter(user_id=request.user.id)
-            print(request.user)
+            print(request.user.email)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
         for user in users:
