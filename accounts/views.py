@@ -59,7 +59,7 @@ class GetAdminStaffView(APIView):
         }
         return Response(data, status=200)
 
-class UserActions(generics.RetrieveUpdateDestroyAPIView):
+class UserActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer

@@ -36,7 +36,8 @@ class PanicView(APIView):
             }
         }
         return Response(data, status=200)
-    
+
+
 class GetPanicRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
 
@@ -67,6 +68,7 @@ class PanicReview(APIView):
             return Response({"message": "review success"}, status=200)
         else:
             return Response({"error": "request already reviewed"}, status=400)
+        
     def delete(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
@@ -97,9 +99,10 @@ class CallRequestView(APIView):
             "id": request.user.id
         }
         return Response(data, status=200)
-    
+
 
 class GetCallRequestAdmin(APIView):
+    permission_classes = (IsAdmin,)
     def get(self, request):
         try:
             users = User.objects.filter(user=request.user.id)
@@ -114,7 +117,7 @@ class GetCallRequestAdmin(APIView):
 
             return Response(data, status=200)
     
-    
+
 class CallReview(APIView):
     permission_classes = (IsAdmin,)
     def post(self, request, pk):
@@ -128,7 +131,7 @@ class CallReview(APIView):
             return Response({"message": "review success"}, status=200)
         else:
             return Response({"error": "request already reviewed"}, status=400)
-        
+
     def delete(self, request, pk):
         try:
             obj = CallRequest.objects.get(id=pk)
@@ -143,22 +146,28 @@ class CallReview(APIView):
 
 
 class TotalIncidentView(APIView):
+    permission_classes = (IsAdmin,)
     def get(self, request):
-        calls = CallRequest.objects.count()
-        panic = PanicRequest.objects.count()
+        try:
+            users = User.objects.filter(user_id=request.user.id)
+        except User.DoesNotExist:
+            return Response({"error": "user not found"}, status=404)
+        for user in users:
+            panic = PanicRequest.objects.filter(user=user).count()
 
-        total = calls + panic
-        return Response({"total incident": total}, status=200)
+            return Response({"total incident": panic}, status=200)
 
 class ReviewedIncident(APIView):
+    permission_classes = (IsAdmin,)
     def get(self, request):
-        calls = CallRequest.objects.filter(is_reviewed=True).count()
-        panic = PanicRequest.objects.filter(is_reviewed=True).count()
-        track_me = TrackMeRequest.objects.filter(is_reviewed=True).count()
+        try:
+            users = User.objects.filter(user_id=request.user.id)
+        except User.DoesNotExist:
+            return Response({"error": "user not found"}, status=404)
+        for user in users:
+            panic = PanicRequest.objects.filter(user=user, is_reviewed=True).count()
 
-        total = calls + panic + track_me
-
-        return Response({"total": total}, status=200)
+            return Response({"reviewed incident": panic}, status=200)
 
 
 class TrackMeRequestView(APIView):
@@ -180,7 +189,7 @@ class TrackMeRequestView(APIView):
             }
         }
         return Response(data, status=200)
-    
+
 
 class GetTrackMeRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
@@ -197,7 +206,7 @@ class GetTrackMeRequestAdmin(APIView):
             }
 
             return Response(data, status=200)
-    
+
 
 
 class TrackMeReview(APIView):
