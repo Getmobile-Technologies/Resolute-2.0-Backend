@@ -46,7 +46,7 @@ class GetPanicRequestAdmin(APIView):
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
         for user in users:
-            objs = PanicRequest.objects.filter(user=user)
+            objs = PanicRequest.objects.filter(user=user.id)
             serializer = PanicSerializer(objs, many=True)
             data = {
                 "request": serializer.data

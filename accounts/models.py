@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 import uuid
 from .managers import UserManager
 from django.core.validators import RegexValidator
-
+import random
 
 
 
@@ -22,6 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(_('staff'), default=False)
     is_admin = models.BooleanField(_('admin'), default=False)
     is_superuser = models.BooleanField(_('superuser'), default=False)
+    is_deleted = models.BooleanField(_('deleted'), default=False)
     user = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="mapped_users")
     timestamp = models.DateTimeField(auto_now_add=True, null=True)
 
@@ -37,4 +38,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.phone
+    
+
+    # def delete(self):
+    #     self.is_deleted = True
+    #     self.email = f"{random.randint}-deleted-{self.email}"
+    #     self.phone = f"{self.phone}-deleted-{random.randint}"
+    #     self.save()
 
