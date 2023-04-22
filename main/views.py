@@ -43,12 +43,11 @@ class GetPanicRequestAdmin(APIView):
     def get(self, request):
         try:
             users = User.objects.filter(user_id=request.user.id)
-            serializer = UserDetailSerializer(users, many=True)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
         for user in users:
-            objs = PanicRequest.objects.filter(user=user.id)
-            # serializer = PanicSerializer(objs, many=True)
+            objs = PanicRequest.objects.filter(user=user)
+            serializer = PanicSerializer(objs, many=True)
             data = {
                 "request": serializer.data
             }
