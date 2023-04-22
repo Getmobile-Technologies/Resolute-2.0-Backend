@@ -52,7 +52,7 @@ class GetPanicRequestAdmin(APIView):
                 "request": serializer.data
             }
 
-        return Response(data, status=200)
+            return Response(data, status=200)
 
 class PanicReview(APIView):
     permission_classes = (IsAdmin,)
