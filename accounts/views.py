@@ -93,7 +93,7 @@ class GetSuperUserAdmins(APIView):
 
 
 class AllUsersView(ListAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_deleted=False)
     serializer_class = UserDetailSerializer
 
 
@@ -149,26 +149,29 @@ class UserLoginView(APIView):
             user = get_object_or_404(User, phone=serializer.validated_data['phone'])
             password = user.check_password(serializer.validated_data['password'])
             if user and password:
-                if user.is_staff:
-                    try:
-                        refresh = RefreshToken.for_user(user)
-                        user_details = {}
-                        user_details['id'] = user.id
-                        user_details['role'] = user.role
-                        user_details['access_token'] = str(refresh.access_token)
-                        user_details['refresh_token'] = str(refresh)
-                        user_logged_in.send(sender=user.__class__,
-                                            request=request, user=user)
+                if user.is_active:
+                    if user.is_staff:
+                        try:
+                            refresh = RefreshToken.for_user(user)
+                            user_details = {}
+                            user_details['id'] = user.id
+                            user_details['role'] = user.role
+                            user_details['access_token'] = str(refresh.access_token)
+                            user_details['refresh_token'] = str(refresh)
+                            user_logged_in.send(sender=user.__class__,
+                                                request=request, user=user)
 
-                        data = {
-                            'message' : "User Login successful",
-                            'data' : user_details,
-                        }
-                        return Response(data, status=status.HTTP_200_OK)
-                    except Exception as e:
-                        raise e
+                            data = {
+                                'message' : "User Login successful",
+                                'data' : user_details,
+                            }
+                            return Response(data, status=status.HTTP_200_OK)
+                        except Exception as e:
+                            raise e
+                    else:
+                        return Response({"error": "unathourized login"}, status=403)
                 else:
-                    return Response({"error": "unathourized login"}, status=403)
+                    return Response({"error": "user is not active"}, status=403)
             else:
                 data = {
                     'message'  : "failed",
@@ -176,7 +179,7 @@ class UserLoginView(APIView):
                     }
                 return Response(data, status=status.HTTP_403_FORBIDDEN)
         except Http404:
-            return Response({"error": "invalid login data"}, status=400)
+                return Response({"error": "invalid login data"}, status=400)
 
 
 class AdminLoginView(APIView):
@@ -188,7 +191,7 @@ class AdminLoginView(APIView):
             user = get_object_or_404(User, email=serializer.validated_data['email'])
             password = user.check_password(serializer.validated_data['password'])
             if user and password:
-                if user.is_staff:
+                if user.is_admin:
                     try:
                         refresh = RefreshToken.for_user(user)
                         user_details = {}
