@@ -28,7 +28,7 @@ class UserRegisterView(APIView):
         data['first_name'] = account.first_name
         data['last_name'] = account.last_name
         data['email'] = account.email
-        data['password'] = serializer.data['password']
+        data['password'] = account.password
         data['location'] = account.location
         data['id'] = account.id
 
