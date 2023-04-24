@@ -36,24 +36,39 @@ class PanicView(APIView):
             }
         }
         return Response(data, status=200)
-
+    
 
 class GetPanicRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
 
     def get(self, request):
-        try:
-            users = User.objects.filter(user_id=request.user.id)
-        except User.DoesNotExist:
-            return Response({"error": "user not found"}, status=404)
+        users = User.objects.filter(user=request.user.id)
+        
+        data = []
         for user in users:
-            objs = PanicRequest.objects.filter(user=user)
-            serializer = PanicSerializer(objs, many=True)
-            data = {
-                "request": serializer.data
-            }
+            panic_requests = PanicRequest.objects.filter(user=user).order_by('-id')
+            for panic_request in panic_requests:
+                serializer = PanicSerializer(panic_request)
+                request_data = {
+                    "id": serializer.data['id'],
+                    "longitude": serializer.data['longitude'],
+                    "latitude": serializer.data['latitude'],
+                    "location": serializer.data['location'],
+                    "is_reviewed": serializer.data['is_reviewed'],
+                    "timestamp": serializer.data['timestamp'],
+                    "user": {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "email": user.email,
+                        "phone": user.phone,
+                        "role": user.role
+                    }
+                }
+                data.append(request_data)
 
-            return Response(data, status=200)
+        return Response(data, status=200)
+
 
 class PanicReview(APIView):
     permission_classes = (IsAdmin,)
@@ -103,19 +118,32 @@ class CallRequestView(APIView):
 
 class GetCallRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
+ 
     def get(self, request):
-        try:
-            users = User.objects.filter(user=request.user.id)
-        except User.DoesNotExist:
-            return Response({"error": "user not found"}, status=404)
+        users = User.objects.filter(user=request.user.id)
+        
+        data = []
         for user in users:
-            objs = CallRequest.objects.filter(user=user)
-            serializer = CallSerializer(objs, many=True)
-            data = {
-                "request": serializer.data
-            }
+            call_requests = CallRequest.objects.filter(user=user).order_by('-id')
+            for call_request in call_requests:
+                serializer = CallSerializer(call_request)
+                request_data = {
+                    "id": serializer.data['id'],
+                    "phone": serializer.data['phone'],
+                    "is_reviewed": serializer.data['is_reviewed'],
+                    "timestamp": serializer.data['timestamp'],
+                    "user": {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "email": user.email,
+                        "phone": user.phone,
+                        "role": user.role
+                    }
+                }
+                data.append(request_data)
 
-            return Response(data, status=200)
+        return Response(data, status=200)
     
 
 class CallReview(APIView):
@@ -190,23 +218,36 @@ class TrackMeRequestView(APIView):
         }
         return Response(data, status=200)
 
-
 class GetTrackMeRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
+ 
     def get(self, request):
-        try:
-            users = User.objects.filter(user=request.user.id)
-        except User.DoesNotExist:
-            return Response({"error": "user not found"}, status=404)
+        users = User.objects.filter(user=request.user)
+        
+        data = []
         for user in users:
-            objs = TrackMeRequest.objects.filter(user=user)
-            serializer = TrackMeSerializer(objs, many=True)
-            data = {
-                "request": serializer.data
-            }
+            track_requests = TrackMeRequest.objects.filter(user=user).order_by('-id')
+            for track_request in track_requests:
+                serializer = TrackMeSerializer(track_request)
+                request_data = {
+                    "id": serializer.data['id'],
+                    "longitude": serializer.data['longitude'],
+                    "latitude": serializer.data['latitude'],
+                    "location": serializer.data['location'],
+                    "is_reviewed": serializer.data['is_reviewed'],
+                    "timestamp": serializer.data['timestamp'],
+                    "user": {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "email": user.email,
+                        "phone": user.phone,
+                        "role": user.role
+                    }
+                }
+                data.append(request_data)
 
-            return Response(data, status=200)
-
+        return Response(data, status=200)
 
 
 class TrackMeReview(APIView):
