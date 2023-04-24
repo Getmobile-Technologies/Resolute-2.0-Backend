@@ -27,6 +27,9 @@ class UserRegisterView(APIView):
         data['response'] = 'successfully registered a new user.'
         data['first_name'] = account.first_name
         data['last_name'] = account.last_name
+        data['email'] = account.email
+        data['password'] = serializer.data['password']
+        data['location'] = account.location
         data['id'] = account.id
 
         return Response(data)
@@ -191,28 +194,31 @@ class AdminLoginView(APIView):
             user = get_object_or_404(User, email=serializer.validated_data['email'])
             password = user.check_password(serializer.validated_data['password'])
             if user and password:
-                if user.is_admin:
-                    try:
-                        refresh = RefreshToken.for_user(user)
-                        user_details = {}
-                        user_details['id'] = user.id
-                        user_details['email'] = user.email
-                        user_details['role'] = user.role
-                        user_details['access_token'] = str(refresh.access_token)
-                        user_details['refresh_token'] = str(refresh)
-                        user_logged_in.send(sender=user.__class__,
-                                            request=request, user=user)
+                if user.is_active:
+                    if user.is_admin:
+                        try:
+                            refresh = RefreshToken.for_user(user)
+                            user_details = {}
+                            user_details['id'] = user.id
+                            user_details['email'] = user.email
+                            user_details['role'] = user.role
+                            user_details['access_token'] = str(refresh.access_token)
+                            user_details['refresh_token'] = str(refresh)
+                            user_logged_in.send(sender=user.__class__,
+                                                request=request, user=user)
 
-                        data = {
-                            'message' : "Admin Login successful",
-                            'data' : user_details,
-                        }
-                        return Response(data, status=status.HTTP_200_OK)
-                    except Exception as e:
-                        raise e
+                            data = {
+                                'message' : "Admin Login successful",
+                                'data' : user_details,
+                            }
+                            return Response(data, status=status.HTTP_200_OK)
+                        except Exception as e:
+                            raise e
 
+                    else:
+                        return Response({"error": "unathorized login"}, status=403)
                 else:
-                    return Response({"error": "unathorized login"}, status=403)
+                    return Response({"error": "user is not active"}, status=403)
             else:
                 data = {
                     'message'  : "failed",

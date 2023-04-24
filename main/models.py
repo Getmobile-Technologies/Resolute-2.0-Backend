@@ -38,6 +38,18 @@ class TrackMeRequest(models.Model):
 
 
 
+class Location(models.Model):
+    address = models.CharField(max_length=500, null=True)
+    state = models.CharField(max_length=250, null=True)
+    is_deleted = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 
+
+
+class Images(models.Model):
+    image = models.ImageField(null=True, upload_to='capture')
+    is_deleted = models.BooleanField(default=False)
+    is_reviewed = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
