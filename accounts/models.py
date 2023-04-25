@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 import uuid
 from .managers import UserManager
 from django.core.validators import RegexValidator
-import random
 
 
 
@@ -13,9 +12,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     first_name = models.CharField(_('first_name'), max_length=250)
     last_name = models.CharField(_('last_name'), max_length=250)
-    phone = models.CharField(_('phone'), max_length=200, unique=True, null=True)
+    phone = models.CharField(_('phone'), max_length=200, unique=True, null=True)#remember to use phone regex for production
     email = models.EmailField(_('email'), unique=True, null=True, blank=True)
-    location = models.CharField(_('location'), max_length=200, null=True)
+    location = models.ForeignKey("main.StaffLocation", on_delete=models.CASCADE, null=True, related_name="user_location")
     role = models.CharField(_('role'), max_length=100, null=True)
     password = models.CharField(_('password'), max_length=100, null=True, blank=False)
     is_active = models.BooleanField(_('active'), default=True)
@@ -45,4 +44,5 @@ class User(AbstractBaseUser, PermissionsMixin):
     #     self.email = f"{random.randint}-deleted-{self.email}"
     #     self.phone = f"{self.phone}-deleted-{random.randint}"
     #     self.save()
+
 

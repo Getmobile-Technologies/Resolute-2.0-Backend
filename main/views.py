@@ -7,10 +7,11 @@ from django.contrib.auth import get_user_model
 from rest_framework import status, generics
 from accounts.serializers import UserDetailSerializer
 from django.http import Http404
-User = get_user_model()
 from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
 from .helpers.location import user_location
+
+User = get_user_model()
 
 
 

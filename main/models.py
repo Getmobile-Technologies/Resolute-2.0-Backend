@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-import uuid
 User = get_user_model()
 
 
@@ -37,19 +36,19 @@ class TrackMeRequest(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
-
-class Location(models.Model):
-    address = models.CharField(max_length=500, null=True)
-    state = models.CharField(max_length=250, null=True)
+class Images(models.Model):
+    image = models.ImageField(null=True, upload_to='capture')
     is_deleted = models.BooleanField(default=False)
+    is_reviewed = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
 
 
-
-class Images(models.Model):
-    image = models.ImageField(null=True, upload_to='capture')
+class StaffLocation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="staff_location")
+    address = models.CharField(max_length=500, null=True)
+    state = models.CharField(max_length=250, null=True)
+    country = models.CharField(max_length=200, null=True)
     is_deleted = models.BooleanField(default=False)
-    is_reviewed = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
