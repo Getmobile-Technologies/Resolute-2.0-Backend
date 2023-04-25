@@ -179,11 +179,11 @@ class TotalIncidentView(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
         try:
-            users = User.objects.filter(user=request.user.id)
+            users = User.objects.filter(user_id=request.user.id)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
-        for user in users:
-            panic = PanicRequest.objects.filter(user=user).count()
+        # for user in users:
+        panic = PanicRequest.objects.filter(user_id__in= users, is_reviewed=True).count()
 
         return Response({"total incident": panic}, status=200)
 
@@ -236,6 +236,7 @@ class GetTrackMeRequestAdmin(APIView):
         data = []
         for user in users:
             track_requests = TrackMeRequest.objects.filter(user=user).order_by('-id')
+            result = track_requests.count()
             for track_request in track_requests:
                 serializer = TrackMeSerializer(track_request)
                 request_data = {
@@ -246,6 +247,7 @@ class GetTrackMeRequestAdmin(APIView):
                     "is_reviewed": serializer.data['is_reviewed'],
                     "timestamp": serializer.data['timestamp'],
                     "user": {
+                        "count": result,
                         "id": user.id,
                         "first_name": user.first_name,
                         "last_name": user.last_name,
