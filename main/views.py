@@ -61,6 +61,7 @@ class GetPanicRequestAdmin(APIView):
                         "first_name": user.first_name,
                         "last_name": user.last_name,
                         "email": user.email,
+                        "location": user.location,
                         "phone": user.phone,
                         "role": user.role
                     }
@@ -137,6 +138,7 @@ class GetCallRequestAdmin(APIView):
                         "first_name": user.first_name,
                         "last_name": user.last_name,
                         "email": user.email,
+                        "location": user.location,
                         "phone": user.phone,
                         "role": user.role
                     }
@@ -183,18 +185,23 @@ class TotalIncidentView(APIView):
         for user in users:
             panic = PanicRequest.objects.filter(user=user).count()
 
-            return Response({"total incident": panic}, status=200)
+        return Response({"total incident": panic}, status=200)
 
 class ReviewedIncident(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
+        data = []
         try:
             users = User.objects.filter(user_id=request.user.id)
+            print(users.count())
             for user in users:
-                panic = PanicRequest.objects.filter(user=user, is_reviewed=True).count()
-                print(panic)
+                panics = PanicRequest.objects.filter(user_id=user.id, is_reviewed=True)
+                for panic in panics:
+                    serializer = PanicSerializer(panic)
+                    
+                    data.append(serializer.data)
 
-                return Response({"reviewed incident": panic}, status=200)
+            return Response({"reviewed incident": len(data)}, status=200)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
        
@@ -243,6 +250,7 @@ class GetTrackMeRequestAdmin(APIView):
                         "first_name": user.first_name,
                         "last_name": user.last_name,
                         "email": user.email,
+                        "location": user.location,
                         "phone": user.phone,
                         "role": user.role
                     }
