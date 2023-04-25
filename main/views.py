@@ -190,12 +190,13 @@ class ReviewedIncident(APIView):
     def get(self, request):
         try:
             users = User.objects.filter(user_id=request.user.id)
-        except User.DoesNotExist:
-            return Response({"error": "user not found"}, status=404)
-        for user in users:
-            panic = PanicRequest.objects.filter(user=user, is_reviewed=True).count()
+            for user in users:
+                panic = PanicRequest.objects.filter(user=user, is_reviewed=True).count()
 
             return Response({"reviewed incident": panic}, status=200)
+        except User.DoesNotExist:
+            return Response({"error": "user not found"}, status=404)
+       
 
 
 class TrackMeRequestView(APIView):
