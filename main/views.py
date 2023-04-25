@@ -183,7 +183,7 @@ class TotalIncidentView(APIView):
         for user in users:
             panic = PanicRequest.objects.filter(user=user).count()
 
-            return Response({"total incident": panic}, status=200)
+        return Response({"total incident": panic}, status=200)
 
 class ReviewedIncident(APIView):
     permission_classes = (IsAdmin,)
@@ -195,7 +195,7 @@ class ReviewedIncident(APIView):
         for user in users:
             panic = PanicRequest.objects.filter(user=user, is_reviewed=True).count()
 
-            return Response({"reviewed incident": panic}, status=200)
+        return Response({"reviewed incident": panic}, status=200)
 
 
 class TrackMeRequestView(APIView):
