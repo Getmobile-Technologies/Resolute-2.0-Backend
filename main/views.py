@@ -199,11 +199,8 @@ class ReviewedIncident(APIView):
                 panics = PanicRequest.objects.filter(user_id=user.id, is_reviewed=True)
                 amt = panics.count()
                 for panic in panics:
-                    result = {
-                        "total_review": amt
-                    }
+                    result = amt
                     
-
             return Response({"reviewed incident": result}, status=200)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
