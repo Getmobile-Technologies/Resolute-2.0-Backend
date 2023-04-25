@@ -177,7 +177,7 @@ class TotalIncidentView(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
         try:
-            users = User.objects.filter(user_id=request.user.id)
+            users = User.objects.filter(user=request.user.id)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
         for user in users:
