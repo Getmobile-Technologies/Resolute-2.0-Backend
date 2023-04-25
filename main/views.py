@@ -180,17 +180,19 @@ class TotalIncidentView(APIView):
     def get(self, request):
         try:
             users = User.objects.filter(user_id=request.user.id)
+            for user in users:
+                panics = PanicRequest.objects.filter(user_id=user.id)
+                amt = panics.count()
+                for panic in panics:
+                    result = amt
+                    
+            return Response({"total incident": result}, status=200)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
-        # for user in users:
-        panic = PanicRequest.objects.filter(user_id__in= users, is_reviewed=True).count()
-
-        return Response({"total incident": panic}, status=200)
 
 class ReviewedIncident(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
-        data = []
         try:
             users = User.objects.filter(user_id=request.user.id)
             for user in users:
@@ -198,10 +200,9 @@ class ReviewedIncident(APIView):
                 amt = panics.count()
                 for panic in panics:
                     result = {
-                        "total_reveiew": amt
+                        "total_review": amt
                     }
                     
-                    # data.append(result)
 
             return Response({"reviewed incident": result}, status=200)
         except User.DoesNotExist:
