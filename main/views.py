@@ -201,9 +201,9 @@ class ReviewedIncident(APIView):
                         "total_reveiew": amt
                     }
                     
-                    data.append(result)
+                    # data.append(result)
 
-            return Response({"reviewed incident": data}, status=200)
+            return Response({"reviewed incident": result}, status=200)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
        
