@@ -193,15 +193,17 @@ class ReviewedIncident(APIView):
         data = []
         try:
             users = User.objects.filter(user_id=request.user.id)
-            print(users.count())
             for user in users:
                 panics = PanicRequest.objects.filter(user_id=user.id, is_reviewed=True)
+                amt = panics.count()
                 for panic in panics:
-                    serializer = PanicSerializer(panic)
+                    result = {
+                        "total_reveiew": amt
+                    }
                     
-                    data.append(serializer.data)
+                    data.append(result)
 
-            return Response({"reviewed incident": len(data)}, status=200)
+            return Response({"reviewed incident": data}, status=200)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
        
@@ -236,7 +238,6 @@ class GetTrackMeRequestAdmin(APIView):
         data = []
         for user in users:
             track_requests = TrackMeRequest.objects.filter(user=user).order_by('-id')
-            result = track_requests.count()
             for track_request in track_requests:
                 serializer = TrackMeSerializer(track_request)
                 request_data = {
@@ -247,7 +248,6 @@ class GetTrackMeRequestAdmin(APIView):
                     "is_reviewed": serializer.data['is_reviewed'],
                     "timestamp": serializer.data['timestamp'],
                     "user": {
-                        "count": result,
                         "id": user.id,
                         "first_name": user.first_name,
                         "last_name": user.last_name,
