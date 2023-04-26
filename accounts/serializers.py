@@ -25,13 +25,12 @@ class AdminRegistrationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='admin')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     location = serializers.PrimaryKeyRelatedField(queryset=StaffLocation.objects.all(), required=False)
-    total_admin_panic = serializers.ReadOnlyField()
 
 
    
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name", "phone", "email", "location", "total_admin_panic", "role", "password"]
+        fields = ["id", "first_name", "last_name", "phone", "email", "location", "role", "password"]
 
     def create(self, validate_data):
         return User.objects.create_admin(**validate_data)
@@ -51,6 +50,8 @@ class SuperAdminSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    total_admin_panic = serializers.ReadOnlyField()
+
     class Meta:
         model = User
         fields = '__all__'
