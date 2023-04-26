@@ -20,13 +20,11 @@ User = get_user_model()
 
 class UserRegisterView(APIView):
     permission_classes = (IsAdmin,)
-    def post(self, request, pk):
+    def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
-        location = StaffLocation.objects.get(id=pk)
         data = {}
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['user'] = request.user
-        serializer.validated_data['location'] = location
         account = serializer.save()
         data['response'] = 'successfully registered a new user.'
         data['first_name'] = account.first_name

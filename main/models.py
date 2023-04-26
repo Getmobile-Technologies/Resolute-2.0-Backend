@@ -52,3 +52,7 @@ class StaffLocation(models.Model):
     country = models.CharField(max_length=200, null=True)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    
+    def __str__(self):
+        return self.state
