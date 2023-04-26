@@ -22,18 +22,12 @@ class PanicView(APIView):
     def post(self, request):
         serializer = PanicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        location = user_location()
 
-        serializer.save(user=request.user,
-                        longitude=location['lon'],
-                        latitude=location['lat'],
-                        location=location['regionName']
-                        )
+        serializer.save(user=request.user)
         data = {
             "message": "panic request sent",
             "user": {
-                "phone": request.user.phone,
-                "status": location['status']
+                "phone": request.user.phone
             }
         }
         return Response(data, status=200)
@@ -212,18 +206,11 @@ class TrackMeRequestView(APIView):
     def post(self, request):
         serializer = TrackMeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        location = user_location()
-
-        serializer.save(user=request.user,
-                        longitude=location['lon'],
-                        latitude=location['lat'],
-                        location=location['regionName']
-                        )
+        serializer.save(user=request.user)
         data = {
             "message": "tracking request sent",
             "user": {
                 "phone": request.user.phone,
-                "status": location['status']
             }
         }
         return Response(data, status=200)

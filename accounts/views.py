@@ -76,6 +76,19 @@ class UserActions(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer
     
+class UserProfile(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        try:
+            user = User.objects.get(id=request.user.id, is_deleted=False)
+        except User.DoesNotExist:
+            return Response({"error": "user not found"}, status=404)
+        serializer = UserDetailSerializer(user)
+        data = {
+            "user": serializer.data
+        }
+        return Response(data, status=200)
+
 class SuperAdminRegisterView(APIView):
     permission_classes = (IsSuperUser,)
     def post(self, request):
