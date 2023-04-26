@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 import uuid
 from .managers import UserManager
 from django.core.validators import RegexValidator
+from django.db.models import Sum
 
 
 
@@ -37,7 +38,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.phone
-    
+
+    @property
+    def total_admin_panic(self):
+        total_panic = self.user_request.filter(is_deleted=False, user__id__in=self.mapped_users.values_list('id', flat=True) ).count()
+        return total_panic
 
     # def delete(self):
     #     self.is_deleted = True
