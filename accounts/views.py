@@ -14,17 +14,24 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from main.serializers import LocationSerializer
 from .permissions import IsAdmin, IsSuperUser
 User = get_user_model()
 
 
 class UserRegisterView(APIView):
     permission_classes = (IsAdmin,)
-    def post(self, request):
+    def post(self, request, pk):
         serializer = UserRegisterationSerializer(data=request.data)
+        try:
+            location = StaffLocation.objects.get(id=pk)
+            serializer_ = LocationSerializer(location)
+        except StaffLocation.DoesNotExist:
+            return Response({"error": "location not found"}, status=404)
         data = {}
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['user'] = request.user
+        serializer.validated_data['location'] = serializer_.data['id']
         account = serializer.save()
         data['response'] = 'successfully registered a new user.'
         data['first_name'] = account.first_name

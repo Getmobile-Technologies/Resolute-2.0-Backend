@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import TokenVerifyView
 
 
 urlpatterns = [
-    path('register/user', views.UserRegisterView.as_view()),
+    path('register/user/<int:pk>', views.UserRegisterView.as_view()),
     path('register/admin', views.AdminRegisterView.as_view()),
     path('register/superuser', views.SuperAdminRegisterView.as_view()),
     path('all_users', views.AllUsersView.as_view()),
