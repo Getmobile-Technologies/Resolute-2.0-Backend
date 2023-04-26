@@ -12,7 +12,6 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='staff')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     email = serializers.CharField(max_length=200, required=False)
-    location = serializers.PrimaryKeyRelatedField(queryset=StaffLocation.objects.all(), required=False)
 
     class Meta():
         model = User
