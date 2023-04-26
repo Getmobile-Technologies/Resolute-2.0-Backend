@@ -25,7 +25,7 @@ class UserRegisterView(APIView):
         location = StaffLocation.objects.get(id=pk)
         data = {}
         serializer.is_valid(raise_exception=True)
-        serializer.validated_data['location'] = location
+        serializer.validated_data['location'] = location.id
         account = serializer.save(user=request.user)
         data['response'] = 'successfully registered a new user.'
         data['first_name'] = account.first_name

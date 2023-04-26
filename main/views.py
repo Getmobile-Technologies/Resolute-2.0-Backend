@@ -187,7 +187,7 @@ class TotalIncidentView(APIView):
                 for panic in panics:
                     result = amt
                     
-                return Response({"total incident": result}, status=200)
+            return Response({"total incident": result}, status=200)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
 
@@ -202,7 +202,7 @@ class ReviewedIncident(APIView):
                 for panic in panics:
                     result = amt
                     
-                return Response({"reviewed incident": result}, status=200)
+            return Response({"reviewed incident": result}, status=200)
         except User.DoesNotExist:
             return Response({"error": "user not found"}, status=404)
        
