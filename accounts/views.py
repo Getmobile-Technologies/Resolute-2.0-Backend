@@ -8,6 +8,7 @@ from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import permissions, status
+from main.models import StaffLocation
 from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, AdminRegistrationSerializer, SuperAdminSerializer, AdminLoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
@@ -19,10 +20,12 @@ User = get_user_model()
 
 class UserRegisterView(APIView):
     permission_classes = (IsAdmin,)
-    def post(self, request):
+    def post(self, request, pk):
         serializer = UserRegisterationSerializer(data=request.data)
+        location = StaffLocation.objects.get(id=pk)
         data = {}
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['location'] = location
         account = serializer.save(user=request.user)
         data['response'] = 'successfully registered a new user.'
         data['first_name'] = account.first_name

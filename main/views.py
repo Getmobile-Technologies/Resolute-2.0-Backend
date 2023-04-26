@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer
-from .models import PanicRequest, CallRequest, TrackMeRequest
+from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer
+from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation
 from django.contrib.auth import get_user_model
 from rest_framework import status, generics
 from accounts.serializers import UserDetailSerializer
@@ -285,3 +285,26 @@ class TrackMeReview(APIView):
             return Response({"message": "unreviewed!"}, status=200)
         else:
             return Response({"error": "request not reviewed"}, status=400)
+
+
+class LocationCreateView(APIView):
+    permission_classes = (IsAdmin,)
+    def post(self, request):
+        serializer = LocationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response({"message": "location created"}, status=200)
+    
+class GetAdminLocations(APIView):
+    permission_classes = (IsAdmin,)
+    def get(self, request):
+        try:
+            locations = StaffLocation.objects.filter(user=request.user.id)
+        except StaffLocation.DoesNotExist:
+            return Response({"error": "location not found"}, status=404)
+        serializer = LocationSerializer(locations, many=True)
+        data = {
+            "locations": serializer.data
+        }
+
+        return Response(data, status=200)

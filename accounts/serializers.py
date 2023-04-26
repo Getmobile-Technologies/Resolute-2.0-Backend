@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.response import Response
 from rest_framework import status
+from main.models import StaffLocation
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -11,6 +12,7 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='staff')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     email = serializers.CharField(max_length=200, required=False)
+    location = serializers.PrimaryKeyRelatedField(queryset=StaffLocation.objects.all(), required=False)
 
     class Meta():
         model = User
@@ -22,6 +24,8 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
 class AdminRegistrationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='admin')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
+    location = serializers.PrimaryKeyRelatedField(queryset=StaffLocation.objects.all(), required=False)
+
    
     class Meta:
         model = User
@@ -32,6 +36,8 @@ class AdminRegistrationSerializer(serializers.ModelSerializer):
 
 class SuperAdminSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
+    location = serializers.PrimaryKeyRelatedField(queryset=StaffLocation.objects.all(), required=False)
+
    
     class Meta:
         model = User

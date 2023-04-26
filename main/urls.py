@@ -16,5 +16,7 @@ urlpatterns = [
     path('create/track/requests', views.TrackMeRequestView.as_view()),
     path('admin/call/requests', views.GetCallRequestAdmin.as_view()),
     path('trackme/review/<int:pk>', views.TrackMeReview.as_view()),
-    path('admin/track/requests', views.GetTrackMeRequestAdmin.as_view())
+    path('admin/track/requests', views.GetTrackMeRequestAdmin.as_view()),
+    path('create/location', views.LocationCreateView.as_view()),
+    path('all/admins/location', views.GetAdminLocations.as_view())
 ]
