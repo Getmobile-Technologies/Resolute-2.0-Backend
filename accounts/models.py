@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 import uuid
 from .managers import UserManager
 from django.core.validators import RegexValidator
-from django.db.models import Sum
+from django.db.models import Count
 
 
 
@@ -41,8 +41,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def total_admin_panic(self):
-        total_panic = self.user_request.filter(is_deleted=False, user__id__in=self.mapped_users.values_list('id', flat=True) ).count()
-        return total_panic
+        user_requests_count = self.mapped_users.annotate(user_request_count=Count('user_request'))
+        total_user_requests_count = sum(mapped_user.user_request_count for mapped_user in user_requests_count)
+        return total_user_requests_count
 
     # def delete(self):
     #     self.is_deleted = True
