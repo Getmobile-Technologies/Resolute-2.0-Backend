@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer
-from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation
+from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer, ImageSerializer
+from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images
 from django.contrib.auth import get_user_model
 from rest_framework import status, generics
 from accounts.serializers import UserDetailSerializer
@@ -286,3 +286,72 @@ class GetAdminLocations(APIView):
         }
 
         return Response(data, status=200)
+
+class LocationActions(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAdmin,)
+    queryset = StaffLocation.objects.filter(is_deleted=False)
+    serializer_class = LocationSerializer
+
+
+class ImageView(APIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        serializer = ImageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        data = {
+            "message": "image request successful"
+            
+        }
+        return Response(data, status=200)
+
+
+class GetImageRequestAdmin(APIView):
+    permission_classes = (IsAdmin,)
+ 
+    def get(self, request):
+        users = User.objects.filter(user=request.user)
+        data = []
+        for user in users:
+            image_requests = Images.objects.filter(user=user).order_by('-id')
+            for image_request in image_requests:
+                serializer = ImageSerializer(image_request)
+                request_data = {
+                    "id": serializer.data['id'],
+                    "image": serializer.data['image'],
+                    "description": serializer.data['description'],
+                    "location": serializer.data['location'],
+                    "is_reviewed": serializer.data['is_reviewed'],
+                    "timestamp": serializer.data['timestamp'],
+                    "user": {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "email": user.email,
+                        "location": user.location,
+                        "phone": user.phone,
+                        "role": user.role
+                    }
+                }
+                data.append(request_data)
+
+        return Response(data, status=200)
+    
+
+class ImageActions(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAdmin,)
+    queryset = Images.objects.filter(is_deleted=False)
+    serializer_class = ImageSerializer
+
+    def delete(self, request, pk):
+        try:
+            obj = Images.objects.get(id=pk)
+        except Images.DoesNotExist:
+            return Response({"error": "image object not found"}, status=404)
+        if not obj.is_deleted:
+            obj.is_deleted = True
+            obj.save()
+        else:
+            return Response({"error": f"Image id {obj.id} is already deleted"}, status=400)
+            
+
