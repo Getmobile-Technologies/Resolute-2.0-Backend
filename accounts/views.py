@@ -69,6 +69,20 @@ class UserActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer
+
+    def delete(self, request, pk):
+        try:
+            user_obj = User.objects.get(id=pk)
+        except User.DoesNotExist:
+            return Response({"error": "user not found"}, status=404)
+        if not user_obj.is_deleted:
+            user_obj.is_deleted = True
+            user_obj.is_active = False
+            user_obj.save()
+            return Response({"message": "success"}, status=200)
+        else:
+            return Response({"error": "user already deleted"})
+        
     
 class UserProfile(APIView):
     permission_classes = (IsAuthenticated,)

@@ -9,7 +9,6 @@ from accounts.serializers import UserDetailSerializer
 from django.http import Http404
 from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
-from .helpers.location import user_location
 
 User = get_user_model()
 
@@ -41,7 +40,7 @@ class GetPanicRequestAdmin(APIView):
         
         data = []
         for user in users:
-            panic_requests = PanicRequest.objects.filter(user=user).order_by('-id')
+            panic_requests = PanicRequest.objects.filter(user=user, is_deleted=True).order_by('-id')
             for panic_request in panic_requests:
                 serializer = PanicSerializer(panic_request)
                 request_data = {
@@ -120,7 +119,7 @@ class GetCallRequestAdmin(APIView):
         
         data = []
         for user in users:
-            call_requests = CallRequest.objects.filter(user=user).order_by('-id')
+            call_requests = CallRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
             for call_request in call_requests:
                 serializer = CallSerializer(call_request)
                 request_data = {
@@ -214,7 +213,7 @@ class GetTrackMeRequestAdmin(APIView):
         
         data = []
         for user in users:
-            track_requests = TrackMeRequest.objects.filter(user=user).order_by('-id')
+            track_requests = TrackMeRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
             for track_request in track_requests:
                 serializer = TrackMeSerializer(track_request)
                 request_data = {
@@ -292,6 +291,16 @@ class LocationActions(generics.RetrieveUpdateAPIView):
     queryset = StaffLocation.objects.filter(is_deleted=False)
     serializer_class = LocationSerializer
 
+    def delete(self, request, pk):
+        try:
+            obj = StaffLocation.objects.get(id=pk)
+        except StaffLocation.DoesNotExist:
+            return Response({"error": "location object not found"}, status=404)
+        if not obj.is_deleted:
+            obj.is_deleted = True
+            obj.save()
+        else:
+            return Response({"error": f"location {obj.id} is already deleted"}, status=400)
 
 class ImageView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -313,7 +322,7 @@ class GetImageRequestAdmin(APIView):
         users = User.objects.filter(user=request.user)
         data = []
         for user in users:
-            image_requests = Images.objects.filter(user=user).order_by('-id')
+            image_requests = Images.objects.filter(user=user, is_deleted=False).order_by('-id')
             for image_request in image_requests:
                 serializer = ImageSerializer(image_request)
                 request_data = {
