@@ -47,7 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def total_reviewed_panic(self):
-        user_requests_count = self.mapped_users.annotate(user_reviewed_request_count=Count('user_request', filter=Q(user_request__is_reviewed=True)))
+        user_requests_count = self.mapped_users.annotate(user_reviewed_request_count=Count('user_request', user_request__is_reviewed=True))
         total_user_reviewed_requests_count = sum(mapped_user.user_reviewed_request_count for mapped_user in user_requests_count)
         return total_user_reviewed_requests_count
 
