@@ -40,7 +40,7 @@ class GetPanicRequestAdmin(APIView):
         
         data = []
         for user in users:
-            panic_requests = PanicRequest.objects.filter(user=user, is_deleted=True).order_by('-id')
+            panic_requests = PanicRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
             for panic_request in panic_requests:
                 serializer = PanicSerializer(panic_request)
                 request_data = {
