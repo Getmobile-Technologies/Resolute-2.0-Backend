@@ -11,6 +11,7 @@ class PanicRequest(models.Model):
     location = models.CharField(max_length=200, null=True, blank=False)
     status = models.CharField(max_length=100, null=True, default='panic')
     is_reviewed = models.BooleanField(default=False)
+    is_genuine = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 

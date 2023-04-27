@@ -179,10 +179,14 @@ class IncidentCounts(APIView):
             return Response({"error": "user not found"}, status=404)
         total_panic = user_obj.total_admin_panic
         total_reviewed = user_obj.total_reviewed_panic
+        total_unreviewed = user_obj.total_unreviewed_panic
+        total_ingenuine = user_obj.total_ingenuine_panic
 
         data = {
             "total_panic": total_panic,
-            "total_reviewed": total_reviewed
+            "total_reviewed": total_reviewed,
+            "total_unreviewed": total_unreviewed,
+            "total_ingenuine": total_ingenuine
         }
 
         return Response(data, status=200)
