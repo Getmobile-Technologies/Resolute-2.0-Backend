@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation
+from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images
 
 
 
@@ -32,4 +32,9 @@ class TrackMeSerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaffLocation
+        fields = '__all__'
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Images
         fields = '__all__'

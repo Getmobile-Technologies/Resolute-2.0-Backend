@@ -21,25 +21,19 @@ User = get_user_model()
 
 class UserRegisterView(APIView):
     permission_classes = (IsAdmin,)
-    def post(self, request, pk):
+    def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
-        try:
-            location = StaffLocation.objects.get(id=pk)
-            serializer_ = LocationSerializer(location)
-        except StaffLocation.DoesNotExist:
-            return Response({"error": "location not found"}, status=404)
         data = {}
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['user'] = request.user
-        serializer.validated_data['location'] = location
         account = serializer.save()
         data['response'] = 'successfully registered a new user.'
+        data['id'] = account.id
         data['first_name'] = account.first_name
         data['last_name'] = account.last_name
         data['email'] = account.email
         data['password'] = account.password
         data['location'] = account.location
-        data['id'] = account.id
 
         return Response(data)
 

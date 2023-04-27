@@ -37,6 +37,7 @@ class TrackMeRequest(models.Model):
 
 
 class Images(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="capture_request")
     image = models.ImageField(null=True, upload_to='capture')
     description = models.TextField(null=True, blank=True)
     is_deleted = models.BooleanField(default=False)

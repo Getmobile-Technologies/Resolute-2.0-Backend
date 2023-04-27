@@ -12,7 +12,7 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='staff')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     email = serializers.CharField(max_length=200, required=False)
-    location = serializers.PrimaryKeyRelatedField(queryset=StaffLocation.objects.all(), required=False)
+    location = serializers.CharField(required=True)
 
     class Meta():
         model = User
@@ -24,7 +24,8 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
 class AdminRegistrationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='admin')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
-    location = serializers.PrimaryKeyRelatedField(queryset=StaffLocation.objects.all(), required=False)
+    location = serializers.CharField(required=False)
+
 
 
    
@@ -37,7 +38,7 @@ class AdminRegistrationSerializer(serializers.ModelSerializer):
 
 class SuperAdminSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
-    location = serializers.PrimaryKeyRelatedField(queryset=StaffLocation.objects.all(), required=False)
+    location = serializers.CharField(required=False)
 
    
     class Meta:

@@ -15,7 +15,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last_name'), max_length=250)
     phone = models.CharField(_('phone'), max_length=200, unique=True, null=True)#remember to use phone regex for production
     email = models.EmailField(_('email'), unique=True, null=True, blank=True)
-    location = models.ForeignKey("main.StaffLocation", on_delete=models.CASCADE, null=True, related_name="user_location")
+    location = models.CharField(_('location'), max_length=300, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
     password = models.CharField(_('password'), max_length=100, null=True, blank=False)
     is_active = models.BooleanField(_('active'), default=True)
@@ -44,6 +44,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         user_requests_count = self.mapped_users.annotate(user_request_count=Count('user_request'))
         total_user_requests_count = sum(mapped_user.user_request_count for mapped_user in user_requests_count)
         return total_user_requests_count
+
+    @property
+    def total_reviewed_panic(self):
+        user_requests_count = self.mapped_users.annotate(user_reviewed_request_count=Count('user_request', filter=Q(user_request__is_reviewed=True)))
+        total_user_reviewed_requests_count = sum(mapped_user.user_reviewed_request_count for mapped_user in user_requests_count)
+        return total_user_reviewed_requests_count
+
 
     # def delete(self):
     #     self.is_deleted = True
