@@ -21,5 +21,8 @@ urlpatterns = [
     path('create/image/request', views.ImageView.as_view()),
     path('admin/image/requests', views.GetImageRequestAdmin.as_view()),
     path('location/actions/<int:pk>', views.LocationActions.as_view()),
-    path('image/actions/<int:pk>', views.ImageActions.as_view())
+    path('image/actions/<int:pk>', views.ImageActions.as_view()),
+    path('panic/actions/<int:pk>', views.PanicActions.as_view()),
+    path('call/actions/<int:pk>', views.CallRequestActions.as_view()),
+    path('track/actions/<int:pk>', views.TrackActions.as_view())
 ]

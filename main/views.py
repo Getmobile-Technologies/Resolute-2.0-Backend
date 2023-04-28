@@ -64,6 +64,24 @@ class GetPanicRequestAdmin(APIView):
 
         return Response(data, status=200)
 
+class PanicActions(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAdmin,)
+    queryset = PanicRequest.objects.filter(is_deleted=False)
+    serializer_class = PanicSerializer
+
+    def delete(self, request, pk):
+        try:
+            obj = PanicRequest.objects.get(id=pk)
+        except PanicRequest.DoesNotExist:
+            return Response({"error": "panic request not found"}, status=404)
+        if not obj.is_deleted:
+            obj.is_deleted = True
+            obj.save()
+            return Response({"message": "success"}, status=200)
+
+        else:
+            return Response({"error": "object already deleted"}, status=400)
+
 
 class PanicReview(APIView):
     permission_classes = (IsAdmin,)
@@ -110,6 +128,23 @@ class CallRequestView(APIView):
         }
         return Response(data, status=200)
 
+class CallRequestActions(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAdmin,)
+    queryset = CallRequest.objects.filter(is_deleted=False)
+    serializer_class = CallSerializer
+
+    def delete(self, request, pk):
+        try:
+            obj = CallRequest.objects.get(id=pk)
+        except CallRequest.DoesNotExist:
+            return Response({"error": "object not found"}, status=404)
+        if not obj.is_deleted:
+            obj.is_deleted = True
+            obj.save()
+            return Response({"message": "success"}, status=200)
+        else:
+            return Response({"error": "object is already deleted"}, status=400)
+        
 
 class GetCallRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
@@ -204,7 +239,24 @@ class TrackMeRequestView(APIView):
             }
         }
         return Response(data, status=200)
+class TrackActions(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAdmin,)
+    queryset = TrackMeRequest.objects.filter(is_deleted=False)
+    serializer_class = TrackMeSerializer
 
+    def delete(self, request, pk):
+        try:
+            obj = TrackMeRequest.objects.get(id=pk)
+        except TrackMeRequest.DoesNotExist:
+            return Response({"error": "object not found"}, status=404)
+        if not obj.is_deleted:
+            obj.is_deleted = True
+            obj.save()
+            return Response({"message": "success"}, status=200)
+        else:
+            return Response({"error": "object already deleted"}, status=400)
+        
+        
 class GetTrackMeRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
  
@@ -299,6 +351,8 @@ class LocationActions(generics.RetrieveUpdateAPIView):
         if not obj.is_deleted:
             obj.is_deleted = True
             obj.save()
+            return Response({"message": "success"}, status=200)
+
         else:
             return Response({"error": f"location {obj.id} is already deleted"}, status=400)
 
@@ -360,6 +414,8 @@ class ImageActions(generics.RetrieveUpdateAPIView):
         if not obj.is_deleted:
             obj.is_deleted = True
             obj.save()
+            return Response({"message": "success"}, status=200)
+
         else:
             return Response({"error": f"Image id {obj.id} is already deleted"}, status=400)
             
