@@ -188,6 +188,8 @@ class UserLoginView(APIView):
                             refresh = RefreshToken.for_user(user)
                             user_details = {}
                             user_details['id'] = user.id
+                            user_details['first_name'] = user.first_name
+                            user_details['last_name'] = user.last_name
                             user_details['role'] = user.role
                             user_details['access_token'] = str(refresh.access_token)
                             user_details['refresh_token'] = str(refresh)
@@ -230,6 +232,8 @@ class AdminLoginView(APIView):
                             refresh = RefreshToken.for_user(user)
                             user_details = {}
                             user_details['id'] = user.id
+                            user_details['first_name'] = user.first_name
+                            user_details['last_name'] = user.last_name
                             user_details['email'] = user.email
                             user_details['role'] = user.role
                             user_details['access_token'] = str(refresh.access_token)
