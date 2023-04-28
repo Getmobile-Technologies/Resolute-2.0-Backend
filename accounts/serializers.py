@@ -51,7 +51,6 @@ class SuperAdminSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    total_admin_panic = serializers.ReadOnlyField()
 
     class Meta:
         model = User
