@@ -10,7 +10,7 @@ User = get_user_model()
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='staff')
-    password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
+    password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=False)
     email = serializers.CharField(max_length=200, required=False)
     location = serializers.CharField(required=True)
 
