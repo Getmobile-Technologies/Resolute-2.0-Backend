@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from .helpers.generator import generate_password
 from main.serializers import LocationSerializer
 from .permissions import IsAdmin, IsSuperUser
 User = get_user_model()
@@ -24,15 +25,18 @@ class UserRegisterView(APIView):
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
         data = {}
+        password = generate_password()
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['user'] = request.user
+        serializer.validated_data['password'] = password
         account = serializer.save()
         data['response'] = 'successfully registered a new user.'
         data['id'] = account.id
         data['first_name'] = account.first_name
         data['last_name'] = account.last_name
+        data['phone'] = account.phone
         data['email'] = account.email
-        data['password'] = account.password
+        data['password'] = password
         data['location'] = account.location
 
         return Response(data)
