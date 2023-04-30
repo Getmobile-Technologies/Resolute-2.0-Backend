@@ -42,5 +42,5 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
-        models = Notifications
+        model = Notifications
         fields = '__all__'
