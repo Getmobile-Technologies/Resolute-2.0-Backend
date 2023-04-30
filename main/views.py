@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer, ImageSerializer
-from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images
+from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer, ImageSerializer, NotificationSerializer
+from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications
 from django.contrib.auth import get_user_model
 from rest_framework import status, generics
 from accounts.serializers import UserDetailSerializer
@@ -11,6 +11,11 @@ from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
+
+def notification_handler(user, status):
+    notify = Notifications.objects.create(user=user, status=status)
+
+    return notify
 
 
 
@@ -23,6 +28,8 @@ class PanicView(APIView):
         serializer.is_valid(raise_exception=True)
 
         serializer.save(user=request.user)
+        status = "new panic request"
+        notification_handler(user=request.user, status=status)
         data = {
             "message": "panic request sent",
             "user": {
@@ -122,6 +129,8 @@ class CallRequestView(APIView):
         serializer = CallSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user, phone=request.user.phone)
+        status = "new call request"
+        notification_handler(user=request.user, status=status)
         data = {
             "message": "call request successful",
             "id": request.user.id
@@ -232,6 +241,8 @@ class TrackMeRequestView(APIView):
         serializer = TrackMeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
+        status = "new track me request"
+        notification_handler(user=request.user, status=status)
         data = {
             "message": "tracking request sent",
             "user": {
@@ -239,6 +250,8 @@ class TrackMeRequestView(APIView):
             }
         }
         return Response(data, status=200)
+    
+
 class TrackActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
     queryset = TrackMeRequest.objects.filter(is_deleted=False)
@@ -362,6 +375,8 @@ class ImageView(APIView):
         serializer = ImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
+        status = "new image request"
+        notification_handler(user=request.user, status=status)
         data = {
             "message": "image request successful"
             
@@ -420,3 +435,35 @@ class ImageActions(generics.RetrieveUpdateAPIView):
             return Response({"error": f"Image id {obj.id} is already deleted"}, status=400)
             
 
+class GetAdminNotifications(APIView):
+    permission_classes = (IsAdmin,)
+
+    def get(self, request):
+        users = User.objects.filter(user=request.user)
+        data = []
+        for user in users:
+            notifications = Notifications.objects.filter(user=user, is_deleted=False).order_by('-id')
+            for notification in notifications:
+                serializer = NotificationSerializer(notification)
+
+                data.append(serializer.data)
+        return Response(data, status=200)
+
+
+class NotifficationActions(generics.RetrieveDestroyAPIView):
+    permission_classes = (IsAdmin,)
+    queryset = Notifications.objects.filter(is_deleted=False)
+    serializer_class = NotificationSerializer
+
+    def delete(self, request, pk):
+        try:
+            obj = Notifications.objects.get(id=pk)
+        except Notifications.DoesNotExist:
+            return Response({"error": "notification object not found"}, status=404)
+        if not obj.is_deleted:
+            obj.is_deleted = True
+            obj.save()
+            return Response({"message": "success"}, status=200)
+
+        else:
+            return Response({"error": "already deleted"}, status=400)

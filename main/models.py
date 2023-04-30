@@ -60,3 +60,12 @@ class StaffLocation(models.Model):
     
     def __str__(self):
         return self.state
+    
+
+
+class Notifications(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="staff_notification")
+    status = models.CharField(max_length=300, null=True)
+    is_deleted = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)

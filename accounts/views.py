@@ -8,14 +8,12 @@ from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import permissions, status
-from main.models import StaffLocation
 from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, AdminRegistrationSerializer, SuperAdminSerializer, AdminLoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from .helpers.generator import generate_password
-from main.serializers import LocationSerializer
 from .permissions import IsAdmin, IsSuperUser
 User = get_user_model()
 
