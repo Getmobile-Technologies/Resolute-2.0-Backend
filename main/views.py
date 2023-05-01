@@ -341,7 +341,7 @@ class GetAdminLocations(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
         try:
-            locations = StaffLocation.objects.filter(user=request.user.id)
+            locations = StaffLocation.objects.filter(user=request.user.id, is_deleted=False)
         except StaffLocation.DoesNotExist:
             return Response({"error": "location not found"}, status=404)
         serializer = LocationSerializer(locations, many=True)
