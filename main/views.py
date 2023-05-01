@@ -116,6 +116,32 @@ class PanicReview(APIView):
         else:
             return Response({"error": "request not reviewed"}, status=400)
 
+class PanicGenuineView(APIView):
+    permission_classes = (IsAdmin,)
+    def post(self, request, pk):
+        try:
+            obj = PanicRequest.objects.get(id=pk)
+        except PanicRequest.DoesNotExist:
+            return Response({"error": "reqeust not found"}, status=404)
+        if not obj.is_genuine:
+            obj.is_genuine = True
+            obj.save()
+            return Response({"message": "review success"}, status=200)
+        else:
+            return Response({"error": "request already reviewed"}, status=400)
+        
+    def delete(self, request, pk):
+        try:
+            obj = PanicRequest.objects.get(id=pk)
+        except PanicRequest.DoesNotExist:
+            return Response({"error": "reqeust not found"}, status=404)
+        if obj.is_genuine:
+            obj.is_genuine = False
+            obj.save()
+            return Response({"message": "unreviewed!"}, status=200)
+        else:
+            return Response({"error": "request not reviewed"}, status=400)
+
 
 class AllPanicRequest(generics.ListAPIView):
     queryset = PanicRequest.objects.all().order_by('-id')
