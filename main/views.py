@@ -123,8 +123,8 @@ class PanicGenuineView(APIView):
             obj = PanicRequest.objects.get(id=pk)
         except PanicRequest.DoesNotExist:
             return Response({"error": "reqeust not found"}, status=404)
-        if not obj.is_genuine:
-            obj.is_genuine = True
+        if obj.is_genuine:
+            obj.is_genuine = False
             obj.save()
             return Response({"message": "review success"}, status=200)
         else:
@@ -135,8 +135,8 @@ class PanicGenuineView(APIView):
             obj = PanicRequest.objects.get(id=pk)
         except PanicRequest.DoesNotExist:
             return Response({"error": "reqeust not found"}, status=404)
-        if obj.is_genuine:
-            obj.is_genuine = False
+        if not obj.is_genuine:
+            obj.is_genuine = True
             obj.save()
             return Response({"message": "unreviewed!"}, status=200)
         else:
