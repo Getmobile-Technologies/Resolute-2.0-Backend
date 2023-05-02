@@ -14,7 +14,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     first_name = models.CharField(_('first_name'), max_length=250)
     last_name = models.CharField(_('last_name'), max_length=250)
-    phone = models.CharField(_('phone'), max_length=200, unique=True, null=True)#remember to use phone regex for production
+    phone = models.CharField(_('phone'), max_length=200, unique=True, null=True, validators=[phone_regex])#remember to use phone regex for production
     email = models.EmailField(_('email'), unique=True, null=True, blank=True)
     location = models.CharField(_('location'), max_length=300, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
