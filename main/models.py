@@ -53,7 +53,6 @@ class StaffLocation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="staff_location")
     address = models.CharField(max_length=500, null=True)
     state = models.CharField(max_length=250, null=True)
-    country = models.CharField(max_length=200, null=True)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
