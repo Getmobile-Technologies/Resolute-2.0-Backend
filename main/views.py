@@ -56,6 +56,7 @@ class GetPanicRequestAdmin(APIView):
                     "latitude": serializer.data['latitude'],
                     "location": serializer.data['location'],
                     "is_reviewed": serializer.data['is_reviewed'],
+                    "is_genuine": serializer.data['is_genuine'],
                     "timestamp": serializer.data['timestamp'],
                     "user": {
                         "id": user.id,
