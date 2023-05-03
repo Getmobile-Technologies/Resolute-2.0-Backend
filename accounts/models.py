@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import  AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
+from phonenumber_field.modelfields import PhoneNumberField
 import uuid
 from .managers import UserManager
 from django.core.validators import RegexValidator
@@ -10,11 +11,10 @@ from django.db.models import Q
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+2341234567890'. Up to 15 digits allowed.")
 
     first_name = models.CharField(_('first_name'), max_length=250)
     last_name = models.CharField(_('last_name'), max_length=250)
-    phone = models.CharField(_('phone'), max_length=200, unique=True, null=True, validators=[phone_regex])#remember to use phone regex for production
+    phone     = PhoneNumberField(unique=True, max_length=50, null=True)
     email = models.EmailField(_('email'), unique=True, null=True, blank=False)
     location = models.CharField(_('location'), max_length=300, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)

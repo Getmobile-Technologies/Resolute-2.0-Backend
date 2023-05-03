@@ -186,12 +186,11 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication'],
 }
 
-AUTHENTICATION_BACKEND = [
 
-    'django.contrib.auth.backends.ModelBackend',
-    'accounts.authentication.PhoneNumberBackend',
-    'django.contrib.auth.backends.AllowAllUsersModelBackend',
-
+AUTHENTICATION_BACKENDS = [
+        'django.contrib.auth.backends.ModelBackend',
+        'accounts.authentication.PhoneNumberBackend',
+        'django.contrib.auth.backends.AllowAllUsersModelBackend',
     ]
 
 
