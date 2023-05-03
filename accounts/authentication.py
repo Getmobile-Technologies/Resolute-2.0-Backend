@@ -6,7 +6,7 @@ class PhoneNumberBackend(BaseBackend):
     def authenticate(self, request, phone=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
-            user = UserModel.objects.get(phone=phone.as_e164)
+            user = UserModel.objects.get(phone=phone)
         except UserModel.DoesNotExist:
             return None
 

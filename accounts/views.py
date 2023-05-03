@@ -201,7 +201,7 @@ class UserLoginView(APIView):
                         user_detail['first_name'] = user.first_name
                         user_detail['last_name'] = user.last_name
                         user_detail['email'] = user.email
-                        user_detail['phone'] = user.phone.as_e164
+                        user_detail['phone'] = user.phone
                         user_detail['role'] = user.role
                         user_detail['is_admin'] = user.is_admin
                         user_detail['access'] = str(refresh.access_token)
