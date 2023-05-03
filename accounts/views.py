@@ -26,7 +26,7 @@ class UserRegisterView(APIView):
         data = {}
         password = generate_password()
         serializer.is_valid(raise_exception=True)
-        serializer.validated_data['user'] = request.user
+        # serializer.validated_data['user'] = request.user
         serializer.validated_data['password'] = password
         account = serializer.save()
         data['response'] = 'successfully registered a new user.'
