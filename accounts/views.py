@@ -8,11 +8,12 @@ from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import permissions, status
-from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, AdminRegistrationSerializer, SuperAdminSerializer, AdminLoginSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, AdminRegistrationSerializer, SuperAdminSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound, ValidationError
 from .helpers.generator import generate_password
 from .permissions import IsAdmin, IsSuperUser
 User = get_user_model()
@@ -58,7 +59,7 @@ class GetAdminStaffView(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
         try:
-            objs = User.objects.filter(user=request.user.id).order_by('-id')
+            objs = User.objects.filter(user=request.user.id, is_deleted=False).order_by('-id')
         except User.DoesNotExist:
             return Response({"error": "users not found"}, status=404)
         serializer = UserDetailSerializer(objs, many=True)
@@ -69,7 +70,7 @@ class GetAdminStaffView(APIView):
 
 class UserActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_deleted=False)
     serializer_class = UserDetailSerializer
 
     def delete(self, request, pk):
@@ -179,87 +180,63 @@ class UserLoginView(APIView):
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        try:
-            user = get_object_or_404(User, phone=serializer.validated_data['phone'])
-            password = user.check_password(serializer.validated_data['password'])
-            if user and password:
-                if user.is_active:
-                    if user.is_staff:
-                        try:
-                            refresh = RefreshToken.for_user(user)
-                            user_details = {}
-                            user_details['id'] = user.id
-                            user_details['first_name'] = user.first_name
-                            user_details['last_name'] = user.last_name
-                            user_details['role'] = user.role
-                            user_details['access_token'] = str(refresh.access_token)
-                            user_details['refresh_token'] = str(refresh)
-                            user_logged_in.send(sender=user.__class__,
-                                                request=request, user=user)
-
-                            data = {
-                                'message' : "User Login successful",
-                                'data' : user_details,
-                            }
-                            return Response(data, status=status.HTTP_200_OK)
-                        except Exception as e:
-                            raise e
-                    else:
-                        return Response({"error": "unathourized login"}, status=403)
-                else:
-                    return Response({"error": "user is not active"}, status=403)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            
+            if "phone" in data:
+                user = authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
+            elif "email" in data:
+                user = authenticate(request, email = data['email'], password = data['password'], is_deleted=False)
+                
             else:
-                data = {
-                    'message'  : "failed",
-                    'errors': 'check password and try again'
+                raise ValidationError("Invalid data. Login with email or phone number")
+                
+
+            if user:
+                if user.is_active==True:
+                    try:
+                        refresh = RefreshToken.for_user(user)
+                        user_detail = {}
+                        user_detail['id']   = user.id
+                        user_detail['first_name'] = user.first_name
+                        user_detail['last_name'] = user.last_name
+                        user_detail['email'] = user.email
+                        user_detail['phone'] = user.phone.as_e164
+                        user_detail['role'] = user.role
+                        user_detail['is_admin'] = user.is_admin
+                        user_detail['access'] = str(refresh.access_token)
+                        user_detail['refresh'] = str(refresh)
+                       
+
+                        if user.role == 'admin':
+                            user_detail["modules"] = user.module_access
+                            
+                        data = {
+    
+                        "message":"success",
+                        'data' : user_detail,
+                        }
+                        return Response(data, status=status.HTTP_200_OK)
+                    
+
+                    except Exception as e:
+                        raise e
+                
+                else:
+                    data = {
+                    
+                    'error': 'This account has not been activated'
                     }
                 return Response(data, status=status.HTTP_403_FORBIDDEN)
-        except Http404:
-                return Response({"error": "invalid login data"}, status=400)
 
-
-class AdminLoginView(APIView):
-
-    def post(self, request):
-        serializer = AdminLoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        try:
-            user = get_object_or_404(User, email=serializer.validated_data['email'])
-            password = user.check_password(serializer.validated_data['password'])
-            if user and password:
-                if user.is_active:
-                    if user.is_admin:
-                        try:
-                            refresh = RefreshToken.for_user(user)
-                            user_details = {}
-                            user_details['id'] = user.id
-                            user_details['first_name'] = user.first_name
-                            user_details['last_name'] = user.last_name
-                            user_details['email'] = user.email
-                            user_details['role'] = user.role
-                            user_details['access_token'] = str(refresh.access_token)
-                            user_details['refresh_token'] = str(refresh)
-                            user_logged_in.send(sender=user.__class__,
-                                                request=request, user=user)
-
-                            data = {
-                                'message' : "Admin Login successful",
-                                'data' : user_details,
-                            }
-                            return Response(data, status=status.HTTP_200_OK)
-                        except Exception as e:
-                            raise e
-
-                    else:
-                        return Response({"error": "unathorized login"}, status=403)
-                else:
-                    return Response({"error": "user is not active"}, status=403)
             else:
                 data = {
-                    'message'  : "failed",
-                    'errors': 'The account is not active'
+                    'error': 'Please provide a valid email and a password'
                     }
-                return Response(data, status=status.HTTP_403_FORBIDDEN)
-        except Http404:
-                return Response({"error": "invalid data"}, status=400)
+                return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+                data = {
+                    
+                    'error': serializer.errors
+                    }
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)

@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
+    'phonenumber_field',
     'corsheaders',
     'cloudinary',
     'rest_framework',
@@ -185,8 +186,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication'],
 }
 
-AUTHENTICATION_BACKEND = ['django.contrib.auth.backends.ModelBackend']
+AUTHENTICATION_BACKEND = [
 
+    'django.contrib.auth.backends.ModelBackend',
+    'accounts.authentication.PhoneNumberBackend',
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',
+
+    ]
 
 
 CLOUDINARY_STORAGE = {

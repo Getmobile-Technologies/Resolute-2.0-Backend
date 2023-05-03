@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.response import Response
 from rest_framework import status
+from phonenumber_field.serializerfields import PhoneNumberField
+
 from main.models import StaffLocation
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -26,9 +28,6 @@ class AdminRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     location = serializers.CharField(required=False)
 
-
-
-   
     class Meta:
         model = User
         fields = ["id", "first_name", "last_name", "phone", "email", "location", "role", "password"]
@@ -56,15 +55,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
-    
 class LoginSerializer(serializers.Serializer):
-    phone = serializers.CharField(max_length=700)
-    password = serializers.CharField(max_length=700)
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField(max_length=300)
+    phone = PhoneNumberField(required=False)
 
-   
-class AdminLoginSerializer(serializers.Serializer):
-    email = serializers.CharField(max_length=700)
-    password = serializers.CharField(max_length=700)
+
 
 
 
