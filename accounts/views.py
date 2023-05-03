@@ -206,10 +206,6 @@ class UserLoginView(APIView):
                         user_detail['is_admin'] = user.is_admin
                         user_detail['access'] = str(refresh.access_token)
                         user_detail['refresh'] = str(refresh)
-                       
-
-                        if user.role == 'admin':
-                            user_detail["modules"] = user.module_access
                             
                         data = {
     
