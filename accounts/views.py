@@ -20,7 +20,7 @@ User = get_user_model()
 
 
 class UserRegisterView(APIView):
-    permission_classes = (IsAdmin,)
+    # permission_classes = (IsAdmin,)
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
         data = {}
