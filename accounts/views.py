@@ -49,6 +49,33 @@ class UserRegisterView(APIView):
 
         return Response(data)
 
+
+class AdminRegisterView(APIView):
+    permission_classes = (IsAdmin,)
+
+    def post(self, request):
+        serializer = AdminRegistrationSerializer(data=request.data)
+        data = {}
+
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.validated_data['user'] = request.user
+            account = serializer.save()
+        except IntegrityError as e:
+            data['response'] = 'error registering a new user.'
+            data['error'] = str(e)
+            return Response(data, status=400)
+
+        data['response'] = 'successfully registered a new user.'
+        data['id'] = account.id
+        data['first_name'] = account.first_name
+        data['last_name'] = account.last_name
+        data['phone'] = account.phone.as_e164
+        data['email'] = account.email
+        data['location'] = account.location
+
+        return Response(data)
+    
 class GetAdminStaffView(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
