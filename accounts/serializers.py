@@ -63,7 +63,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     password = serializers.CharField(max_length=300)
-    phone = PhoneNumberField(required=False)
+    phone = serializers.CharField(required=False)
 
 
 
