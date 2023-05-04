@@ -1,6 +1,7 @@
 import email
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.db import IntegrityError
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework import status, generics
@@ -21,14 +22,22 @@ User = get_user_model()
 
 class UserRegisterView(APIView):
     permission_classes = (IsAdmin,)
+
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
         data = {}
         password = generate_password()
-        serializer.is_valid(raise_exception=True)
-        serializer.validated_data['user'] = request.user
-        serializer.validated_data['password'] = password
-        account = serializer.save()
+
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.validated_data['user'] = request.user
+            serializer.validated_data['password'] = password
+            account = serializer.save()
+        except IntegrityError as e:
+            data['response'] = 'error registering a new user.'
+            data['error'] = str(e)
+            return Response(data, status=400)
+
         data['response'] = 'successfully registered a new user.'
         data['id'] = account.id
         data['first_name'] = account.first_name
@@ -37,21 +46,6 @@ class UserRegisterView(APIView):
         data['email'] = account.email
         data['password'] = password
         data['location'] = account.location
-
-        return Response(data)
-
-class AdminRegisterView(APIView):
-    permission_classes = (IsSuperUser,)
-    def post(self, request):
-        serializer = AdminRegistrationSerializer(data=request.data)
-
-        data = {}
-        serializer.is_valid(raise_exception=True)
-        account = serializer.save(user=request.user)
-        data['response'] = 'successfully registered a new user.'
-        data['first_name'] = account.first_name
-        data['last_name'] = account.last_name
-        data['id'] = account.id
 
         return Response(data)
 
@@ -201,7 +195,7 @@ class UserLoginView(APIView):
                         user_detail['first_name'] = user.first_name
                         user_detail['last_name'] = user.last_name
                         user_detail['email'] = user.email
-                        # user_detail['phone'] = user.phone
+                        user_detail['phone'] = user.phone.as_e164
                         user_detail['role'] = user.role
                         user_detail['is_admin'] = user.is_admin
                         user_detail['access'] = str(refresh.access_token)

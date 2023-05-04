@@ -64,7 +64,7 @@ class GetPanicRequestAdmin(APIView):
                         "last_name": user.last_name,
                         "email": user.email,
                         "location": user.location,
-                        "phone": user.phone,
+                        "phone": user.phone.as_e164,
                         "role": user.role
                     }
                 }
@@ -204,7 +204,7 @@ class GetCallRequestAdmin(APIView):
                         "last_name": user.last_name,
                         "email": user.email,
                         "location": user.location,
-                        "phone": user.phone,
+                        "phone": user.phone.as_e164,
                         "role": user.role
                     }
                 }
