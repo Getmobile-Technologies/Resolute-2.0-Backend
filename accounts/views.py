@@ -32,6 +32,7 @@ class UserRegisterView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.validated_data['user'] = request.user
             serializer.validated_data['password'] = password
+            serializer.validated_data['open_password'] = password
             account = serializer.save()
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
@@ -257,3 +258,23 @@ class UserLoginView(APIView):
                     'error': serializer.errors
                     }
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminResetPassword(APIView):
+    permission_classes = (IsAdmin,)
+
+    def post(self, request, pk):
+        try:
+            user = User.objects.get(id=pk)
+        except User.DoesNotExist:
+            return Response({"erorr": "user not found"}, status=404)
+        password = generate_password()
+        user.set_password(password)
+        user.open_password = password
+        user.save()
+        data = {
+            "message": "reset successful",
+            "password": password
+        }
+
+        return Response(data, status=200)

@@ -20,6 +20,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     location = models.CharField(_('location'), max_length=300, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
     password = models.CharField(_('password'), max_length=100, null=True, blank=False)
+    open_password = models.CharField(_('open_password'), max_length=100, null=True)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)
     is_admin = models.BooleanField(_('admin'), default=False)

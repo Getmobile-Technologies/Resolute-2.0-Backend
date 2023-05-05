@@ -10,7 +10,6 @@ class PhoneNumberBackend(BaseBackend):
         except UserModel.DoesNotExist:
             return None
 
-        # Verify the password (you may use other authentication mechanisms)
         if user.check_password(password):
             return user
 
@@ -31,7 +30,6 @@ class EmailBackend(BaseBackend):
         except UserModel.DoesNotExist:
             return None
 
-        # Verify the password (you may use other authentication mechanisms)
         if user.check_password(password):
             return user
 
