@@ -22,6 +22,6 @@ urlpatterns = [
     path('djoser/', include('djoser.urls')),
     path('admin/users', views.GetAdminStaffView.as_view()),
     path('superadmin/admins', views.GetSuperUserAdmins.as_view()),
-    path('reset/user/password', views.AdminResetPassword.as_view())
+    path('reset/user/password/<int:pk>', views.AdminResetPassword.as_view())
     
 ]
