@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import permissions, status
-from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, ActivitySerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
@@ -34,13 +34,14 @@ class UserRegisterView(APIView):
             serializer.validated_data['user'] = request.user
             serializer.validated_data['password'] = password
             serializer.validated_data['open_password'] = password
-            # serializer.validated_data['organisation'] = request.user.organisation
+            serializer.validated_data['organisation'] = request.user.organisation
             account = serializer.save()
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
             return Response(data, status=400)
-
+        message = f"new user created by {request.user.role}"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data['response'] = 'successfully registered a new user.'
         data['id'] = account.id
         data['first_name'] = account.first_name
@@ -79,7 +80,9 @@ class AdminRegisterView(APIView):
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
             return Response(data, status=400)
-
+        
+        message = f"new user created by {request.user.role}"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data['response'] = 'successfully registered a new user.'
         data['id'] = user.id
         data['first_name'] = user.first_name
@@ -179,6 +182,7 @@ class ChangePasswordView(generics.GenericAPIView):
                     'status': 'success',
                     'message': 'Password updated successfully',
                 }
+                
                 return Response(data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -229,7 +233,8 @@ class UserLoginView(APIView):
                         user_detail['refresh'] = str(refresh)
                         user_logged_in.send(sender=user.__class__,
                                             request=request, user=user)
-                            
+                        message = f"{user.role} member login"
+                        UserActivity.objects.create(user=user, organisation=user.organisation, timeline=message)
                         data = {
     
                         "message":"success",
@@ -273,6 +278,8 @@ class AdminResetPassword(APIView):
         user.set_password(password)
         user.open_password = password
         user.save()
+        message = f"{request.user.role} reset user password"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data = {
             "message": "reset successful",
             "password": password
@@ -294,3 +301,10 @@ class GetAdminStaffView(APIView):
             "staffs": serializer.data
         }
         return Response(data, status=200)
+    
+
+
+class AllUserActivities(generics.ListAPIView):
+    permission_classes = (IsAdmin,)
+    serializer_class = ActivitySerializer
+    queryset = UserActivity.objects.all().order_by('-id')

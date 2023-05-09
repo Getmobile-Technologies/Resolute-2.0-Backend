@@ -9,7 +9,7 @@ from accounts.serializers import UserDetailSerializer
 from django.http import Http404
 from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
-
+from accounts.models import UserActivity
 User = get_user_model()
 
 def notification_handler(user, status):
@@ -30,6 +30,8 @@ class PanicView(APIView):
         serializer.save(user=request.user)
         status = "new panic request"
         notification_handler(user=request.user, status=status)
+        message = f"new panic request made by {request.user.role}"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data = {
             "message": "panic request sent",
             "user": {
@@ -158,6 +160,8 @@ class CallRequestView(APIView):
         serializer.save(user=request.user, phone=request.user.phone)
         status = "new call request"
         notification_handler(user=request.user, status=status)
+        message = f"new call request made by {request.user.role}"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data = {
             "message": "call request successful",
             "id": request.user.id
@@ -270,6 +274,8 @@ class TrackMeRequestView(APIView):
         serializer.save(user=request.user)
         status = "new track me request"
         notification_handler(user=request.user, status=status)
+        message = f"new track request made by {request.user.role}"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data = {
             "message": "tracking request sent",
             "user": {
@@ -362,6 +368,8 @@ class LocationCreateView(APIView):
         serializer = LocationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
+        message = f"new location created by {request.user.role}"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         return Response({"message": "location created"}, status=200)
     
 class GetAdminLocations(APIView):
@@ -404,6 +412,8 @@ class ImageView(APIView):
         serializer.save(user=request.user)
         status = "new image request"
         notification_handler(user=request.user, status=status)
+        message = f"new image request made by {request.user.role}"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data = {
             "message": "image request successful"
             
