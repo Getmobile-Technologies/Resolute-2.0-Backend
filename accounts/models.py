@@ -72,6 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Organisations(models.Model):
     name = models.CharField(max_length=250, null=True)
+    category = models.CharField(max_length=200, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class UserActivity(models.Model):
