@@ -74,6 +74,8 @@ class AdminRegisterView(APIView):
             except Http404:
                 org_obj = Organisations.objects.create(**organisation)
                 user = User.objects.create(user=request.user, organisation=org_obj.name, category=org_obj.category, is_admin=True, is_staff=True, **admin)
+                user.set_password(user.password)
+                user.save()
                 org_obj.contact_admin = user
                 org_obj.save()
         except IntegrityError as e:
