@@ -3,7 +3,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.response import Response
 from rest_framework import status
 from phonenumber_field.serializerfields import PhoneNumberField
-
+from .models import UserActivity, Organisations
 from main.models import StaffLocation
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -20,7 +20,7 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
 
     class Meta():
         model = User
-        fields = ['id', "first_name", "last_name", "phone", "email", 'location', "role", "password", "open_password"]
+        fields = ['id', "first_name", "last_name", "phone", "email", 'location', "organisation", "role", "password", "open_password"]
 
     def create(self, validate_data):
         return User.objects.create_user(**validate_data)
@@ -29,12 +29,14 @@ class AdminRegistrationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='admin')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     location = serializers.CharField(required=False)
+    organisation = serializers.CharField(required=True)
     phone = serializers.CharField(required=True)
+
 
 
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name", "phone", "email", "location", "role", "password"]
+        fields = ["id", "first_name", "last_name", "phone", "email", "location", "role", "organisation", "password"]
 
     def create(self, validate_data):
         return User.objects.create_admin(**validate_data)
@@ -95,3 +97,23 @@ class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = UserActivity
+        fields = '__all__'
+
+
+class OrganisationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Organisations
+        fields = '__all__'
+
+
+class CreateOrganisationSerializer(serializers.Serializer):
+    admin = AdminRegistrationSerializer()
+    organisation = OrganisationSerializer()

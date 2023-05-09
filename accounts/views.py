@@ -7,9 +7,10 @@ from django.contrib.auth import authenticate
 from rest_framework import status, generics
 from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
+from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import permissions, status
-from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, AdminRegistrationSerializer, SuperAdminSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
@@ -33,6 +34,7 @@ class UserRegisterView(APIView):
             serializer.validated_data['user'] = request.user
             serializer.validated_data['password'] = password
             serializer.validated_data['open_password'] = password
+            # serializer.validated_data['organisation'] = request.user.organisation
             account = serializer.save()
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
@@ -47,6 +49,7 @@ class UserRegisterView(APIView):
         data['email'] = account.email
         data['password'] = password
         data['location'] = account.location
+        data['organisation'] = account.organisation
 
         return Response(data)
 
@@ -55,40 +58,37 @@ class AdminRegisterView(APIView):
     permission_classes = (IsAdmin,)
 
     def post(self, request):
-        serializer = AdminRegistrationSerializer(data=request.data)
+        serializer = CreateOrganisationSerializer(data=request.data)
+
         data = {}
 
         try:
             serializer.is_valid(raise_exception=True)
-            serializer.validated_data['user'] = request.user
-            account = serializer.save()
+            admin = serializer.validated_data.pop('admin')
+            organisation = serializer.validated_data.pop('organisation')
+            name = organisation['name']
+            try:
+                get_object_or_404(Organisations, name=name)
+                return Response({"error": "organisation already exist"}, status=400)
+            except Http404:
+                org_obj = Organisations.objects.create(**organisation)
+                user = User.objects.create(user=request.user, organisation=org_obj.name, **admin)
+
+
+            # account = serializer.save()
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
             return Response(data, status=400)
 
         data['response'] = 'successfully registered a new user.'
-        data['id'] = account.id
-        data['first_name'] = account.first_name
-        data['last_name'] = account.last_name
-        data['phone'] = account.phone
-        data['email'] = account.email
-        data['location'] = account.location
+        data['id'] = user.id
+        data['first_name'] = user.first_name
+        data['last_name'] = user.last_name
+       
 
         return Response(data)
-    
-class GetAdminStaffView(APIView):
-    permission_classes = (IsAdmin,)
-    def get(self, request):
-        try:
-            objs = User.objects.filter(user=request.user.id, is_deleted=False).order_by('-id')
-        except User.DoesNotExist:
-            return Response({"error": "users not found"}, status=404)
-        serializer = UserDetailSerializer(objs, many=True)
-        data = {
-            "staffs": serializer.data
-        }
-        return Response(data, status=200)
+ 
 
 class UserActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
@@ -279,4 +279,19 @@ class AdminResetPassword(APIView):
             "password": password
         }
 
+        return Response(data, status=200)
+
+
+   
+class GetAdminStaffView(APIView):
+    permission_classes = (IsSuperUser,)
+    def get(self, request):
+        try:
+            objs = User.objects.filter(user=request.user.id, is_deleted=False).order_by('-id')
+        except User.DoesNotExist:
+            return Response({"error": "users not found"}, status=404)
+        serializer = UserDetailSerializer(objs, many=True)
+        data = {
+            "staffs": serializer.data
+        }
         return Response(data, status=200)

@@ -19,6 +19,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email'), unique=True, null=True, blank=False)
     location = models.CharField(_('location'), max_length=300, null=True)
     organisation = models.CharField(_('organisation'), max_length=300, null=True)
+    category = models.CharField(_('category'), max_length=300, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
     password = models.CharField(_('password'), max_length=100, null=True, blank=False)
     open_password = models.CharField(_('open_password'), max_length=100, null=True)
@@ -69,10 +70,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 
-    # def delete(self):
-    #     self.is_deleted = True
-    #     self.email = f"{random.randint}-deleted-{self.email}"
-    #     self.phone = f"{self.phone}-deleted-{random.randint}"
-    #     self.save()
+class Organisations(models.Model):
+    name = models.CharField(max_length=250, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
+class UserActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="users_activity")
+    organisation = models.CharField(max_length=250, null=True)
+    timeline = models.CharField(max_length=300, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
