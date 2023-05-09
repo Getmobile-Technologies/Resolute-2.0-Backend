@@ -310,3 +310,32 @@ class AllUserActivities(generics.ListAPIView):
     permission_classes = (IsAdmin,)
     serializer_class = ActivitySerializer
     queryset = UserActivity.objects.all().order_by('-id')
+
+
+class OrganizationView(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request):
+        orgs = Organisations.objects.filter(is_deleted=False)
+        data = []
+        for org in orgs:
+            user = User.objects.get(id=org.contact_admin)
+            sum = User.objects.filter(organisation=org.name).count()
+
+            request_data = {
+                "id": org.id,
+                "organisation": org.name,
+                "category": org.category,
+                "total_registered_users": sum,
+                "contact_admin": {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "phone": user.phone,
+                    "email": user.email
+                }
+            }
+            data.append(request_data)
+        return Response(data, status=200)
+
+

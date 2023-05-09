@@ -147,7 +147,7 @@ class PanicGenuineView(APIView):
 
 
 class AllPanicRequest(generics.ListAPIView):
-    queryset = PanicRequest.objects.all().order_by('-id')
+    queryset = PanicRequest.objects.filter(is_deleted=False).order_by('-id')
     permission_classes = (IsAdmin,)
     serializer_class = PanicSerializer
 

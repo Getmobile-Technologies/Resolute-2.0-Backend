@@ -74,6 +74,7 @@ class Organisations(models.Model):
     name = models.CharField(max_length=250, null=True)
     category = models.CharField(max_length=200, null=True)
     contact_admin = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="admin_users")
+    is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class UserActivity(models.Model):
