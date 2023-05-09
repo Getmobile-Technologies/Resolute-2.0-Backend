@@ -29,7 +29,7 @@ class AdminRegistrationSerializer(serializers.ModelSerializer):
     role = serializers.CharField(max_length=100, default='admin')
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     location = serializers.CharField(required=False)
-    organisation = serializers.CharField(required=True)
+    organisation = serializers.CharField(required=False)
     phone = serializers.CharField(required=True)
 
 
