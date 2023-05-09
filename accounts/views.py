@@ -72,8 +72,9 @@ class AdminRegisterView(APIView):
                 return Response({"error": "organisation already exist"}, status=400)
             except Http404:
                 org_obj = Organisations.objects.create(**organisation)
-                user = User.objects.create(user=request.user, organisation=org_obj.name, is_admin=True, is_staff=True, **admin)
-
+                user = User.objects.create(user=request.user, organisation=org_obj.name, category=org_obj.category, is_admin=True, is_staff=True, **admin)
+                org_obj.contact_admin = user
+                org_obj.save()
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
