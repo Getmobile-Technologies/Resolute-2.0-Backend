@@ -26,7 +26,7 @@ class PanicView(APIView):
     def post(self, request):
         serializer = PanicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
+        serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user)
         status = "new panic request"
         notification_handler(user=request.user, status=status)
@@ -45,7 +45,7 @@ class GetPanicRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
 
     def get(self, request):
-        users = User.objects.filter(user=request.user.id)
+        users = User.objects.filter(organisation=request.user.organisation, is_deleted=False)
         
         data = []
         for user in users:
@@ -157,6 +157,7 @@ class CallRequestView(APIView):
     def post(self, request):
         serializer = CallSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user, phone=request.user.phone)
         status = "new call request"
         notification_handler(user=request.user, status=status)
@@ -190,7 +191,7 @@ class GetCallRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
  
     def get(self, request):
-        users = User.objects.filter(user=request.user.id)
+        users = User.objects.filter(organisation=request.user.organisation)
         
         data = []
         for user in users:
@@ -271,6 +272,7 @@ class TrackMeRequestView(APIView):
     def post(self, request):
         serializer = TrackMeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user)
         status = "new track me request"
         notification_handler(user=request.user, status=status)
@@ -307,7 +309,7 @@ class GetTrackMeRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
  
     def get(self, request):
-        users = User.objects.filter(user=request.user)
+        users = User.objects.filter(organisation=request.user.organisation, is_deletd=False)
         
         data = []
         for user in users:
@@ -367,6 +369,7 @@ class LocationCreateView(APIView):
     def post(self, request):
         serializer = LocationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user)
         message = f"new location created by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
@@ -376,7 +379,7 @@ class GetAdminLocations(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
         try:
-            locations = StaffLocation.objects.filter(user=request.user.id, is_deleted=False)
+            locations = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)
         except StaffLocation.DoesNotExist:
             return Response({"error": "location not found"}, status=404)
         serializer = LocationSerializer(locations, many=True)
@@ -409,6 +412,7 @@ class ImageView(APIView):
     def post(self, request):
         serializer = ImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user)
         status = "new image request"
         notification_handler(user=request.user, status=status)
@@ -425,10 +429,10 @@ class GetImageRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
  
     def get(self, request):
-        users = User.objects.filter(user=request.user)
+        users = User.objects.filter(organisation=request.user.organisation)
         data = []
         for user in users:
-            image_requests = Images.objects.filter(user=user, is_deleted=False).order_by('-id')
+            image_requests = Images.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-id')
             for image_request in image_requests:
                 serializer = ImageSerializer(image_request)
                 request_data = {

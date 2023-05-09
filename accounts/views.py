@@ -144,7 +144,7 @@ class GetSuperUserAdmins(APIView):
     permission_classes = (IsSuperUser,)
     def get(self, request):
         try:
-            objs = User.objects.filter(user=request.user).order_by('-id')
+            objs = User.objects.filter(is_deleted=False, is_admin=True, is_superuser=False).order_by('-id')
         except User.DoesNotExist:
             return Response({"error": "admins not found"}, status=404)
         serializer = UserDetailSerializer(objs, many=True)
@@ -292,10 +292,10 @@ class AdminResetPassword(APIView):
 
    
 class GetAdminStaffView(APIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdmin,)
     def get(self, request):
         try:
-            objs = User.objects.filter(user=request.user.id, is_deleted=False).order_by('-id')
+            objs = User.objects.filter(organisation=request.user.organisation, is_admin=False, is_superuser=False, is_deleted=False).order_by('-id')
         except User.DoesNotExist:
             return Response({"error": "users not found"}, status=404)
         serializer = UserDetailSerializer(objs, many=True)
