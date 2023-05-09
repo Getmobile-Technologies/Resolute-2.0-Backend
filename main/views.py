@@ -309,7 +309,7 @@ class GetTrackMeRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
  
     def get(self, request):
-        users = User.objects.filter(organisation=request.user.organisation, is_deletd=False)
+        users = User.objects.filter(organisation=request.user.organisation, is_deleted=False)
         
         data = []
         for user in users:
