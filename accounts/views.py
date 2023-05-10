@@ -68,14 +68,15 @@ class AdminRegisterView(APIView):
             admin = serializer.validated_data.pop('admin')
             organisation = serializer.validated_data.pop('organisation')
             name = organisation['name']
+            category = organisation['category']
             try:
                 get_object_or_404(Organisations, name=name)
                 return Response({"error": "organisation already exist"}, status=400)
             except Http404:
-                org_obj = Organisations.objects.create(**organisation)
-                user = User.objects.create(user=request.user, organisation=org_obj.name, category=org_obj.category, is_admin=True, is_staff=True, **admin)
+                user = User.objects.create(user=request.user, organisation=name, category=category, is_admin=True, is_staff=True, **admin)
                 user.set_password(user.password)
                 user.save()
+                org_obj = Organisations.objects.create(**organisation)
                 org_obj.contact_admin = user
                 org_obj.save()
         except IntegrityError as e:
