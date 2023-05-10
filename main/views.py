@@ -520,7 +520,7 @@ class SuperUserTotalIncidents(APIView):
     def get(self, request):
         total_incident = PanicRequest.objects.filter(is_deleted=False).count()
         reviewed_incident = PanicRequest.objects.filter(is_reviewed=True).count()
-        un_reviewed_incident = PanicRequest.objects.filter(is_reveiewd=False).count()
+        un_reviewed_incident = PanicRequest.objects.filter(is_reviewed=False).count()
         ingenuine_incident = PanicRequest.objects.filter(is_genuine=False).count()
 
         data = {
