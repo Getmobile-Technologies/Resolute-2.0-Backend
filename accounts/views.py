@@ -325,7 +325,7 @@ class OrganizationView(APIView):
         for org in orgs:
             print(org.contact_admin)
             user = User.objects.get(id=org.contact_admin_id)
-            sum = User.objects.filter(organisation=org.name).count()
+            sum = User.objects.filter(organisation=org.name, is_deleted=False).count()
 
             request_data = {
                 "id": org.id,
