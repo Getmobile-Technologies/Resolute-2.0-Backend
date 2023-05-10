@@ -511,3 +511,23 @@ class NotifficationActions(generics.RetrieveDestroyAPIView):
 
         else:
             return Response({"error": "already deleted"}, status=400)
+
+
+
+class SuperUserTotalIncidents(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request):
+        total_incident = PanicRequest.objects.filter(is_deleted=False).count()
+        reviewed_incident = PanicRequest.objects.filter(is_reviewed=True).count()
+        un_reviewed_incident = PanicRequest.objects.filter(is_reveiewd=False).count()
+        ingenuine_incident = PanicRequest.objects.filter(is_genuine=False).count()
+
+        data = {
+            "total_incident": total_incident,
+            "reviewed_incident": reviewed_incident,
+            "un_reviewed_incident": un_reviewed_incident,
+            "ingenuine_incident": ingenuine_incident
+        }
+
+        return Response(data, status=200)
