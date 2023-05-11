@@ -344,3 +344,27 @@ class OrganizationView(APIView):
         return Response(data, status=200)
 
 
+class AllUsersOrganizedView(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request):
+        users = User.objects.filter(is_deleted=False)
+        data = []
+        for user in users:
+            orgs = Organisations.objects.filter(name=user.organisation, is_deleted=False)
+            for org in orgs:
+                admin_user = User.objects.get(id=org.contact_admin_id)
+                request_data = {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "phone": user.phone,
+                    "location": user.location,
+                    "organisation": org.name,
+                    "contact_admin": {
+                        "first_name": admin_user.first_name,
+                        "last_name": admin_user.last_name,
+                    }
+                }
+                data.append(request_data)
+        return Response(data, status=200)

@@ -24,6 +24,7 @@ urlpatterns = [
     path('superadmin/admins', views.GetSuperUserAdmins.as_view()),
     path('reset/user/password/<int:pk>', views.AdminResetPassword.as_view()),
     path('user/activities', views.AllUserActivities.as_view()),
-    path('organizations', views.OrganizationView.as_view())
+    path('organizations', views.OrganizationView.as_view()),
+    path('superuser/all_users', views.AllUsersOrganizedView.as_view())
     
 ]
