@@ -413,9 +413,10 @@ class ImageView(APIView):
         serializer = ImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
-        serializer.save(user=request.user)
+        serializer.validated_data['user'] = request.user
+        serializer.save()
         status = "new image request"
-        notification_handler(user=request.user, status=status)
+        notification_handler(user=request.user, organisation=request.user.organisation, status=status)
         message = f"new image request made by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data = {
@@ -429,10 +430,10 @@ class GetImageRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
  
     def get(self, request):
-        users = User.objects.filter(organisation=request.user.organisation)
+        users = User.objects.filter(organisation=request.user.organisation, is_deleted=False)
         data = []
         for user in users:
-            image_requests = Images.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-id')
+            image_requests = Images.objects.filter(user=user, is_deleted=False).order_by('-id')
             for image_request in image_requests:
                 serializer = ImageSerializer(image_request)
                 request_data = {
