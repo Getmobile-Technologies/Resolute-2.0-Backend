@@ -191,7 +191,7 @@ class GetCallRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
  
     def get(self, request):
-        users = User.objects.filter(organisation=request.user.organisation)
+        users = User.objects.filter(organisation=request.user.organisation, is_deleted=False)
         
         data = []
         for user in users:
@@ -530,5 +530,139 @@ class SuperUserTotalIncidents(APIView):
             "un_reviewed_incident": un_reviewed_incident,
             "ingenuine_incident": ingenuine_incident
         }
+
+        return Response(data, status=200)
+    
+
+class SuperUserIncidents(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request):
+        users = User.objects.filter(is_deleted=False)
+        data = []
+        for user in users:
+            panic_requests = PanicRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
+            for panic_request in panic_requests:
+                serializer = PanicSerializer(panic_request)
+                request_data = {
+                    "id": serializer.data['id'],
+                    "longitude": serializer.data['longitude'],
+                    "latitude": serializer.data['latitude'],
+                    "location": serializer.data['location'],
+                    "is_reviewed": serializer.data['is_reviewed'],
+                    "is_genuine": serializer.data['is_genuine'],
+                    "timestamp": serializer.data['timestamp'],
+                    "organisation": user.organisation,
+                    "user": {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "email": user.email,
+                        "location": user.location,
+                        "phone": user.phone,
+                        "role": user.role
+                    }
+                }
+                data.append(request_data)
+
+        return Response(data, status=200)
+    
+
+class SuperUserCallRequest(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request):
+        users = User.objects.filter(is_deleted=False)
+        
+        data = []
+        for user in users:
+            call_requests = CallRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
+            for call_request in call_requests:
+                serializer = CallSerializer(call_request)
+                request_data = {
+                    "id": serializer.data['id'],
+                    "phone": serializer.data['phone'],
+                    "is_reviewed": serializer.data['is_reviewed'],
+                    "timestamp": serializer.data['timestamp'],
+                    "organisation": user.organisation,
+                    "user": {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "email": user.email,
+                        "location": user.location,
+                        "phone": user.phone,
+                        "role": user.role
+                    }
+                }
+                data.append(request_data)
+
+        return Response(data, status=200)
+    
+
+class SuperUserTrackRequest(APIView):
+    permission_classes = (IsSuperUser,)
+    def get(self, request):
+        users = User.objects.filter(is_deleted=False)
+        
+        data = []
+        for user in users:
+            track_requests = TrackMeRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
+            for track_request in track_requests:
+                serializer = TrackMeSerializer(track_request)
+                request_data = {
+                    "id": serializer.data['id'],
+                    "longitude": serializer.data['longitude'],
+                    "latitude": serializer.data['latitude'],
+                    "location": serializer.data['location'],
+                    "is_reviewed": serializer.data['is_reviewed'],
+                    "timestamp": serializer.data['timestamp'],
+                    "organisation": user.organisation,
+                    "user": {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "email": user.email,
+                        "location": user.location,
+                        "phone": user.phone,
+                        "role": user.role
+                    }
+                }
+                data.append(request_data)
+
+        return Response(data, status=200)
+    
+class SuperUserImageRequest(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request):
+        users = User.objects.filter(is_deleted=False)
+        data = []
+        for user in users:
+            image_requests = Images.objects.filter(user=user, is_deleted=False).order_by('-id')
+            for image_request in image_requests:
+                serializer = ImageSerializer(image_request)
+                request_data = {
+                    "id": serializer.data['id'],
+                    "image": serializer.data['image'],
+                    "image2": serializer.data['image2'],
+                    "image3": serializer.data['image3'],
+                    "image4": serializer.data['image4'],
+                    "description": serializer.data['description'],
+                    "location": serializer.data['location'],
+                    "is_reviewed": serializer.data['is_reviewed'],
+                    "timestamp": serializer.data['timestamp'],
+                    "organisation": user.organisation,
+                    "user": {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "email": user.email,
+                        "location": user.location,
+                        "phone": user.phone,
+                        "role": user.role
+                    }
+                }
+                data.append(request_data)
 
         return Response(data, status=200)
