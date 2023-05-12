@@ -6,7 +6,7 @@ from . import views
 
 urlpatterns = [
     path('create/panic/request', views.PanicView.as_view()),
-    path('admin/panic/requests', views.GetPanicRequestAdmin.as_view()),
+    path('admin/panic/requests', views.GetPanicRequests.as_view()),
     path('create/call/request', views.CallRequestView.as_view()),
     path('panic/review/<int:pk>', views.PanicReview.as_view()),
     path('panic/all', views.AllPanicRequest.as_view()),
@@ -28,8 +28,6 @@ urlpatterns = [
     path('get/admin/notifications', views.GetAdminNotifications.as_view()),
     path('notification/actions/<int:pk>', views.NotifficationActions.as_view()),
     path('panic/genuine/review/<int:pk>', views.PanicGenuineView.as_view()),
-    path('superuser/incidents/count', views.SuperUserTotalIncidents.as_view()),
-    path('superuser/all/incidents', views.SuperUserIncidents.as_view()),
     path('superuser/all/call_requests', views.SuperUserCallRequest.as_view()),
     path('superuser/all/track_requests', views.SuperUserTrackRequest.as_view()),
     path('superuser/all/image_requests', views.SuperUserImageRequest.as_view())
