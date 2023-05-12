@@ -294,22 +294,6 @@ class AdminResetPassword(APIView):
         return Response(data, status=200)
 
 
-   
-class GetAdminStaffView(APIView):
-    permission_classes = (IsAdmin,)
-    def get(self, request):
-        try:
-            objs = User.objects.filter(organisation=request.user.organisation, is_admin=False, is_superuser=False, is_deleted=False).order_by('-id')
-        except User.DoesNotExist:
-            return Response({"error": "users not found"}, status=404)
-        serializer = UserDetailSerializer(objs, many=True)
-        data = {
-            "staffs": serializer.data
-        }
-        return Response(data, status=200)
-    
-
-
 class AllUserActivities(generics.ListAPIView):
     permission_classes = (IsAdmin,)
     serializer_class = ActivitySerializer
@@ -344,27 +328,38 @@ class OrganizationView(APIView):
         return Response(data, status=200)
 
 
-class AllUsersOrganizedView(APIView):
-    permission_classes = (IsSuperUser,)
+class AllUsersView(APIView):
+    permission_classes = (IsAdmin,)
 
     def get(self, request):
-        users = User.objects.filter(is_deleted=False)
-        data = []
-        for user in users:
-            orgs = Organisations.objects.filter(name=user.organisation, is_deleted=False)
-            for org in orgs:
-                admin_user = User.objects.get(id=org.contact_admin_id)
-                request_data = {
-                    "id": user.id,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "phone": user.phone,
-                    "location": user.location,
-                    "organisation": org.name,
-                    "contact_admin": {
-                        "first_name": admin_user.first_name,
-                        "last_name": admin_user.last_name,
+        if request.user.role == 'admin':
+            try:
+                objs = User.objects.filter(organisation=request.user.organisation, is_admin=False, is_superuser=False, is_deleted=False).order_by('-id')
+            except User.DoesNotExist:
+                return Response({"error": "users not found"}, status=404)
+            serializer = UserDetailSerializer(objs, many=True)
+            data = {
+                "staffs": serializer.data
+            }
+            return Response(data, status=200)
+        else:
+            users = User.objects.filter(is_deleted=False).order_by('-id')
+            data = []
+            for user in users:
+                orgs = Organisations.objects.filter(name=user.organisation, is_deleted=False)
+                for org in orgs:
+                    admin_user = User.objects.get(id=org.contact_admin_id)
+                    request_data = {
+                        "id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "phone": user.phone,
+                        "location": user.location,
+                        "organisation": org.name,
+                        "contact_admin": {
+                            "first_name": admin_user.first_name,
+                            "last_name": admin_user.last_name,
+                        }
                     }
-                }
-                data.append(request_data)
-        return Response(data, status=200)
+                    data.append(request_data)
+            return Response(data, status=200)

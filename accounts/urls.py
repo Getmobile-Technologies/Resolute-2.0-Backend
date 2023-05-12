@@ -20,11 +20,10 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('token/verify', TokenVerifyView.as_view(), name='token_verify'),
     path('djoser/', include('djoser.urls')),
-    path('admin/users', views.GetAdminStaffView.as_view()),
+    path('all/users', views.AllUsersView.as_view()),
     path('superadmin/admins', views.GetSuperUserAdmins.as_view()),
     path('reset/user/password/<int:pk>', views.AdminResetPassword.as_view()),
     path('user/activities', views.AllUserActivities.as_view()),
-    path('organizations', views.OrganizationView.as_view()),
-    path('superuser/all_users', views.AllUsersOrganizedView.as_view())
+    path('organizations', views.OrganizationView.as_view())
     
 ]
