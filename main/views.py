@@ -315,10 +315,10 @@ class IncidentCounts(APIView):
             total_ingenuine = user_obj.total_ingenuine_panic
 
             data = {
-                "total_panic": total_panic,
-                "total_reviewed": total_reviewed,
-                "total_unreviewed": total_unreviewed,
-                "total_ingenuine": total_ingenuine
+                "total_incident": total_panic,
+                "reviewed_incident": total_reviewed,
+                "un_reviewed_incident": total_unreviewed,
+               "ingenuine_incident": total_ingenuine
             }
 
             return Response(data, status=200)
