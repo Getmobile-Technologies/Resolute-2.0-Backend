@@ -473,13 +473,13 @@ class LocationCreateView(APIView):
         state = serializer.validated_data['state']
         try:
             get_object_or_404(StaffLocation, city=city, state=state)
-        except Http404:
             return Response({"error": "location already exist"}, status=400)
-        serializer.validated_data['organisation'] = request.user.organisation
-        serializer.save(user=request.user)
-        message = f"new location created by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
-        return Response({"message": "location created"}, status=200)
+        except Http404:
+            serializer.validated_data['organisation'] = request.user.organisation
+            serializer.save(user=request.user)
+            message = f"new location created by {request.user.role}"
+            UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+            return Response({"message": "location created"}, status=200)
     
 class GetAdminLocations(APIView):
     permission_classes = (IsAdmin,)
