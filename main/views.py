@@ -497,7 +497,7 @@ class GetLocations(APIView):
             return Response(data, status=200)
         else:
             try:
-                locations = StaffLocation.objects.Filter(is_deleted=False)
+                locations = StaffLocation.objects.filter(is_deleted=False)
             except StaffLocation.DoesNotExist:
                 return Response({"error": "locations not found"}, status=404)
             serializer = LocationSerializer(locations, many=True)
