@@ -17,7 +17,8 @@ from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound, ValidationError
-from .helpers.generator import generate_password
+from .helpers.generator import generate_password, generate_admin_password
+from .helpers.mail import signup_mail
 from .permissions import IsAdmin, IsSuperUser
 User = get_user_model()
 
@@ -78,8 +79,9 @@ class AdminRegisterView(APIView):
                 return Response({"error": "organisation already exist"}, status=400)
             except Http404:
                 user = User.objects.create(user=request.user, organisation=name, category=category, is_admin=True, is_staff=True, **admin)
+                password = generate_admin_password()
                 if user:
-                    user.set_password(user.password)
+                    user.set_password(password)
                     user.save()
                     org_obj = Organisations.objects.create(**organisation)
                     org_obj.contact_admin = user
@@ -90,7 +92,7 @@ class AdminRegisterView(APIView):
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
             return Response(data, status=400)
-        
+        signup_mail(email= user.email, password=password, first_name=user.first_name) 
         message = f"new user created by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data['response'] = 'successfully registered a new user.'
