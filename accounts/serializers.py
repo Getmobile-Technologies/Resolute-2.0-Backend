@@ -25,6 +25,19 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     def create(self, validate_data):
         return User.objects.create_user(**validate_data)
 
+class AdminRegistrationSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(max_length=100, default='admin')
+    password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
+    location = serializers.CharField(required=False)
+    organisation = serializers.CharField(required=False)
+    phone = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name", "phone", "email", "location", "role", "organisation", "password"]
+
+    def create(self, validate_data):
+        return User.objects.create_admin(**validate_data)
 
 class SuperAdminSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
