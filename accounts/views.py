@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import permissions, status
+from main import models
 from .serializers import LoginSerializer, ChangePasswordSerializer, ActivitySerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
@@ -310,12 +311,29 @@ class OrganizationView(APIView):
             print(org.contact_admin)
             user = User.objects.get(id=org.contact_admin_id)
             sum = User.objects.filter(organisation=org.name, is_deleted=False).count()
+            incidents = models.PanicRequest.filter(organisation=org.name, is_deleted=False).count()
+            resolved = models.PanicRequest.filter(organisation=org.name, is_reveiwed=True, is_deleted=False).count()
+            unresolved = models.PanicRequest.filter(organisation=org.name, is_reveiwd=False, is_deleted=False).count()
+            ingenuine = models.PanicRequest.filter(organisation=org.name, is_genuine=False, is_deleted=False).count()
+            locations = models.StaffLocation.filter(organisation=org.name, is_deleted=False).count()
+            captures = models.Images.filter(organisation=org.name, is_deleted=False).count()
+            track = models.TrackMeRequest.filter(organisation=org.name, is_deleted=False).count()
+            call = models.CallRequest.filter(organisation=org.name, is_deleted=False).count()
 
             request_data = {
                 "id": org.id,
                 "organisation": org.name,
                 "category": org.category,
                 "total_registered_users": sum,
+                "total_reported_incidents": incidents,
+                "total_resolved_incidents": resolved,
+                "total_unresolved_incidents": unresolved,
+                "total_ingenuine_incidents": ingenuine,
+                "total_locations": locations,
+                "total_capture": captures,
+                "total_track": track,
+                "total_call": call,
+
                 "contact_admin": {
                     "id": user.id,
                     "first_name": user.first_name,
