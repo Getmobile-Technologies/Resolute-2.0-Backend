@@ -311,14 +311,14 @@ class OrganizationView(APIView):
             print(org.contact_admin)
             user = User.objects.get(id=org.contact_admin_id)
             sum = User.objects.filter(organisation=org.name, is_deleted=False).count()
-            incidents = models.PanicRequest.filter(organisation=org.name, is_deleted=False).count()
-            resolved = models.PanicRequest.filter(organisation=org.name, is_reveiwed=True, is_deleted=False).count()
-            unresolved = models.PanicRequest.filter(organisation=org.name, is_reveiwd=False, is_deleted=False).count()
-            ingenuine = models.PanicRequest.filter(organisation=org.name, is_genuine=False, is_deleted=False).count()
-            locations = models.StaffLocation.filter(organisation=org.name, is_deleted=False).count()
-            captures = models.Images.filter(organisation=org.name, is_deleted=False).count()
-            track = models.TrackMeRequest.filter(organisation=org.name, is_deleted=False).count()
-            call = models.CallRequest.filter(organisation=org.name, is_deleted=False).count()
+            incidents = models.PanicRequest.objects.filter(organisation=org.name, is_deleted=False).count()
+            resolved = models.PanicRequest.objects.filter(organisation=org.name, is_reveiwed=True, is_deleted=False).count()
+            unresolved = models.PanicRequest.objects.filter(organisation=org.name, is_reveiwd=False, is_deleted=False).count()
+            ingenuine = models.PanicRequest.objects.filter(organisation=org.name, is_genuine=False, is_deleted=False).count()
+            locations = models.StaffLocation.objects.filter(organisation=org.name, is_deleted=False).count()
+            captures = models.Images.objects.filter(organisation=org.name, is_deleted=False).count()
+            track = models.TrackMeRequest.objects.filter(organisation=org.name, is_deleted=False).count()
+            call = models.CallRequest.objects.filter(organisation=org.name, is_deleted=False).count()
 
             request_data = {
                 "id": org.id,
