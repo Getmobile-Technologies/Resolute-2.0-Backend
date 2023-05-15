@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer, ImageSerializer, NotificationSerializer
-from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications
+from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer, ImageSerializer, NotificationSerializer, CatgorySerializer
+from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category
 from django.contrib.auth import get_user_model
 from rest_framework import status, generics
 from accounts.serializers import UserDetailSerializer
@@ -663,4 +663,36 @@ class NotifficationActions(generics.RetrieveDestroyAPIView):
 
         else:
             return Response({"error": "already deleted"}, status=400)
+        
+
+class CreateCategory(APIView):
+    permission_classes = (IsSuperUser,)
+    def post(self, request):
+        serializer = CatgorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        name = serializer.validated_data['name']
+        try:
+            get_object_or_404(Category, name=name)
+            return Response({"error": "category already exist"}, status=400)
+        except Http404:
+            serializer.save()
+            return Response({"message": "new category created"}, status=200)
+    
+    def get(self, request):
+        try:
+            obj = Category.objects.all()
+            serializer = CatgorySerializer(obj, many=True)
+            data = {
+                "categories": serializer.data
+            }
+            return Response(data, status=200)
+        except Category.DoesNotExist:
+            return Response({"error": "category not found"}, status=404)
+
+
+class CategoryActions(generics.RetrieveAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = CatgorySerializer
+    queryset = Category.objects.all()
+        
     

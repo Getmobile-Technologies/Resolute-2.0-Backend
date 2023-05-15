@@ -77,3 +77,8 @@ class Notifications(models.Model):
     organisation = models.CharField(max_length=300, null=True)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=200, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
