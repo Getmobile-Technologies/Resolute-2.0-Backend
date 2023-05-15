@@ -15,7 +15,7 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=False)
     email = serializers.CharField(max_length=200, required=False)
     location = serializers.CharField(required=True)
-    phone = serializers.CharField(required=True)
+    phone = PhoneNumberField(required=True)
     open_password = serializers.CharField(required=False)
 
     class Meta():
@@ -30,7 +30,7 @@ class AdminRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=True)
     location = serializers.CharField(required=False)
     organisation = serializers.CharField(required=False)
-    phone = serializers.CharField(required=True)
+    phone = PhoneNumberField(required=True)
 
     class Meta:
         model = User

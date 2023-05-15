@@ -3,6 +3,7 @@ from django.contrib.auth.models import  AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 import uuid
+import re
 from .managers import UserManager
 from django.core.validators import RegexValidator
 from django.db.models import Count
