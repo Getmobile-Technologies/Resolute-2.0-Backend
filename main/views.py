@@ -481,19 +481,29 @@ class LocationCreateView(APIView):
             UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
             return Response({"message": "location created"}, status=200)
     
-class GetAdminLocations(APIView):
+class GetLocations(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
-        try:
-            locations = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)
-        except StaffLocation.DoesNotExist:
-            return Response({"error": "location not found"}, status=404)
-        serializer = LocationSerializer(locations, many=True)
-        data = {
-            "locations": serializer.data
-        }
+        if request.user.role == "admin":
+            try:
+                locations = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)
+            except StaffLocation.DoesNotExist:
+                return Response({"error": "location not found"}, status=404)
+            serializer = LocationSerializer(locations, many=True)
+            data = {
+                "locations": serializer.data
+            }
 
-        return Response(data, status=200)
+            return Response(data, status=200)
+        else:
+            try:
+                locations = StaffLocation.objects.Filter(is_deleted=False)
+            except StaffLocation.DoesNotExist:
+                return Response({"error": "locations not found"}, status=404)
+            serializer = LocationSerializer(locations, many=True)
+            data = {
+                "locations": serializer.data
+            }
 
 class LocationActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
