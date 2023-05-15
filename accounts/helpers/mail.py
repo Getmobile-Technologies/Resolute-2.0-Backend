@@ -13,8 +13,8 @@ def signup_mail(email, password, first_name):
         },
         json={
             "event": "sign",
+            "email": email,
             "data": {
-                "email": email,
                 "password": password,
                 "url": url,
                 "first_name": first_name
