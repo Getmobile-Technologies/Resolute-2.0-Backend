@@ -308,12 +308,11 @@ class OrganizationView(APIView):
         orgs = Organisations.objects.filter(is_deleted=False)
         data = []
         for org in orgs:
-            print(org.contact_admin)
             user = User.objects.get(id=org.contact_admin_id)
             sum = User.objects.filter(organisation=org.name, is_deleted=False).count()
             incidents = models.PanicRequest.objects.filter(organisation=org.name, is_deleted=False).count()
             resolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=True, is_deleted=False).count()
-            unresolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewd=False, is_deleted=False).count()
+            unresolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=False, is_deleted=False).count()
             ingenuine = models.PanicRequest.objects.filter(organisation=org.name, is_genuine=False, is_deleted=False).count()
             locations = models.StaffLocation.objects.filter(organisation=org.name, is_deleted=False).count()
             captures = models.Images.objects.filter(organisation=org.name, is_deleted=False).count()
