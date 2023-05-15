@@ -504,6 +504,7 @@ class GetLocations(APIView):
             data = {
                 "locations": serializer.data
             }
+            return Response(data, status=200)
 
 class LocationActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
