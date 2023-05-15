@@ -48,8 +48,8 @@ class UserRegisterView(APIView):
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data['response'] = 'successfully registered a new user.'
         data['id'] = account.id
-        data['first_name'] = account.first_name.capital()
-        data['last_name'] = account.last_name.capital()
+        data['first_name'] = account.first_name
+        data['last_name'] = account.last_name
         data['phone'] = account.phone
         data['email'] = account.email
         data['password'] = password
