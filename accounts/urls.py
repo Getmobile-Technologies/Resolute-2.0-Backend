@@ -10,7 +10,6 @@ urlpatterns = [
     path('register/user', views.UserRegisterView.as_view()),
     path('register/admin', views.AdminRegisterView.as_view()),
     path('register/superuser', views.SuperAdminRegisterView.as_view()),
-    path('all_users', views.AllUsersView.as_view()),
     path('single/user/<int:pk>', views.UserActions.as_view()),
     path('user/profile', views.UserProfile.as_view()),
     path('user/login', views.UserLoginView.as_view()),

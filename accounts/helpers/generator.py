@@ -18,3 +18,7 @@ def generate_admin_password():
     return "resolute" + pin
 
 
+def split(str):
+    list = str.split(",")
+    return list[0]
+

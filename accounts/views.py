@@ -17,7 +17,7 @@ from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound, ValidationError
-from .helpers.generator import generate_password, generate_admin_password
+from .helpers.generator import generate_password, generate_admin_password, split
 from .helpers.mail import signup_mail
 from .permissions import IsAdmin, IsSuperUser
 User = get_user_model()
@@ -41,6 +41,7 @@ class UserRegisterView(APIView):
                 serializer.validated_data['organisation'] = request.user.organisation
 
             account = serializer.save()
+            location = split(account.location)
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
@@ -54,7 +55,7 @@ class UserRegisterView(APIView):
         data['phone'] = account.phone
         data['email'] = account.email
         data['password'] = password
-        data['location'] = account.location
+        data['location'] = location
         data['organisation'] = account.organisation
 
         return Response(data)
@@ -162,11 +163,6 @@ class GetSuperUserAdmins(APIView):
             "admins": serializer.data
         }
         return Response(data, status=200)
-
-
-class AllUsersView(ListAPIView):
-    queryset = User.objects.filter(is_deleted=False)
-    serializer_class = UserDetailSerializer
 
 
 class ChangePasswordView(generics.GenericAPIView):
@@ -371,12 +367,13 @@ class AllUsersView(APIView):
                 orgs = Organisations.objects.filter(name=user.organisation, is_deleted=False)
                 for org in orgs:
                     admin_user = User.objects.get(id=org.contact_admin_id)
+                    location = split(user.location)
                     request_data = {
                         "id": user.id,
                         "first_name": user.first_name,
                         "last_name": user.last_name,
                         "phone": user.phone,
-                        "location": user.location,
+                        "location": location,
                         "organisation": org.name,
                         "contact_admin": {
                             "first_name": admin_user.first_name,
