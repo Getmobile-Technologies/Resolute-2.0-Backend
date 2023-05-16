@@ -667,6 +667,7 @@ class NotifficationActions(generics.RetrieveDestroyAPIView):
 
 class CreateCategory(APIView):
     permission_classes = (IsSuperUser,)
+
     def post(self, request):
         serializer = CatgorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -690,9 +691,16 @@ class CreateCategory(APIView):
             return Response({"error": "category not found"}, status=404)
 
 
-class CategoryActions(generics.RetrieveAPIView):
+class CategoryActions(generics.Retrieve):
     permission_classes = (IsSuperUser,)
     serializer_class = CatgorySerializer
     queryset = Category.objects.all()
         
     
+# class GetIncidentbyLocation(APIView):
+#     permission_classes = (IsAdmin,)
+
+#     def get(self, request):
+#         if request.user.role == 'admin':
+            
+#             location = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)

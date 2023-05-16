@@ -310,7 +310,7 @@ class OrganizationView(APIView):
     permission_classes = (IsSuperUser,)
 
     def get(self, request):
-        orgs = Organisations.objects.filter(is_deleted=False)
+        orgs = Organisations.objects.filter(is_deleted=False).order_by('-id')
         data = []
         for org in orgs:
             user = User.objects.get(id=org.contact_admin_id)
