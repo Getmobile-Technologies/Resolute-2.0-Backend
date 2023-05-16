@@ -691,7 +691,7 @@ class CreateCategory(APIView):
             return Response({"error": "category not found"}, status=404)
 
 
-class CategoryActions(generics.Retrieve):
+class CategoryActions(generics.RetrieveAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = CatgorySerializer
     queryset = Category.objects.all()
