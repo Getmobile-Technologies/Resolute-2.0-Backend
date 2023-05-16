@@ -681,7 +681,7 @@ class CreateCategory(APIView):
     
     def get(self, request):
         try:
-            obj = Category.objects.all()
+            obj = Category.objects.filter(is_deleted=False)
             serializer = CatgorySerializer(obj, many=True)
             data = {
                 "categories": serializer.data
@@ -691,10 +691,23 @@ class CreateCategory(APIView):
             return Response({"error": "category not found"}, status=404)
 
 
-class CategoryActions(generics.RetrieveAPIView):
+class CategoryActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = CatgorySerializer
-    queryset = Category.objects.all()
+    queryset = Category.objects.filter(is_deleted=False)
+
+    def delete(self, request, pk):
+        try:
+            obj = Category.objects.get(id=pk)
+        except Category.DoesNotExist:
+            return Response({"error": "not found"}, status=404)
+        obj.is_deleted = True
+        obj.save()
+        return Response({"message": "category deleted"}, status=200)
+        
+
+
+
         
     
 # class GetIncidentbyLocation(APIView):
