@@ -36,10 +36,10 @@ class UserRegisterView(APIView):
             serializer.validated_data['user'] = request.user
             serializer.validated_data['password'] = password
             serializer.validated_data['open_password'] = password
-            serializer.validated_data['organisation'] = request.user.organisation
-            if request.user.role == 'superuser':
-                serializer.save()
-            
+
+            if request.user.role == 'admin':
+                serializer.validated_data['organisation'] = request.user.organisation
+
             account = serializer.save()
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
