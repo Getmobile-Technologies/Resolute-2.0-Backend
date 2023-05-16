@@ -41,7 +41,6 @@ class UserRegisterView(APIView):
                 serializer.validated_data['organisation'] = request.user.organisation
 
             account = serializer.save()
-            location = split(account.location)
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
@@ -55,7 +54,7 @@ class UserRegisterView(APIView):
         data['phone'] = account.phone
         data['email'] = account.email
         data['password'] = password
-        data['location'] = location
+        data['location'] = account.location
         data['organisation'] = account.organisation
 
         return Response(data)
@@ -367,13 +366,12 @@ class AllUsersView(APIView):
                 orgs = Organisations.objects.filter(name=user.organisation, is_deleted=False)
                 for org in orgs:
                     admin_user = User.objects.get(id=org.contact_admin_id)
-                    location = split(user.location)
                     request_data = {
                         "id": user.id,
                         "first_name": user.first_name,
                         "last_name": user.last_name,
                         "phone": user.phone,
-                        "location": location,
+                        "location": user.location,
                         "organisation": org.name,
                         "contact_admin": {
                             "first_name": admin_user.first_name,
