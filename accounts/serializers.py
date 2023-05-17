@@ -16,7 +16,7 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     email = serializers.CharField(max_length=200, required=False)
     location = serializers.CharField(required=True)
     phone = serializers.CharField(required=True)
-    organisation = serializers.CharField(required=True)
+    organisation = serializers.CharField(required=False)
     open_password = serializers.CharField(required=False)
     state = serializers.CharField(required=True)
 
