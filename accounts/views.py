@@ -215,10 +215,10 @@ class UserLoginView(APIView):
         if serializer.is_valid():
             data = serializer.validated_data
             
-            if "phone" in data:
-                user = authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
-            elif "email" in data:
-                user = authenticate(request, email = data['email'], password = data['password'], is_deleted=False)
+            if "email" in data:
+                user = authenticate(request, email = data['phone'], password = data['password'], is_deleted=False)
+            elif "phone" in data:
+                user = authenticate(request, phone = data['email'], password = data['password'], is_deleted=False)
                 
             else:
                 raise ValidationError("Invalid data. Login with email or phone number")
