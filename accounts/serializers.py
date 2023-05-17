@@ -18,10 +18,11 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(required=True)
     organisation = serializers.CharField(required=True)
     open_password = serializers.CharField(required=False)
+    state = serializers.CharField(required=True)
 
     class Meta():
         model = User
-        fields = ['id', "first_name", "last_name", "phone", "email", 'location', "organisation", "role", "password", "open_password"]
+        fields = ['id', "first_name", "last_name", "phone", "email", 'location', "state", "organisation", "role", "password", "open_password"]
 
     def create(self, validate_data):
         return User.objects.create_user(**validate_data)

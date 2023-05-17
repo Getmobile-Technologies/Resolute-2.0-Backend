@@ -19,6 +19,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(_('phone'), max_length=200, unique=True, null=True, validators=[phone_regex])
     email = models.EmailField(_('email'), unique=True, null=True, blank=False)
     location = models.CharField(_('location'), max_length=300, null=True)
+    state = models.CharField(_('state'), max_length=300, null=True)
     organisation = models.CharField(_('organisation'), max_length=300, null=True)
     category = models.CharField(_('category'), max_length=300, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)

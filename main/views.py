@@ -28,6 +28,7 @@ class PanicView(APIView):
         serializer = PanicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
+        serializer.validated_data['state'] = request.user.state
         serializer.save(user=request.user)
         status = "new panic request"
         notification_handler(user=request.user, status=status)

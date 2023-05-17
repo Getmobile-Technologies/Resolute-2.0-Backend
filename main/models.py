@@ -9,6 +9,7 @@ class PanicRequest(models.Model):
     longitude = models.CharField(max_length=200, null=True, blank=False)
     latitude = models.CharField(max_length=200, null=True, blank=False)
     location = models.CharField(max_length=200, null=True, blank=False)
+    state = models.CharField(max_length=300, null=True, blank=True)
     status = models.CharField(max_length=100, null=True, default='panic')
     organisation = models.CharField(max_length=300, null=True)
     is_reviewed = models.BooleanField(default=False)
