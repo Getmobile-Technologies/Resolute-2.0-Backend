@@ -18,6 +18,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound, ValidationError
 from .helpers.generator import generate_password, generate_admin_password
+from .helpers.sms import sign_up_sms
 from .helpers.mail import signup_mail
 from .permissions import IsAdmin, IsSuperUser
 from .authentication import phone_authenticate
@@ -42,6 +43,7 @@ class UserRegisterView(APIView):
                 serializer.validated_data['organisation'] = request.user.organisation
 
             account = serializer.save()
+            sign_up_sms(number=account.phone, pin=password)
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
