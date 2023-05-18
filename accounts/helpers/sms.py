@@ -23,5 +23,7 @@ def sign_up_sms(number, pin):
         "to": number,
         "message": message
     })
+    print(request)
 
     return request
+    
