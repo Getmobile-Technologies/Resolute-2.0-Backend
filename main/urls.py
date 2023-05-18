@@ -30,4 +30,5 @@ urlpatterns = [
     path('panic/genuine/review/<int:pk>', views.PanicGenuineView.as_view()),
     path('category', views.CreateCategory.as_view()),
     path('category/actions/<int:pk>', views.CategoryActions.as_view()),
+    path('location/incidents/count', views.LocationIncidentCount.as_view())
 ]

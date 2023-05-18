@@ -705,7 +705,41 @@ class CategoryActions(generics.RetrieveUpdateDestroyAPIView):
         obj.is_deleted = True
         obj.save()
         return Response({"message": "category deleted"}, status=200)
-        
+
+class LocationIncidentCount(APIView):
+    permission_classes = (IsAdmin,)
+
+    def get(self, request):
+        if request.user.role == "admin":
+            try:
+                locations = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)
+            except StaffLocation.DoesNotExist:
+                return Response({"error": "not found"}, status=404)
+            data = []
+            for location in locations:
+                panic = PanicRequest.objects.flter(state=location.state, is_deleted=False).count()
+                request_data = {
+                    "state": location.state,
+                    "panic_count": panic
+                }
+                data.append(request_data)
+            return Response(data, status=200)
+        else:
+            try:
+                locations = StaffLocation.objects.filter(is_deleted=False)
+            except StaffLocation.DoesNotExist:
+                return Response({"error": "not found"}, status=404)
+            data = []
+            for location in locations:
+                panic = PanicRequest.objects.flter(state=location.state, is_deleted=False).count()
+                request_data = {
+                    "state": location.state,
+                    "panic_count": panic
+                }
+                data.append(request_data)
+            return Response(data, status=200)
+
+
 
 
 
