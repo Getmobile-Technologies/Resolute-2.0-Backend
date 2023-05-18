@@ -17,7 +17,7 @@ from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound, ValidationError
-from .helpers.generator import generate_password, generate_admin_password, split
+from .helpers.generator import generate_password, generate_admin_password, split, phone_authenticate
 from .helpers.mail import signup_mail
 from .permissions import IsAdmin, IsSuperUser
 User = get_user_model()
@@ -218,7 +218,7 @@ class UserLoginView(APIView):
             if "email" in data:
                 user = authenticate(request, email = data['email'], password = data['password'], is_deleted=False)
             elif "phone" in data:
-                user = authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
+                user = phone_authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
                 
             else:
                 raise ValidationError("Invalid data. Login with email or phone number")
