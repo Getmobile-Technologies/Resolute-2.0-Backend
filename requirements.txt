@@ -30,6 +30,7 @@ phonenumberslite==8.13.11
 Pillow==9.5.0
 psycopg2==2.9.6
 pycparser==2.21
+pydantic==1.10.7
 PyJWT==2.6.0
 python-dotenv==1.0.0
 python3-openid==3.2.0
@@ -40,8 +41,10 @@ six==1.16.0
 social-auth-app-django==4.0.0
 social-auth-core==4.4.1
 sqlparse==0.4.3
+typing_extensions==4.5.0
 tzdata==2023.3
 uritemplate==4.1.1
 urllib3==1.26.15
+vonage==3.5.0
 whitenoise==6.3.0
 wrapt==1.15.0
