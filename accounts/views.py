@@ -17,9 +17,10 @@ from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound, ValidationError
-from .helpers.generator import generate_password, generate_admin_password, split, phone_authenticate
+from .helpers.generator import generate_password, generate_admin_password
 from .helpers.mail import signup_mail
 from .permissions import IsAdmin, IsSuperUser
+from .authentication import phone_authenticate
 User = get_user_model()
 
 

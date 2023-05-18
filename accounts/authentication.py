@@ -1,5 +1,6 @@
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth import get_user_model
+from rest_framework.exceptions import AuthenticationFailed
 
 
 class PhoneNumberBackend(BaseBackend):
@@ -41,4 +42,15 @@ class EmailBackend(BaseBackend):
             return None
 
     
-    
+
+def phone_authenticate(phone=None, password=None):
+        UserModel = get_user_model()
+        try:
+            user = UserModel.objects.get(phone=phone)
+        except UserModel.DoesNotExist:
+            return None
+
+        if user.check_password(password):
+            return user
+        else:
+            raise AuthenticationFailed(detail="password don't match")
