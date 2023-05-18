@@ -717,7 +717,7 @@ class LocationIncidentCount(APIView):
                 return Response({"error": "not found"}, status=404)
             data = []
             for location in locations:
-                panic = PanicRequest.objects.flter(state=location.state, is_deleted=False).count()
+                panic = PanicRequest.objects.filter(state=location.state, is_deleted=False).count()
                 request_data = {
                     "state": location.state,
                     "panic_count": panic
@@ -731,7 +731,7 @@ class LocationIncidentCount(APIView):
                 return Response({"error": "not found"}, status=404)
             data = []
             for location in locations:
-                panic = PanicRequest.objects.flter(state=location.state, is_deleted=False).count()
+                panic = PanicRequest.objects.filter(state=location.state, is_deleted=False).count()
                 request_data = {
                     "state": location.state,
                     "panic_count": panic
