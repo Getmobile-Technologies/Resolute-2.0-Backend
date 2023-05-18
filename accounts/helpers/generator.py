@@ -25,7 +25,7 @@ def split(str):
     return list[0]
 
 
-def phone_authenticate(self, request, phone=None, password=None, **kwargs):
+def phone_authenticate(phone=None, password=None):
         UserModel = get_user_model()
         try:
             user = UserModel.objects.get(phone=phone)

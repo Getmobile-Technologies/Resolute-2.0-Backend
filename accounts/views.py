@@ -218,7 +218,7 @@ class UserLoginView(APIView):
             if "email" in data:
                 user = authenticate(request, email = data['email'], password = data['password'], is_deleted=False)
             elif "phone" in data:
-                user = phone_authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
+                user = phone_authenticate(phone = data['phone'], password = data['password'])
                 
             else:
                 raise ValidationError("Invalid data. Login with email or phone number")
