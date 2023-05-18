@@ -6,7 +6,7 @@ Vonage_API_Secret = os.getenv("vonage_secret_key")
 
 
 nexmo_client = nexmo.Client(
-    api_key=Vonage_API_Key, api_secret=Vonage_API_Secret
+    key=Vonage_API_Key, secret=Vonage_API_Secret
 )
 Vonage_number = os.getenv("vonage_number")
 
