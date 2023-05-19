@@ -31,12 +31,11 @@ class PanicView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.validated_data['state'] = request.user.state
-        panic = serializer.save(user=request.user)
+        serializer.save(user=request.user)
         status = "new panic request"
         notification_handler(user=request.user, status=status)
         message = f"new panic request made by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
-        send_emergency_sms(created=True, instance=panic)
         
         data = {
             "message": "panic request sent",
