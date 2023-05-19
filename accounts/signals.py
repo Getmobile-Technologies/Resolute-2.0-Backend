@@ -14,6 +14,7 @@ import  requests
 from firebase_admin import messaging
 
 
+
 def send_notification(sender, instance:Notifications, created, *args,**kwargs):
     
     if created:        
@@ -22,3 +23,8 @@ def send_notification(sender, instance:Notifications, created, *args,**kwargs):
             notification = messaging.Notification(title=instance.heading, body=instance.body, image=instance.image_url)
             messaging.send(messaging.Message(notification=notification, token=instance.user.fcm_token))
     return
+
+
+
+
+# @receiver(post_save, sender=P)

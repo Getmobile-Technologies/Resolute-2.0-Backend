@@ -11,6 +11,7 @@ from django.http import Http404
 from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
 from accounts.models import UserActivity
+from accounts.helpers.sms import emergency_sms
 User = get_user_model()
 
 def notification_handler(user, status):
@@ -34,6 +35,7 @@ class PanicView(APIView):
         notification_handler(user=request.user, status=status)
         message = f"new panic request made by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        
         data = {
             "message": "panic request sent",
             "user": {
