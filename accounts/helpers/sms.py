@@ -7,7 +7,7 @@ Vonage_API_Secret = os.environ.get("vonage_secret_key")
 
 
 nexmo_client = vonage.Client(
-    key=Vonage_API_Key, secret=Vonage_API_Secret
+    key="533627b3", secret="ckLc6G8YwK2oBhAl"
 )
 sms = vonage.Sms(nexmo_client)
 
