@@ -29,12 +29,14 @@ def sign_up_sms(number, pin):
     return request
     
 
-def emergency_sms(location, long, lat, emergency_con, name):
+def emergency_sms(location, long, lat, emergency_con, user):
     message = f"""
     EMERGENCY!!!!
-    A panic request as been made at {location}.
+    {name} at {location} has made a panic request.
     The situation should be attended to immediately.
-    User coordinates http://www.google.com/maps/place/{long},{lat}
+    see location: http://www.google.com/maps/place/{long},{lat},
+    Call: {phone}
+    
     """
     request = sms.send_message({
         "from": "Resolute",
