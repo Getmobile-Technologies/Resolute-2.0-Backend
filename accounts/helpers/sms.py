@@ -7,7 +7,7 @@ import urllib.parse
 
 Vonage_API_Key = os.getenv("vonage_api_key")
 Vonage_API_Secret = os.getenv("vonage_secret_key")
-api_key = os.getenv("api_key_1")
+api_key = os.getenv("api_key_2")
 
 
 nexmo_client = vonage.Client(
