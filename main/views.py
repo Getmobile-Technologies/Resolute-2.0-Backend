@@ -756,7 +756,7 @@ class EmergencyContactView(APIView):
     
     def get(self, request):
         try:
-            contacts = EmergencyContact.objects.all()
+            contacts = EmergencyContact.objects.filter(is_deleted=False)
         except EmergencyContact.DoesNotExist:
             return Response({"error": "error fetching data"}, status=404)
         serializer = EmergencySerializer(contacts, many=True)
@@ -770,7 +770,7 @@ class EmergencyContactView(APIView):
 class EmergencyActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = EmergencySerializer
-    queryset = EmergencyContact.objects.all()
+    queryset = EmergencyContact.objects.filter(is_deleted=False)
 
 
         
