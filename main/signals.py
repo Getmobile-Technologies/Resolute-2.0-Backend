@@ -11,10 +11,7 @@ from accounts.helpers.sms import emergency_sms
 @receiver(post_save, sender=PanicRequest)
 def send_emergency_sms(instance, created, **kwargs):
     if created:
-        try:
-            contacts = EmergencyContact.objects.all()
-        except EmergencyContact.DoesNotExist:
-            return
+        contacts = EmergencyContact.objects.filter(is_deleted=False)
         for contact in contacts:
             emergency_sms(
                 location=instance.location,
@@ -23,7 +20,7 @@ def send_emergency_sms(instance, created, **kwargs):
                 emergency_con=contact.phone
             )
 
-        return
+    return 
 
 
 

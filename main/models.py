@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
+from django.utils import timezone
 User = get_user_model()
 
 
@@ -69,6 +70,12 @@ class StaffLocation(models.Model):
     
     def __str__(self):
         return self.state
+        
+
+    def delete(self):
+        self.is_deleted=True
+        self.save()
+
     
 
 
@@ -80,12 +87,21 @@ class Notifications(models.Model):
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    def delete(self):
+        self.is_deleted=True
+        self.save()
+
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200, null=True)
     description = models.CharField(max_length=500, null=True)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def delete(self):
+        self.is_deleted=True
+        self.save()
 
 
 class EmergencyContact(models.Model):
@@ -94,3 +110,10 @@ class EmergencyContact(models.Model):
     full_name = models.CharField(max_length=350, null=True, blank=True)
     phone = models.CharField(max_length=200, unique=True, null=True, validators=[phone_regex], blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, null=True)
+    is_deleted = models.BooleanField(default=False)
+
+
+    def delete(self):
+        self.is_deleted=True
+        self.phone = self.phone + f"--deleted--{timezone.now()}"
+        self.save()
