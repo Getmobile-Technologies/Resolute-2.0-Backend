@@ -12,7 +12,7 @@ from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
 from accounts.models import UserActivity
 from .signals import send_emergency_sms
-from accounts.helpers.sms import emergency_sms
+from accounts.helpers.sms import emergency_sms, geocoding
 User = get_user_model()
 
 def notification_handler(user, status):
@@ -22,7 +22,13 @@ def notification_handler(user, status):
 
 
 
-
+class testkey(APIView):
+    def get(self, request):
+        url = geocoding(lat="39.0438", long="-77.4874")
+        data = {
+            "url": url
+        }
+        return Response(data, status=200)
 
 class PanicView(APIView):
     permission_classes = (IsAuthenticated,)
