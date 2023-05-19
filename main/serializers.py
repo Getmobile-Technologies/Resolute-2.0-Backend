@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category
+from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category, EmergencyContact
 
 
 
@@ -49,4 +49,10 @@ class NotificationSerializer(serializers.ModelSerializer):
 class CatgorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
+        fields = '__all__'
+
+
+class EmergencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmergencyContact
         fields = '__all__'

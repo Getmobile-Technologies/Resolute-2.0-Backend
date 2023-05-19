@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer, ImageSerializer, NotificationSerializer, CatgorySerializer
-from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category
+from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer, EmergencySerializer, ImageSerializer, NotificationSerializer, CatgorySerializer
+from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category, EmergencyContact
 from django.contrib.auth import get_user_model
 from rest_framework import status, generics
 from accounts.serializers import UserDetailSerializer
@@ -743,6 +743,33 @@ class LocationIncidentCount(APIView):
 
 
 
+class EmergencyContactView(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request):
+        serializer = EmergencySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"message": "emergency contact added succesfuly"}, status=200)
+    
+    def get(self, request):
+        try:
+            contacts = EmergencyContact.objects.all()
+        except EmergencyContact.DoesNotExist:
+            return Response({"error": "error fetching data"}, status=404)
+        serializer = EmergencySerializer(contacts, many=True)
+
+        data = {
+            "contacts": serializer.data
+        }
+
+        return Response(data, status=200)
+    
+class EmergencyActions(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = EmergencySerializer
+    queryset = EmergencyContact.objects.all()
 
 
         

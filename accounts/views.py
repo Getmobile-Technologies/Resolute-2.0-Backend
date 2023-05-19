@@ -11,7 +11,7 @@ from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from main import models
-from .serializers import LoginSerializer, ChangePasswordSerializer, ActivitySerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
+from .serializers import LoginSerializer, FirebaseSerializer, ChangePasswordSerializer, ActivitySerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
@@ -384,3 +384,23 @@ class AllUsersView(APIView):
                     }
                     data.append(request_data)
             return Response(data, status=200)
+
+class FireBaseResetToken(APIView):
+    
+    def post(self, request):
+        """Update the FCM token for a logged in use to enable push notifications
+
+        Returns:
+            Json response with message of success and status code of 200.
+        """
+        
+        serializer = FirebaseSerializer(data=request.data)
+        
+        serializer.is_valid(raise_exception=True)
+        
+        fcm_token = serializer.validated_data.get("fcm_token")
+
+        request.user.fcm_token = fcm_token
+        request.user.save()
+            
+        return Response({"message": "success"}, status=status.HTTP_200_OK)

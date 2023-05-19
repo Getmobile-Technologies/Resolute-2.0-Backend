@@ -117,3 +117,8 @@ class OrganisationSerializer(serializers.ModelSerializer):
 class CreateOrganisationSerializer(serializers.Serializer):
     admin = AdminRegistrationSerializer()
     organisation = OrganisationSerializer()
+
+   
+
+class FirebaseSerializer(serializers.Serializer):
+    fcm_token = serializers.CharField(max_length=6000)

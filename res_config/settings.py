@@ -16,6 +16,9 @@ from dotenv import load_dotenv, find_dotenv
 from django.utils.timezone import timedelta
 import dj_database_url
 import os
+import firebase_admin
+from firebase_admin import credentials
+import json
 
 
 load_dotenv(find_dotenv())
@@ -200,3 +203,10 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.getenv("API_KEY"),
     'API_SECRET': os.getenv("API_SECRET")
 }
+
+
+ 
+# FIREBASE_CREDENTIALS = os.getenv("FIREBASE_CREDENTIALS")
+    
+# cred = credentials.Certificate(json.loads(FIREBASE_CREDENTIALS))
+# firebase_admin.initialize_app(cred)

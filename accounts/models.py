@@ -30,6 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_admin = models.BooleanField(_('admin'), default=False)
     is_superuser = models.BooleanField(_('superuser'), default=False)
     is_deleted = models.BooleanField(_('deleted'), default=False)
+    fcm_token = models.TextField(null=True)
     user = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="mapped_users")
     timestamp = models.DateTimeField(auto_now_add=True, null=True)
 
@@ -84,4 +85,3 @@ class UserActivity(models.Model):
     organisation = models.CharField(max_length=250, null=True)
     timeline = models.CharField(max_length=300, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-
