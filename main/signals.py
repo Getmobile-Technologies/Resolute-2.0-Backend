@@ -23,7 +23,6 @@ def send_emergency_sms(sender, instance, created, **kwargs):
                 lat=instance.latitude,
                 emergency_con=contact.phone
             )
-        print("check")
 
         return
 
