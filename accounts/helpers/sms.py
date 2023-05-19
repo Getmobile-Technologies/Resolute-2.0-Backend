@@ -55,10 +55,11 @@ def sign_up_sms(number, pin):
     
 
 def emergency_sms(panic:PanicRequest, phone):
+    url = geocoding(lat=panic.latitude, long=panic.longitude)
 
     message = f"""{panic.user.first_name.title()} from {panic.location} just made a panic alert.
 The situation should be attended to immediately.
-see location: http://www.google.com/maps/place/{panic.longitude},{panic.latitude},
+see location: {url},
 Call: {panic.user.phone}"""
     request = sms.send_message({
         "from": "Resolute",

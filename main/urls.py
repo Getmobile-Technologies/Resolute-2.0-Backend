@@ -32,6 +32,5 @@ urlpatterns = [
     path('category/actions/<int:pk>', views.CategoryActions.as_view()),
     path('location/incidents/count', views.LocationIncidentCount.as_view()),
     path('emergency/contacts', views.EmergencyContactView.as_view()),
-    path('emergency/contact/<int:pk>', views.EmergencyActions.as_view()),
-    path('test/key', views.testkey.as_view())
+    path('emergency/contact/<int:pk>', views.EmergencyActions.as_view())
 ]

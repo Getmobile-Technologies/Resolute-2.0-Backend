@@ -22,14 +22,6 @@ def notification_handler(user, status):
 
 
 
-class testkey(APIView):
-    def get(self, request):
-        url = geocoding(lat="39.0438", long="-77.4874")
-        data = {
-            "url": url
-        }
-        return Response(data, status=200)
-
 class PanicView(APIView):
     permission_classes = (IsAuthenticated,)
     def post(self, request):
