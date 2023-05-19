@@ -24,25 +24,20 @@ def sign_up_sms(number, pin):
         "to": number,
         "text": message
     })
-    print(request)
+
 
     return request
     
 
-def emergency_sms(location, long, lat, emergency_con, user):
-    message = f"""
-    EMERGENCY!!!!
-    {name} at {location} has made a panic request.
-    The situation should be attended to immediately.
-    see location: http://www.google.com/maps/place/{long},{lat},
-    Call: {phone}
-    
-    """
+def emergency_sms(panic:PanicRequest, phone):
+    message = f"""{panic.user.first_name.title()} from {panic.location} just made a panic alert.
+The situation should be attended to immediately.
+see location: http://www.google.com/maps/place/{panic.longitude},{panic.latitude},
+Call: {panic.user.phone}"""
     request = sms.send_message({
         "from": "Resolute",
-        "to": emergency_con,
+        "to": phone,
         "text": message
     })
-    print(request)
 
     return request

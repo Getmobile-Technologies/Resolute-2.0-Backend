@@ -14,10 +14,8 @@ def send_emergency_sms(instance, created, **kwargs):
         contacts = EmergencyContact.objects.filter(is_deleted=False)
         for contact in contacts:
             emergency_sms(
-                location=instance.location,
-                long=instance.longitude,
-                lat=instance.latitude,
-                emergency_con=contact.phone
+                panic=instance
+                phone=contact.phone
             )
 
     return 
