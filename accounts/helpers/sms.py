@@ -7,7 +7,7 @@ Vonage_API_Secret = os.environ.get("vonage_secret_key")
 
 
 nexmo_client = vonage.Client(
-    key="533627b3", secret="ckLc6G8YwK2oBhAl"
+    key=Vonage_API_Key, secret=Vonage_API_Secret
 )
 sms = vonage.Sms(nexmo_client)
 
@@ -29,7 +29,7 @@ def sign_up_sms(number, pin):
     return request
     
 
-def emergency_sms(location, long, lat, emergency_con):
+def emergency_sms(location, long, lat, emergency_con, name):
     message = f"""
     EMERGENCY!!!!
     A panic request as been made at {location}.
