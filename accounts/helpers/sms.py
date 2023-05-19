@@ -2,8 +2,8 @@ import nexmo
 import vonage
 import os
 
-Vonage_API_Key = os.getenv("vonage_api_key")
-Vonage_API_Secret = os.getenv("vonage_secret_key")
+Vonage_API_Key = os.environ.get("vonage_api_key")
+Vonage_API_Secret = os.environ.get("vonage_secret_key")
 
 
 nexmo_client = vonage.Client(
@@ -24,6 +24,7 @@ def sign_up_sms(number, pin):
         "to": number,
         "text": message
     })
+    print(request)
 
     return request
     

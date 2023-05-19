@@ -93,3 +93,4 @@ class EmergencyContact(models.Model):
 
     full_name = models.CharField(max_length=350, null=True, blank=True)
     phone = models.CharField(max_length=200, unique=True, null=True, validators=[phone_regex], blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True, null=True)
