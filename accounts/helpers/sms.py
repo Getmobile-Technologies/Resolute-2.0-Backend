@@ -1,6 +1,7 @@
 import nexmo
 import vonage
 import os
+from main.models import PanicRequest
 
 Vonage_API_Key = os.environ.get("vonage_api_key")
 Vonage_API_Secret = os.environ.get("vonage_secret_key")
