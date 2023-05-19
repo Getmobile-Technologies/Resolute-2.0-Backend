@@ -3,8 +3,8 @@ import vonage
 import os
 from main.models import PanicRequest
 
-Vonage_API_Key = os.environ.get("vonage_api_key")
-Vonage_API_Secret = os.environ.get("vonage_secret_key")
+Vonage_API_Key = os.getenv("vonage_api_key")
+Vonage_API_Secret = os.getenv("vonage_secret_key")
 
 
 nexmo_client = vonage.Client(
