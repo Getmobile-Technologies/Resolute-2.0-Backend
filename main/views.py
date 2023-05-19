@@ -756,7 +756,7 @@ class EmergencyContactView(APIView):
     
     def get(self, request):
         try:
-            contacts = EmergencyContact.objects.filter(is_deleted=False)
+            contacts = EmergencyContact.objects.filter(is_deleted=False).order_by('-id')
         except EmergencyContact.DoesNotExist:
             return Response({"error": "error fetching data"}, status=404)
         serializer = EmergencySerializer(contacts, many=True)
