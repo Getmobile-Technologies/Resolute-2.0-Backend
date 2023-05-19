@@ -11,6 +11,7 @@ from django.http import Http404
 from accounts.permissions import IsAdmin, IsSuperUser
 from rest_framework.permissions import IsAuthenticated
 from accounts.models import UserActivity
+from .signals import send_emergency_sms
 from accounts.helpers.sms import emergency_sms
 User = get_user_model()
 
@@ -30,11 +31,12 @@ class PanicView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.validated_data['state'] = request.user.state
-        serializer.save(user=request.user)
+        panic = serializer.save(user=request.user)
         status = "new panic request"
         notification_handler(user=request.user, status=status)
         message = f"new panic request made by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        send_emergency_sms(created=True, instance=panic)
         
         data = {
             "message": "panic request sent",
