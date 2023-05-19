@@ -14,6 +14,7 @@ def send_emergency_sms(sender, instance, created, **kwargs):
         try:
             contacts = EmergencyContact.objects.all()
         except EmergencyContact.DoesNotExist:
+            print("fail")
             return
         for contact in contacts:
             emergency_sms(
@@ -22,6 +23,7 @@ def send_emergency_sms(sender, instance, created, **kwargs):
                 lat=instance.latitude,
                 emergency_con=contact.phone
             )
+        print("check")
 
         return
 

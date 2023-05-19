@@ -40,5 +40,6 @@ def emergency_sms(location, long, lat, emergency_con):
         "to": emergency_con,
         "text": message
     })
+    print(request)
 
     return request
