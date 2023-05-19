@@ -91,5 +91,5 @@ class Category(models.Model):
 class EmergencyContact(models.Model):
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+2341234567890'. Up to 15 digits allowed.")
 
-    full_name = models.CharField(max_length=350, null=True, blank=False)
-    phone = models.CharField(max_length=200, unique=True, null=True, validators=[phone_regex], blank=False)
+    full_name = models.CharField(max_length=350, null=True, blank=True)
+    phone = models.CharField(max_length=200, unique=True, null=True, validators=[phone_regex], blank=True)
