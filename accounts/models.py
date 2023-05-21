@@ -7,6 +7,7 @@ import re
 from .managers import UserManager
 from django.core.validators import RegexValidator
 from django.db.models import Count
+from django.utils import timezone
 from django.db.models import Q
 
 
@@ -46,6 +47,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.phone
+        
+    def delete(self):
+        self.is_deleted=True
+        self.is_active=False
+        self.phone = self.phone + f"--deleted--{timezone.now()}"
+        self.email = self.email + f"--deleted--{timezone.now()}"
+        self.save()
 
     @property
     def total_admin_panic(self):
