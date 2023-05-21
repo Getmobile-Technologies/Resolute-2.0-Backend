@@ -8,6 +8,7 @@ from .managers import UserManager
 from django.core.validators import RegexValidator
 from django.db.models import Count
 from django.utils import timezone
+import random
 from django.db.models import Q
 
 
@@ -52,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.is_deleted=True
         self.is_active=False
         self.phone = self.phone + f"--deleted--{timezone.now()}"
-        self.email = self.email + f"--deleted--{timezone.now()}"
+        self.email = f"{random.randint}-deleted-{self.email}"
         self.save()
 
     @property
