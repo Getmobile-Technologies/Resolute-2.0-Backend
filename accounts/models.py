@@ -94,3 +94,4 @@ class UserActivity(models.Model):
     organisation = models.CharField(max_length=250, null=True)
     timeline = models.CharField(max_length=300, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
+    

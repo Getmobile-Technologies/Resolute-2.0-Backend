@@ -106,23 +106,11 @@ class GetPanicRequests(APIView):
 
             return Response(data, status=200)
 
-class PanicActions(generics.RetrieveUpdateAPIView):
+class PanicActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
     queryset = PanicRequest.objects.filter(is_deleted=False)
     serializer_class = PanicSerializer
 
-    def delete(self, request, pk):
-        try:
-            obj = PanicRequest.objects.get(id=pk)
-        except PanicRequest.DoesNotExist:
-            return Response({"error": "panic request not found"}, status=404)
-        if not obj.is_deleted:
-            obj.is_deleted = True
-            obj.save()
-            return Response({"message": "success"}, status=200)
-
-        else:
-            return Response({"error": "object already deleted"}, status=400)
 
 
 class PanicReview(APIView):
@@ -201,23 +189,11 @@ class CallRequestView(APIView):
         }
         return Response(data, status=200)
 
-class CallRequestActions(generics.RetrieveUpdateAPIView):
+class CallRequestActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
     queryset = CallRequest.objects.filter(is_deleted=False)
     serializer_class = CallSerializer
 
-    def delete(self, request, pk):
-        try:
-            obj = CallRequest.objects.get(id=pk)
-        except CallRequest.DoesNotExist:
-            return Response({"error": "object not found"}, status=404)
-        if not obj.is_deleted:
-            obj.is_deleted = True
-            obj.save()
-            return Response({"message": "success"}, status=200)
-        else:
-            return Response({"error": "object is already deleted"}, status=400)
-        
 
 class GetCallRequestAdmin(APIView):
     permission_classes = (IsAdmin,)
@@ -361,22 +337,11 @@ class TrackMeRequestView(APIView):
         return Response(data, status=200)
     
 
-class TrackActions(generics.RetrieveUpdateAPIView):
+class TrackActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
     queryset = TrackMeRequest.objects.filter(is_deleted=False)
     serializer_class = TrackMeSerializer
 
-    def delete(self, request, pk):
-        try:
-            obj = TrackMeRequest.objects.get(id=pk)
-        except TrackMeRequest.DoesNotExist:
-            return Response({"error": "object not found"}, status=404)
-        if not obj.is_deleted:
-            obj.is_deleted = True
-            obj.save()
-            return Response({"message": "success"}, status=200)
-        else:
-            return Response({"error": "object already deleted"}, status=400)
         
         
 class GetTrackMeRequestAdmin(APIView):
@@ -508,23 +473,11 @@ class GetLocations(APIView):
             }
             return Response(data, status=200)
 
-class LocationActions(generics.RetrieveUpdateAPIView):
+class LocationActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
     queryset = StaffLocation.objects.filter(is_deleted=False)
     serializer_class = LocationSerializer
 
-    def delete(self, request, pk):
-        try:
-            obj = StaffLocation.objects.get(id=pk)
-        except StaffLocation.DoesNotExist:
-            return Response({"error": "location object not found"}, status=404)
-        if not obj.is_deleted:
-            obj.is_deleted = True
-            obj.save()
-            return Response({"message": "success"}, status=200)
-
-        else:
-            return Response({"error": f"location {obj.id} is already deleted"}, status=400)
 
 class ImageView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -614,23 +567,11 @@ class GetImageRequestAdmin(APIView):
             return Response(data, status=200)
         
 
-class ImageActions(generics.RetrieveUpdateAPIView):
+class ImageActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
     queryset = Images.objects.filter(is_deleted=False)
     serializer_class = ImageSerializer
 
-    def delete(self, request, pk):
-        try:
-            obj = Images.objects.get(id=pk)
-        except Images.DoesNotExist:
-            return Response({"error": "image object not found"}, status=404)
-        if not obj.is_deleted:
-            obj.is_deleted = True
-            obj.save()
-            return Response({"message": "success"}, status=200)
-
-        else:
-            return Response({"error": f"Image id {obj.id} is already deleted"}, status=400)
             
 
 class GetAdminNotifications(APIView):
@@ -653,18 +594,6 @@ class NotifficationActions(generics.RetrieveDestroyAPIView):
     queryset = Notifications.objects.filter(is_deleted=False)
     serializer_class = NotificationSerializer
 
-    def delete(self, request, pk):
-        try:
-            obj = Notifications.objects.get(id=pk)
-        except Notifications.DoesNotExist:
-            return Response({"error": "notification object not found"}, status=404)
-        if not obj.is_deleted:
-            obj.is_deleted = True
-            obj.save()
-            return Response({"message": "success"}, status=200)
-
-        else:
-            return Response({"error": "already deleted"}, status=400)
         
 
 class CreateCategory(APIView):
@@ -698,14 +627,7 @@ class CategoryActions(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CatgorySerializer
     queryset = Category.objects.filter(is_deleted=False)
 
-    def delete(self, request, pk):
-        try:
-            obj = Category.objects.get(id=pk)
-        except Category.DoesNotExist:
-            return Response({"error": "not found"}, status=404)
-        obj.is_deleted = True
-        obj.save()
-        return Response({"message": "category deleted"}, status=200)
+
 
 class LocationIncidentCount(APIView):
     permission_classes = (IsAdmin,)
@@ -771,14 +693,3 @@ class EmergencyActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = EmergencySerializer
     queryset = EmergencyContact.objects.filter(is_deleted=False)
-
-
-        
-    
-# class GetIncidentbyLocation(APIView):
-#     permission_classes = (IsAdmin,)
-
-#     def get(self, request):
-#         if request.user.role == 'admin':
-            
-#             location = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)

@@ -19,6 +19,10 @@ class PanicRequest(models.Model):
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    def delete(self):
+        self.is_deleted=True
+        self.save()
+
 
 
 class CallRequest(models.Model):
@@ -29,6 +33,10 @@ class CallRequest(models.Model):
     is_reviewed = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def delete(self):
+        self.is_deleted=True
+        self.save()
 
 
 class TrackMeRequest(models.Model):
@@ -41,6 +49,10 @@ class TrackMeRequest(models.Model):
     is_reviewed = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def delete(self):
+        self.is_deleted=True
+        self.save()
 
 
 class Images(models.Model):
@@ -55,6 +67,10 @@ class Images(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_reviewed = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def delete(self):
+        self.is_deleted=True
+        self.save()
 
 
 
