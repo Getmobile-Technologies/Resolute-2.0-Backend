@@ -639,9 +639,13 @@ class LocationIncidentCount(APIView):
             for location in locations:
                 locate = location.state
                 panic = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False).count()
+                resolved = PanicRequest.objects.filter(state=location.lower(), is_deleted=False, is_reviewed=True).count()
+                unresolved = PanicRequest.objects.filter(state=location.lower(), is_deleted=False, is_reviewed=False).count()
                 request_data = {
                     "state": location.state,
-                    "panic_count": panic
+                    "panic_count": panic,
+                    "panic_resolved": resolved,
+                    "panic_unresolved": unresolved
                 }
                 data.append(request_data)
             return Response(data, status=200)
@@ -654,9 +658,13 @@ class LocationIncidentCount(APIView):
             for location in locations:
                 locate = location.state
                 panic = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False).count()
+                resolved = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False, is_reviewed=True).count()
+                unresolved = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False, is_reviewed=False).count()
                 request_data = {
                     "state": location.state,
-                    "panic_count": panic
+                    "panic_count": panic,
+                    "panic_resolved": resolved,
+                    "panic_unresolved": unresolved
                 }
                 data.append(request_data)
             return Response(data, status=200)
