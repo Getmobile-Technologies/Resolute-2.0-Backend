@@ -25,7 +25,7 @@ def send_emergency_sms(instance, created, **kwargs):
     if created:
         contacts = EmergencyContact.objects.filter(is_deleted=False)
         admin = Organisations.objects.filter(name=instance.organisation)
-        phone = admin.contact_admin.phone
+        phone = admin.user.phone
         # contacts.append(admin_phone)
         # for contact in contacts:
         emergency_sms(
