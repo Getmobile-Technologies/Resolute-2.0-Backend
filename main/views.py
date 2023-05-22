@@ -544,9 +544,6 @@ class GetImageRequestAdmin(APIView):
                     request_data = {
                         "id": serializer.data['id'],
                         "image": serializer.data['image'],
-                        "image2": serializer.data['image2'],
-                        "image3": serializer.data['image3'],
-                        "image4": serializer.data['image4'],
                         "description": serializer.data['description'],
                         "location": serializer.data['location'],
                         "is_reviewed": serializer.data['is_reviewed'],
