@@ -372,23 +372,3 @@ class AllUsersView(APIView):
                     }
                     data.append(request_data)
             return Response(data, status=200)
-
-class FireBaseResetToken(APIView):
-    
-    def post(self, request):
-        """Update the FCM token for a logged in use to enable push notifications
-
-        Returns:
-            Json response with message of success and status code of 200.
-        """
-        
-        serializer = FirebaseSerializer(data=request.data)
-        
-        serializer.is_valid(raise_exception=True)
-        
-        fcm_token = serializer.validated_data.get("fcm_token")
-
-        request.user.fcm_token = fcm_token
-        request.user.save()
-            
-        return Response({"message": "success"}, status=status.HTTP_200_OK)
