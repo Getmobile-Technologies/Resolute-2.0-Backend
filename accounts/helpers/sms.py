@@ -2,7 +2,7 @@ import nexmo
 import vonage
 import os
 import requests
-from main.models import PanicRequest
+from main.models import PanicRequest, CallRequest
 import urllib.parse
 
 Vonage_API_Key = os.getenv("vonage_api_key")
@@ -60,6 +60,21 @@ def emergency_sms(panic:PanicRequest, phone):
     message = f"""{panic.user.first_name.title()} from {panic.location} just made a panic alert.
 The situation should be attended to immediately.
 see location: {url},
+Call: {panic.user.phone}"""
+    request = sms.send_message({
+        "from": "Resolute",
+        "to": phone,
+        "text": message
+    })
+
+    return request
+
+
+
+def call_emergency_sms(panic:CallRequest, phone):
+
+    message = f"""{panic.user.first_name.title()} from {panic.location} just made a distress call request.
+The situation should be attended to immediately.
 Call: {panic.user.phone}"""
     request = sms.send_message({
         "from": "Resolute",

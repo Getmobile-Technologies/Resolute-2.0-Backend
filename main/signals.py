@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from . models import PanicRequest, EmergencyContact
-from accounts.helpers.sms import emergency_sms
+from . models import PanicRequest, EmergencyContact, CallRequest
+from accounts.helpers.sms import emergency_sms, call_emergency_sms
 import random
 from accounts.models import Organisations 
 from django.core.mail import send_mail
@@ -26,14 +26,31 @@ def send_emergency_sms(instance, created, **kwargs):
         contacts = EmergencyContact.objects.filter(is_deleted=False)
         admin = Organisations.objects.get(name=instance.organisation)
         user = User.objects.get(id=admin.contact_admin_id)
-        # contacts.append(admin_phone)
-        # for contact in contacts:
-        emergency_sms(
-            panic=instance,
-            phone=user.phone
-        )
+        contacts.append(user.phone)
+        for contact in contacts:
+            emergency_sms(
+                panic=instance,
+                phone=contact.phone
+            )
 
-    return 
+        return 
+    
+
+
+@receiver(post_save, sender=CallRequest)
+def call__emergency_sms(instance, created, **kwargs):
+    if created:
+        contacts = EmergencyContact.objects.filter(is_deleted=False)
+        admin = Organisations.objects.get(name=instance.organisation)
+        user = User.objects.get(id=admin.contact_admin_id)
+        contacts.append(user.phone)
+        for contact in contacts:
+            call_emergency_sms(
+                panic=instance,
+                phone=contact.phone
+            )
+
+        return
 
 
 
