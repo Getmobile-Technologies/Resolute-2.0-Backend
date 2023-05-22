@@ -23,7 +23,7 @@ from firebase_admin import messaging
 def send_emergency_sms(instance, created, **kwargs):
     if created:
         contacts = EmergencyContact.objects.filter(is_deleted=False)
-        admin_phone = instance.organisation__organisation.contact_admin.user.phone
+        admin_phone = instance.organisation.contact_admin.user.phone
         contacts.append(admin_phone)
         # for contact in contacts:
         emergency_sms(
