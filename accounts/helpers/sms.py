@@ -73,9 +73,9 @@ Call: {panic.user.phone}"""
 
 def call_emergency_sms(panic:CallRequest, phone):
 
-    message = f"""{panic.user.first_name.title()} from {panic.location} just made a distress call request.
+    message = f"""{panic.user.first_name.title()} from {panic.user.location} just made a distress call request.
 The situation should be attended to immediately.
-Call: {panic.user.phone}"""
+Call: {panic.phone}"""
     request = sms.send_message({
         "from": "Resolute",
         "to": phone,
