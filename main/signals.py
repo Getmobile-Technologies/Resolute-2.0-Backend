@@ -16,7 +16,7 @@ import os
 import  requests
 from firebase_admin import messaging
 
-
+User = get_user_model()
 
 
 
@@ -24,13 +24,13 @@ from firebase_admin import messaging
 def send_emergency_sms(instance, created, **kwargs):
     if created:
         contacts = EmergencyContact.objects.filter(is_deleted=False)
-        admin = Organisations.objects.filter(name=instance.organisation)
-        phone = admin.contact_admin.user.phone
+        admin = Organisations.objects.get(name=instance.organisation)
+        user = User.objects.get(id=admin.contact_admin_id)
         # contacts.append(admin_phone)
         # for contact in contacts:
         emergency_sms(
             panic=instance,
-            phone=phone
+            phone=user.phone
         )
 
     return 
