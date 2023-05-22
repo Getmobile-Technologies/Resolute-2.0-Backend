@@ -56,3 +56,7 @@ class EmergencySerializer(serializers.ModelSerializer):
     class Meta:
         model = EmergencyContact
         fields = '__all__'
+
+
+class FirebaseSerializer(serializers.Serializer):
+    fcm_token = serializers.CharField(max_length=6000)

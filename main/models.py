@@ -58,9 +58,6 @@ class TrackMeRequest(models.Model):
 class Images(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="capture_request")
     image = models.ImageField(null=True, upload_to='capture')
-    image2 = models.ImageField(null=True, upload_to='capture')
-    image3 = models.ImageField(null=True, upload_to='capture')
-    image4 = models.ImageField(null=True, upload_to='capture')
     location = models.CharField(max_length=300, null=True, blank=False)
     organisation = models.CharField(max_length=300, null=True)
     description = models.TextField(null=True, blank=True)

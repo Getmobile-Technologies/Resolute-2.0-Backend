@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, LocationSerializer, EmergencySerializer, ImageSerializer, NotificationSerializer, CatgorySerializer
+from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, FirebaseSerializer, LocationSerializer, EmergencySerializer, ImageSerializer, NotificationSerializer, CatgorySerializer
 from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category, EmergencyContact
 from django.contrib.auth import get_user_model
 from rest_framework import status, generics
@@ -693,3 +693,23 @@ class EmergencyActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = EmergencySerializer
     queryset = EmergencyContact.objects.filter(is_deleted=False)
+
+class FireBaseResetToken(APIView):
+    
+    def post(self, request):
+        """Update the FCM token for a logged in use to enable push notifications
+
+        Returns:
+            Json response with message of success and status code of 200.
+        """
+        
+        serializer = FirebaseSerializer(data=request.data)
+        
+        serializer.is_valid(raise_exception=True)
+        
+        fcm_token = serializer.validated_data.get("fcm_token")
+
+        request.user.fcm_token = fcm_token
+        request.user.save()
+            
+        return Response({"message": "success"}, status=status.HTTP_200_OK)

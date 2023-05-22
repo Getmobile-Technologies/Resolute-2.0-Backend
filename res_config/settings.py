@@ -209,4 +209,6 @@ CLOUDINARY_STORAGE = {
 # FIREBASE_CREDENTIALS = os.getenv("FIREBASE_CREDENTIALS")
     
 # cred = credentials.Certificate(json.loads(FIREBASE_CREDENTIALS))
-# firebase_admin.initialize_app(cred)
+cred = credentials.Certificate('/Users/DELL/Desktop/Resolute/res_config/resolute.json')
+
+firebase_admin.initialize_app(cred)

@@ -15,14 +15,14 @@ from firebase_admin import messaging
 
 
 
-def send_notification(sender, instance:Notifications, created, *args,**kwargs):
+# def send_notification(sender, instance:Notifications, created, *args,**kwargs):
     
-    if created:        
-        if instance.user.fcm_token:
+#     if created:        
+#         if instance.user.fcm_token:
         
-            notification = messaging.Notification(title=instance.heading, body=instance.body, image=instance.image_url)
-            messaging.send(messaging.Message(notification=notification, token=instance.user.fcm_token))
-    return
+#             notification = messaging.Notification(title=instance.heading, body=instance.body, image=instance.image_url)
+#             messaging.send(messaging.Message(notification=notification, token=instance.user.fcm_token))
+#     return
 
 
 
