@@ -30,7 +30,7 @@ def send_emergency_sms(instance, created, **kwargs):
         for contact in contacts:
             emergency_sms(
                 panic=instance,
-                phone=contact.phone
+                phone=contact
             )
 
         return 
@@ -47,7 +47,7 @@ def call__emergency_sms(instance, created, **kwargs):
         for contact in contacts:
             call_emergency_sms(
                 panic=instance,
-                phone=contact.phone
+                phone=contact
             )
 
         return
