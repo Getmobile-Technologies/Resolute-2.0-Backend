@@ -488,7 +488,7 @@ class ImageView(APIView):
         serializer.validated_data['user'] = request.user
         serializer.save()
         status = "new image request"
-        notification_handler(user=request.user, organisation=request.user.organisation, status=status)
+        notification_handler(user=request.user, status=status)
         message = f"new image request made by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data = {
