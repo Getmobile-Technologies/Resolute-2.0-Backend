@@ -3,6 +3,7 @@ from django.db.models.signals import post_save
 from . models import PanicRequest, EmergencyContact
 from accounts.helpers.sms import emergency_sms
 import random
+from accounts.models import Organisations 
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from djoser.signals import user_registered, user_activated
@@ -23,12 +24,13 @@ from firebase_admin import messaging
 def send_emergency_sms(instance, created, **kwargs):
     if created:
         contacts = EmergencyContact.objects.filter(is_deleted=False)
-        admin_phone = instance.organisation.contact_admin.user.phone
-        contacts.append(admin_phone)
+        admin = Organisations.objects.filter(name=instance.organisation)
+        phone = admin.contact_admin.phone
+        # contacts.append(admin_phone)
         # for contact in contacts:
         emergency_sms(
             panic=instance,
-            phone=admin_phone
+            phone=phone
         )
 
     return 
