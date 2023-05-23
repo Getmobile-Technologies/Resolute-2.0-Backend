@@ -274,12 +274,11 @@ class AdminResetPassword(APIView):
             return Response({"erorr": "user not found"}, status=404)
         password = generate_password()
         user.set_password(password)
-        user.open_password = password
         user.save()
         message = f"{request.user.role} reset user password"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data = {
-            "message": "reset successful",
+            "message": "reset successful. please copy this somewhere as you would not have access to it again.",
             "password": password
         }
 

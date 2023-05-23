@@ -11,7 +11,7 @@ class PanicRequest(models.Model):
     longitude = models.CharField(max_length=200, null=True, blank=False)
     latitude = models.CharField(max_length=200, null=True, blank=False)
     location = models.CharField(max_length=200, null=True, blank=False)
-    state = models.CharField(max_length=300, null=True, blank=True)
+    user_location = models.CharField(max_length=300, null=True, blank=True) #location assigned to a user upon create
     status = models.CharField(max_length=100, null=True, default='panic')
     organisation = models.CharField(max_length=300, null=True)
     is_reviewed = models.BooleanField(default=False)
@@ -29,7 +29,7 @@ class CallRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="call_request")
     phone = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=100, null=True, default='call_request')
-    organisation = models.CharField(max_length=300, null=True)
+    organisation = models.ForeignKey(max_length=300, null=True)
     is_reviewed = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -95,7 +95,7 @@ class StaffLocation(models.Model):
 class Notifications(models.Model):
 
     status = models.CharField(max_length=300, null=True)
-    organisation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="organisation_notifications")
+    organisation = models.ForeignKey(, on_delete=models.CASCADE, null=True, blank=True, related_name="organisation_notifications")
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 

@@ -20,13 +20,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last_name'), max_length=250)
     phone = models.CharField(_('phone'), max_length=200, unique=True, null=True, validators=[phone_regex])
     email = models.EmailField(_('email'), unique=True, null=True, blank=False)
-    location = models.CharField(_('location'), max_length=300, null=True)
+    location = models.ForeignKey(_('location'), max_length=300, null=True)
     state = models.CharField(_('state'), max_length=300, null=True)
-    organisation = models.CharField(_('organisation'), max_length=300, null=True)
-    category = models.CharField(_('category'), max_length=300, null=True)
+    organisation = models.ForeignKey(_('organisation'), max_length=300, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
-    password = models.CharField(_('password'), max_length=100, null=True, blank=False)
-    open_password = models.CharField(_('open_password'), max_length=100, null=True)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)
     is_admin = models.BooleanField(_('admin'), default=False)
@@ -34,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_deleted = models.BooleanField(_('deleted'), default=False)
     fcm_token = models.TextField(null=True)
     user = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="mapped_users")
-    timestamp = models.DateTimeField(auto_now_add=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'password', 'email']
@@ -53,8 +50,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.is_deleted=True
         self.is_active=False
         self.phone = self.phone + f"--deleted--{timezone.now()}"
-        self.email = f"{random.randint}-deleted-{self.email}"
+        self.email = f"{random.randint()}-deleted-{self.email}"
         self.save()
+
 
     @property
     def total_admin_panic(self):
@@ -89,6 +87,7 @@ class Organisations(models.Model):
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    
 class UserActivity(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="users_activity")
     organisation = models.CharField(max_length=250, null=True)

@@ -15,10 +15,7 @@ from .signals import send_emergency_sms
 from accounts.helpers.sms import emergency_sms, geocoding
 User = get_user_model()
 
-def notification_handler(organisation, status):
-    notify = Notifications.objects.create(organisation=organisation, status=status)
 
-    return notify
 
 
 
