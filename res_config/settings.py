@@ -117,9 +117,15 @@ WSGI_APPLICATION = 'res_config.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config()
+# DATABASES = {}
+# DATABASES['default'] = dj_database_url.config()
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -206,9 +212,9 @@ CLOUDINARY_STORAGE = {
 
 
  
-# FIREBASE_CREDENTIALS = os.getenv("FIREBASE_CREDENTIALS")
+FIREBASE_CREDENTIALS = os.getenv("FIREBASE_CREDENTIALS")
     
-# # cred = credentials.Certificate(json.loads(FIREBASE_CREDENTIALS))
 # cred = credentials.Certificate(json.loads(FIREBASE_CREDENTIALS))
+cred = credentials.Certificate(json.loads(FIREBASE_CREDENTIALS))
 
-# firebase_admin.initialize_app(cred)
+firebase_admin.initialize_app(cred)
