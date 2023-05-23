@@ -15,8 +15,8 @@ from .signals import send_emergency_sms
 from accounts.helpers.sms import emergency_sms, geocoding
 User = get_user_model()
 
-def notification_handler(user, status):
-    notify = Notifications.objects.create(user=user, status=status)
+def notification_handler(organisation, status):
+    notify = Notifications.objects.create(organisation=organisation, status=status)
 
     return notify
 
@@ -703,7 +703,7 @@ class FireBaseResetToken(APIView):
     permission_classes = (IsAuthenticated,)
     
     def post(self, request):
-        """Update the FCM token for a logged in use to enable push notifications
+        """Update the FCM token for a logged in user to enable push notifications
 
         Returns:
             Json response with message of success and status code of 200.

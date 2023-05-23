@@ -56,12 +56,11 @@ def call__emergency_sms(instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Notifications)
-
 def send_notification(sender, instance:Notifications, created, *args,**kwargs):
     
     if created:        
         if instance.user.fcm_token:
         
-            notification = messaging.Notification(title=instance.heading, body=instance.body, image=instance.image_url)
+            notification = messaging.Notification(title=instance.heading, body=instance.body)
             messaging.send(messaging.Message(notification=notification, token=instance.user.fcm_token))
     return
