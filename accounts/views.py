@@ -22,12 +22,18 @@ from .helpers.sms import sign_up_sms
 from .helpers.mail import signup_mail
 from .permissions import IsAdmin, IsSuperUser
 from .authentication import phone_authenticate
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import action
+
+
 User = get_user_model()
 
 
 class UserRegisterView(APIView):
     permission_classes = (IsAdmin,)
 
+    @swagger_auto_schema(method="post", request_body=UserRegisterationSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
         data = {}
@@ -66,6 +72,8 @@ class UserRegisterView(APIView):
 class AdminRegisterView(APIView):
     permission_classes = (IsAdmin,)
 
+    @swagger_auto_schema(method="post", request_body=CreateOrganisationSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = CreateOrganisationSerializer(data=request.data)
 
@@ -91,10 +99,12 @@ class AdminRegisterView(APIView):
                     org_obj.save()
                 else:
                     return Response({"error": "error registering user"}, status=400)
+                
         except IntegrityError as e:
             data['response'] = 'error registering a new user.'
             data['error'] = str(e)
             return Response(data, status=400)
+        
         signup_mail(email= user.email, password=password, first_name=user.first_name) 
         message = f"new user created by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
@@ -116,6 +126,7 @@ class UserActions(generics.RetrieveUpdateDestroyAPIView):
     
 class UserProfile(APIView):
     permission_classes = (IsAuthenticated,)
+    
     def get(self, request):
         try:
             user = User.objects.get(id=request.user.id, is_deleted=False)
@@ -129,6 +140,9 @@ class UserProfile(APIView):
 
 class SuperAdminRegisterView(APIView):
     permission_classes = (IsSuperUser,)
+    
+    @swagger_auto_schema(method="post", request_body=SuperAdminSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = SuperAdminSerializer(data=request.data)
         data = {}
@@ -143,6 +157,7 @@ class SuperAdminRegisterView(APIView):
 
 class GetSuperUserAdmins(APIView):
     permission_classes = (IsSuperUser,)
+    
     def get(self, request):
         try:
             objs = User.objects.filter(is_deleted=False, is_admin=True, is_superuser=False).order_by('-id')
@@ -159,6 +174,7 @@ class ChangePasswordView(generics.GenericAPIView):
         """
         An endpoint for changing password.
         """
+        
         serializer_class = ChangePasswordSerializer
         model = User
         permission_classes = (IsAuthenticated,)
@@ -166,7 +182,10 @@ class ChangePasswordView(generics.GenericAPIView):
         def get_object(self):
             obj = self.request.user
             return obj
-
+        
+        
+        @swagger_auto_schema(method="post", request_body=ChangePasswordSerializer())
+        @action(methods=["post"], detail=True)
         def post(self, request):
             self.object = self.get_object()
             serializer = self.get_serializer(data=request.data)
@@ -190,6 +209,8 @@ class LogoutView(APIView):
     serializer_class = UserLogoutSerializer
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(method="post", request_body=UserLogoutSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -201,6 +222,8 @@ class LogoutView(APIView):
 
 class UserLoginView(APIView):
 
+    @swagger_auto_schema(method="post", request_body=LoginSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -267,6 +290,7 @@ class UserLoginView(APIView):
 class AdminResetPassword(APIView):
     permission_classes = (IsAdmin,)
 
+    
     def post(self, request, pk):
         try:
             user = User.objects.get(id=pk)

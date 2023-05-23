@@ -78,7 +78,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'djoser',
     'accounts',
-    'main'
+    'main',
+    'drf_yasg',
+    'coreapi',
 ]
 
 MIDDLEWARE = [

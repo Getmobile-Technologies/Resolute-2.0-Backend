@@ -14,6 +14,9 @@ from accounts.models import UserActivity
 from .signals import send_emergency_sms
 from accounts.helpers.sms import emergency_sms, geocoding
 from .helpers.notify import notification_handler
+from rest_framework.decorators import action
+from drf_yasg.utils import swagger_auto_schema
+
 User = get_user_model()
 
 
@@ -23,6 +26,9 @@ User = get_user_model()
 class PanicView(APIView):
     permission_classes = (IsAuthenticated,)
     
+    
+    @swagger_auto_schema(method="post", request_body=PanicSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = PanicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -115,6 +121,9 @@ class PanicActions(generics.RetrieveUpdateDestroyAPIView):
 
 class PanicReview(APIView):
     permission_classes = (IsAdmin,)
+    
+    @swagger_auto_schema(method="post", request_body=PanicSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
@@ -127,6 +136,7 @@ class PanicReview(APIView):
         else:
             return Response({"error": "request already reviewed"}, status=400)
         
+    
     def delete(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
@@ -141,6 +151,8 @@ class PanicReview(APIView):
 
 class PanicGenuineView(APIView):
     permission_classes = (IsAdmin,)
+    
+    
     def post(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
@@ -174,6 +186,9 @@ class AllPanicRequest(generics.ListAPIView):
     
 class CallRequestView(APIView):
     permission_classes = (IsAuthenticated,)
+    
+    @swagger_auto_schema(method="post", request_body=CallSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = CallSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -254,6 +269,7 @@ class GetCallRequestAdmin(APIView):
 
 class CallReview(APIView):
     permission_classes = (IsAdmin,)
+    
     def post(self, request, pk):
         try:
             obj = CallRequest.objects.get(id=pk)
@@ -281,6 +297,7 @@ class CallReview(APIView):
 
 class IncidentCounts(APIView):
     permission_classes = (IsAdmin,)
+    
     def get(self, request):
         if request.user.role == 'admin':
             try:
@@ -319,6 +336,9 @@ class IncidentCounts(APIView):
 
 
 class TrackMeRequestView(APIView):
+    
+    @swagger_auto_schema(method="post", request_body=TrackMeSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = TrackMeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -433,6 +453,9 @@ class TrackMeReview(APIView):
 
 class LocationCreateView(APIView):
     permission_classes = (IsAdmin,)
+    
+    @swagger_auto_schema(method="post", request_body=LocationSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = LocationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -481,6 +504,9 @@ class LocationActions(generics.RetrieveUpdateDestroyAPIView):
 
 class ImageView(APIView):
     permission_classes = (IsAuthenticated,)
+    
+    @swagger_auto_schema(method="post", request_body=ImageSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = ImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -596,6 +622,8 @@ class NotifficationActions(generics.RetrieveDestroyAPIView):
 class CreateCategory(APIView):
     permission_classes = (IsSuperUser,)
 
+    @swagger_auto_schema(method="post", request_body=CatgorySerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = CatgorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -674,6 +702,8 @@ class LocationIncidentCount(APIView):
 class EmergencyContactView(APIView):
     permission_classes = (IsSuperUser,)
 
+    @swagger_auto_schema(method="post", request_body=EmergencySerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = EmergencySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
