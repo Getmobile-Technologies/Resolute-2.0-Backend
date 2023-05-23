@@ -13,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from accounts.models import UserActivity
 from .signals import send_emergency_sms
 from accounts.helpers.sms import emergency_sms, geocoding
+from .helpers.notify import notification_handler
 User = get_user_model()
 
 
@@ -21,16 +22,18 @@ User = get_user_model()
 
 class PanicView(APIView):
     permission_classes = (IsAuthenticated,)
+    
     def post(self, request):
         serializer = PanicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.validated_data['state'] = request.user.state
         serializer.save(user=request.user)
-        status = "new panic request"
-        notification_handler(user=request.user, status=status)
-        message = f"new panic request made by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+
+        notification_handler(organization=request.user.organisation,
+                             message=f"New panic alert from {request.user.first_name}")
+        
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a new panic alert")
         
         data = {
             "message": "panic request sent",

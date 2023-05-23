@@ -24,9 +24,9 @@ User = get_user_model()
 def send_emergency_sms(instance, created, **kwargs):
     if created:
         contacts = list(EmergencyContact.objects.filter(is_deleted=False))
-        admin = Organisations.objects.get(name=instance.organisation)
-        user = User.objects.get(id=admin.contact_admin_id)
-        contacts.append(user.phone)
+        org = Organisations.objects.get(id=instance.organisation.id, is_deleted=False)
+
+        contacts.append(org.contact_admin.phone)
         for contact in contacts:
             emergency_sms(
                 panic=instance,
@@ -38,12 +38,12 @@ def send_emergency_sms(instance, created, **kwargs):
 
 
 @receiver(post_save, sender=CallRequest)
-def call__emergency_sms(instance, created, **kwargs):
+def call_emergency_sms(instance, created, **kwargs):
     if created:
         contacts = list(EmergencyContact.objects.filter(is_deleted=False))
-        admin = Organisations.objects.get(name=instance.organisation)
-        user = User.objects.get(id=admin.contact_admin_id)
-        contacts.append(user.phone)
+        org = Organisations.objects.get(id=instance.organisation.id, is_deleted=False)
+
+        contacts.append(org.contact_admin.phone)
         for contact in contacts:
             call_emergency_sms(
                 panic=instance,

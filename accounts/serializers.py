@@ -58,7 +58,9 @@ class SuperAdminSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-
+    location_data = serializers.ReadOnlyField()
+    organisation_data = serializers.ReadOnlyField()
+    
     class Meta:
         model = User
         fields = '__all__'
