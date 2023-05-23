@@ -30,6 +30,7 @@ class TrackMeSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = StaffLocation
         fields = '__all__'

@@ -212,7 +212,15 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv("API_SECRET")
 }
 
-
+SWAGGER_SETTINGS = {
+        'SECURITY_DEFINITIONS': {
+            'Bearer': {
+                'type': 'apiKey',
+                'name': 'Authorization',
+                'in': 'header'
+            }
+            }
+        }
 
 FIREBASE_CREDENTIALS = os.getenv("FIREBASE_CREDENTIALS")
     

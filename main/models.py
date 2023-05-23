@@ -74,10 +74,10 @@ class Images(models.Model):
 
 
 class StaffLocation(models.Model):
-    user_location = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     city = models.CharField(max_length=500, null=True)
     state = models.CharField(max_length=250, null=True)
-    organisation = models.CharField(max_length=300, null=True)
+    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 

@@ -38,22 +38,17 @@ class UserRegisterView(APIView):
         serializer = UserRegisterationSerializer(data=request.data)
         data = {}
         password = generate_password()
+        
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['user'] = request.user
+        serializer.validated_data['password'] = password
 
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.validated_data['user'] = request.user
-            serializer.validated_data['password'] = password
-            serializer.validated_data['open_password'] = password
+        if request.user.role == 'admin':
+            serializer.validated_data['organisation'] = request.user.organisation
 
-            if request.user.role == 'admin':
-                serializer.validated_data['organisation'] = request.user.organisation
-
-            account = serializer.save()
-            sign_up_sms(number=account.phone, pin=password)
-        except IntegrityError as e:
-            data['response'] = 'error registering a new user.'
-            data['error'] = str(e)
-            return Response(data, status=400)
+        account = serializer.save()
+        sign_up_sms(number=account.phone, pin=password)
+    
         message = f"new user created by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         data['response'] = 'successfully registered a new user.'
@@ -63,7 +58,7 @@ class UserRegisterView(APIView):
         data['phone'] = account.phone
         data['email'] = account.email
         data['password'] = password
-        data['location'] = account.location
+        data['location'] = account.location.city
         data['organisation'] = account.organisation
 
         return Response(data)
@@ -79,31 +74,20 @@ class AdminRegisterView(APIView):
 
         data = {}
 
-        try:
-            serializer.is_valid(raise_exception=True)
-            admin = serializer.validated_data.pop('admin')
-            organisation = serializer.validated_data.pop('organisation')
-            name = organisation['name']
-            category = organisation['category']
-            try:
-                get_object_or_404(Organisations, name=name)
-                return Response({"error": "organisation already exist"}, status=400)
-            except Http404:
-                user = User.objects.create(user=request.user, organisation=name, category=category, is_admin=True, is_staff=True, **admin)
-                password = generate_admin_password()
-                if user:
-                    user.set_password(password)
-                    user.save()
-                    org_obj = Organisations.objects.create(**organisation)
-                    org_obj.contact_admin = user
-                    org_obj.save()
-                else:
-                    return Response({"error": "error registering user"}, status=400)
-                
-        except IntegrityError as e:
-            data['response'] = 'error registering a new user.'
-            data['error'] = str(e)
-            return Response(data, status=400)
+        serializer.is_valid(raise_exception=True)
+        admin = serializer.validated_data.pop('admin')
+        organisation = serializer.validated_data.pop('organisation')
+        category = organisation['category']
+        user = User.objects.create(is_admin=True, is_staff=True, **admin)
+        password = generate_admin_password()
+        user.set_password(password)
+        user.save()
+
+        org_obj = Organisations.objects.create(**organisation)
+        org_obj.contact_admin = user
+        org_obj.save()
+        user.organisation = org_obj
+        user.save()
         
         signup_mail(email= user.email, password=password, first_name=user.first_name) 
         message = f"new user created by {request.user.role}"
