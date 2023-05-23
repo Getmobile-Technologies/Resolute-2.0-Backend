@@ -697,7 +697,6 @@ class EmergencyActions(generics.RetrieveUpdateDestroyAPIView):
     queryset = EmergencyContact.objects.filter(is_deleted=False)
 
 class FireBaseResetToken(APIView):
-    permission_classes = (IsAuthenticated,)
     
     def post(self, request):
         """Update the FCM token for a logged in user to enable push notifications
