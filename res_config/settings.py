@@ -212,8 +212,8 @@ CLOUDINARY_STORAGE = {
 
 
 
-FIREBASE_CREDENTIALS = os.getenv("FIREBASE_CREDENTIALS")
+# FIREBASE_CREDENTIALS = os.getenv("FIREBASE_CREDENTIALS")
     
-cred = credentials.Certificate(json.loads(FIREBASE_CREDENTIALS))
+# cred = credentials.Certificate(json.loads(FIREBASE_CREDENTIALS))
 
-firebase_admin.initialize_app(cred)
+# firebase_admin.initialize_app(cred)
