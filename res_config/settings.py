@@ -22,6 +22,9 @@ import json
 
 
 load_dotenv(find_dotenv())
+
+
+ENVIRONMENT=os.getenv("ENVIRONMENT", "Development")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,37 +33,73 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("MYKEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-ALLOWED_HOSTS = ['resolute.herokuapp.com', '127.0.0.1', '0.0.0.0:$PORT', 'localhost']
+if ENVIRONMENT.title() == "Development":
+    
+    ALLOWED_HOSTS = []
+    DEBUG = True
+    DATABASES = {
+        'default' : {
+            'ENGINE' : 'django.db.backends.sqlite3',
+            'NAME' : BASE_DIR/ 'db.sqlite3'
+        }
+    }
+    
+    
+else:
+    
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(',')
+    DEBUG = False
+    
+    CORS_ALLOW_ALL_ORIGIN = True
+    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ALLOW_ALL_ORIGINS = True
+    CORS_ALLOW_CREDENTIALS = True
+    
+        
+    DATABASES = {}
+    DATABASES['default'] = dj_database_url.config()
+    
+    
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': os.path.join(BASE_DIR, 'resolute.log'),
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
+    
+    SESSION_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_REDIRECT_EXEMPT = []
+    SECURE_SSL_HOST = None
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER =(
+        ('HTTP_X_FORWARDED_PROTO', 'https')
+    )
+    CSRF_COOKIE_SECURE=True
+    
+    
 
-CSRF_TRUSTED_ORIGINS = ['https://resolute.herokuapp.com' ,'https://*.127.0.0.1', 'http://localhost']
 
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4000",
-    "http://127.0.0.1:8080",
-    "https://resolute.herokuapp.com"
-
-]
-
-CORS_ALLOW_ALL_ORIGIN = True
-CORS_ALLOW_HEADERS = [
-    'baggage',
-    'content-type',
-    'authorization',
-    'sentry-trace'
-    ]
-
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-
-
-DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,8 +108,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
+    'django.contrib.staticfiles',
     'phonenumber_field',
     'corsheaders',
     'cloudinary',
@@ -120,8 +159,6 @@ WSGI_APPLICATION = 'res_config.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config()
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -147,7 +184,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 
@@ -203,8 +240,8 @@ AUTHENTICATION_BACKENDS = [
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv("CLOUD_NAME"),
-    'API_KEY': os.getenv("API_KEY"),
-    'API_SECRET': os.getenv("API_SECRET")
+    'API_KEY': os.getenv("CLOUD_API_KEY"),
+    'API_SECRET': os.getenv("CLOUD_API_SECRET")
 }
 
 SWAGGER_SETTINGS = {
