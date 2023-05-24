@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from django.utils import timezone
+from accounts.models import Organisations
 User = get_user_model()
 
 
@@ -13,7 +14,7 @@ class PanicRequest(models.Model):
     location = models.CharField(max_length=200, null=True, blank=False)
     user_location = models.CharField(max_length=300, null=True, blank=True) #location assigned to a user upon create
     status = models.CharField(max_length=100, null=True, default='panic')
-    organisation = models.CharField(max_length=300, null=True)
+    organisation = models.ForeignKey(Organisations, on_delete=models.CASCADE, null=True)
     is_reviewed = models.BooleanField(default=False)
     is_genuine = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -29,7 +30,7 @@ class CallRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="call_request")
     phone = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=100, null=True, default='call_request')
-    organisation = models.ForeignKey(max_length=300, null=True)
+    organisation = models.ForeignKey(Organisations, on_delete=models.CASCADE, null=True)
     is_reviewed = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -44,7 +45,7 @@ class TrackMeRequest(models.Model):
     longitude = models.CharField(max_length=200, null=True, blank=False)
     latitude = models.CharField(max_length=200, null=True, blank=False)
     location = models.CharField(max_length=200, null=True, blank=False)
-    organisation = models.CharField(max_length=300, null=True)
+    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True)
     status = models.CharField(max_length=100, null=True, default='track_request')
     is_reviewed = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
@@ -59,7 +60,7 @@ class Images(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="capture_request")
     image = models.ImageField(null=True, upload_to='capture')
     location = models.CharField(max_length=300, null=True, blank=False)
-    organisation = models.CharField(max_length=300, null=True)
+    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True)
     description = models.TextField(null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
     is_reviewed = models.BooleanField(default=False)
@@ -73,10 +74,10 @@ class Images(models.Model):
 
 
 class StaffLocation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="staff_location")
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     city = models.CharField(max_length=500, null=True)
     state = models.CharField(max_length=250, null=True)
-    organisation = models.CharField(max_length=300, null=True)
+    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -93,9 +94,8 @@ class StaffLocation(models.Model):
 
 
 class Notifications(models.Model):
-
-    status = models.CharField(max_length=300, null=True)
-    organisation = models.ForeignKey(, on_delete=models.CASCADE, null=True, blank=True, related_name="organisation_notifications")
+    message = models.CharField(max_length=300, null=True)
+    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True, blank=True, related_name="organisation_notifications")
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 

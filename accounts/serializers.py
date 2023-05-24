@@ -11,32 +11,19 @@ User = get_user_model()
 
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(max_length=100, default='staff')
-    password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=False)
-    email = serializers.CharField(max_length=200, required=False)
-    location = serializers.CharField(required=True)
-    phone = serializers.CharField(required=True)
-    organisation = serializers.CharField(required=False)
-    open_password = serializers.CharField(required=False)
-    state = serializers.CharField(required=True)
 
     class Meta():
         model = User
-        fields = ['id', "first_name", "last_name", "phone", "email", 'location', "state", "organisation", "role", "password", "open_password"]
+        fields = ["first_name", "last_name", "phone", "email", 'location', "role"]
 
     def create(self, validate_data):
         return User.objects.create_user(**validate_data)
 
 class AdminRegistrationSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(max_length=100, default='admin')
-    password = serializers.CharField(style={"input_type": "password"}, write_only=True, required=False)
-    location = serializers.CharField(required=False)
-    organisation = serializers.CharField(required=False)
-    phone = serializers.CharField(required=True)
 
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name", "phone", "email", "location", "role", "organisation", "password"]
+        fields = ["first_name", "last_name", "phone", "email", "role"]
 
     def create(self, validate_data):
         return User.objects.create_admin(**validate_data)
@@ -58,7 +45,10 @@ class SuperAdminSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    location_data = serializers.ReadOnlyField()
+    organisation_data = serializers.ReadOnlyField()
 
+    
     class Meta:
         model = User
         fields = '__all__'
@@ -108,6 +98,8 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
+    admin_data = serializers.ReadOnlyField()
+    category_data = serializers.ReadOnlyField()
 
     class Meta:
         model = Organisations

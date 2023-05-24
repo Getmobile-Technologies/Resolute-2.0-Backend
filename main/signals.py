@@ -24,9 +24,8 @@ User = get_user_model()
 def send_emergency_sms(instance, created, **kwargs):
     if created:
         contacts = list(EmergencyContact.objects.filter(is_deleted=False))
-        admin = Organisations.objects.get(name=instance.organisation)
-        user = User.objects.get(id=admin.contact_admin_id)
-        contacts.append(user.phone)
+        admin = instance.user.user
+        contacts.append(admin.phone)
         for contact in contacts:
             emergency_sms(
                 panic=instance,
@@ -41,9 +40,8 @@ def send_emergency_sms(instance, created, **kwargs):
 def call__emergency_sms(instance, created, **kwargs):
     if created:
         contacts = list(EmergencyContact.objects.filter(is_deleted=False))
-        admin = Organisations.objects.get(name=instance.organisation)
-        user = User.objects.get(id=admin.contact_admin_id)
-        contacts.append(user.phone)
+        admin = instance.user.user
+        contacts.append(admin.phone)
         for contact in contacts:
             call_emergency_sms(
                 panic=instance,
@@ -55,12 +53,12 @@ def call__emergency_sms(instance, created, **kwargs):
 
 
 
-@receiver(post_save, sender=Notifications)
-def send_notification(sender, instance:Notifications, created, *args,**kwargs):
+# @receiver(post_save, sender=Notifications)
+# def send_notification(sender, instance:Notifications, created, *args,**kwargs):
     
-    if created:        
-        if instance.user.fcm_token:
+#     if created:        
+#         if instance.organisation.fcm_token:
         
-            notification = messaging.Notification(title=instance.heading, body=instance.body)
-            messaging.send(messaging.Message(notification=notification, token=instance.user.fcm_token))
-    return
+#             notification = messaging.Notification(title=instance.heading, body=instance.body)
+#             messaging.send(messaging.Message(notification=notification, token=instance.user.fcm_token))
+#     return

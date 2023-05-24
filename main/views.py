@@ -13,6 +13,10 @@ from rest_framework.permissions import IsAuthenticated
 from accounts.models import UserActivity
 from .signals import send_emergency_sms
 from accounts.helpers.sms import emergency_sms, geocoding
+from .helpers.notify import notification_handler
+from rest_framework.decorators import action
+from drf_yasg.utils import swagger_auto_schema
+
 User = get_user_model()
 
 
@@ -21,16 +25,21 @@ User = get_user_model()
 
 class PanicView(APIView):
     permission_classes = (IsAuthenticated,)
+    
+    
+    @swagger_auto_schema(method="post", request_body=PanicSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = PanicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
-        serializer.validated_data['state'] = request.user.state
+        serializer.validated_data['user_location'] = request.user.location.state
         serializer.save(user=request.user)
-        status = "new panic request"
-        notification_handler(user=request.user, status=status)
-        message = f"new panic request made by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+
+        notification_handler(organisation=request.user.organisation,
+                             message=f"New panic alert from {request.user.first_name}")
+        
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a new panic alert")
         
         data = {
             "message": "panic request sent",
@@ -65,7 +74,7 @@ class GetPanicRequests(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -94,7 +103,7 @@ class GetPanicRequests(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -112,6 +121,9 @@ class PanicActions(generics.RetrieveUpdateDestroyAPIView):
 
 class PanicReview(APIView):
     permission_classes = (IsAdmin,)
+    
+    @swagger_auto_schema(method="post", request_body=PanicSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
@@ -124,6 +136,7 @@ class PanicReview(APIView):
         else:
             return Response({"error": "request already reviewed"}, status=400)
         
+    
     def delete(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
@@ -138,6 +151,8 @@ class PanicReview(APIView):
 
 class PanicGenuineView(APIView):
     permission_classes = (IsAdmin,)
+    
+    
     def post(self, request, pk):
         try:
             obj = PanicRequest.objects.get(id=pk)
@@ -171,15 +186,20 @@ class AllPanicRequest(generics.ListAPIView):
     
 class CallRequestView(APIView):
     permission_classes = (IsAuthenticated,)
+    
+    @swagger_auto_schema(method="post", request_body=CallSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = CallSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user, phone=request.user.phone)
-        status = "new call request"
-        notification_handler(user=request.user, status=status)
-        message = f"new call request made by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+
+        notification_handler(organisation=request.user.organisation,
+                             message=f"New call alert from {request.user.first_name}")
+        
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a call panic alert")
+
         data = {
             "message": "call request successful",
             "id": request.user.id
@@ -213,7 +233,7 @@ class GetCallRequestAdmin(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -251,6 +271,7 @@ class GetCallRequestAdmin(APIView):
 
 class CallReview(APIView):
     permission_classes = (IsAdmin,)
+    
     def post(self, request, pk):
         try:
             obj = CallRequest.objects.get(id=pk)
@@ -278,6 +299,7 @@ class CallReview(APIView):
 
 class IncidentCounts(APIView):
     permission_classes = (IsAdmin,)
+    
     def get(self, request):
         if request.user.role == 'admin':
             try:
@@ -316,15 +338,19 @@ class IncidentCounts(APIView):
 
 
 class TrackMeRequestView(APIView):
+    
+    @swagger_auto_schema(method="post", request_body=TrackMeSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = TrackMeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user)
-        status = "new track me request"
-        notification_handler(user=request.user, status=status)
-        message = f"new track request made by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        notification_handler(organisation=request.user.organisation,
+                             message=f"New Track alert from {request.user.first_name}")
+        
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a track alert")
+
         data = {
             "message": "tracking request sent",
             "user": {
@@ -364,7 +390,7 @@ class GetTrackMeRequestAdmin(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -430,20 +456,23 @@ class TrackMeReview(APIView):
 
 class LocationCreateView(APIView):
     permission_classes = (IsAdmin,)
+    
+    @swagger_auto_schema(method="post", request_body=LocationSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = LocationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         city = serializer.validated_data['city']
         state = serializer.validated_data['state']
-        try:
-            get_object_or_404(StaffLocation, city=city, state=state)
+        if StaffLocation.objects.filter(city=city, state=state, organisation=request.user.organisation, is_deleted=False).exists():
             return Response({"error": "location already exist"}, status=400)
-        except Http404:
-            serializer.validated_data['organisation'] = request.user.organisation
-            serializer.save(user=request.user)
-            message = f"new location created by {request.user.role}"
-            UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
-            return Response({"message": "location created"}, status=200)
+        
+        serializer.validated_data['organisation'] = request.user.organisation
+        serializer.validated_data['admin'] = request.user
+        serializer.save(user=request.user)
+        message = f"new location created by {request.user.role}"
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        return Response({"message": "location created"}, status=200)
     
 class GetLocations(APIView):
     permission_classes = (IsAdmin,)
@@ -478,16 +507,18 @@ class LocationActions(generics.RetrieveUpdateDestroyAPIView):
 
 class ImageView(APIView):
     permission_classes = (IsAuthenticated,)
+    
+    @swagger_auto_schema(method="post", request_body=ImageSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = ImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.validated_data['user'] = request.user
         serializer.save()
-        status = "new image request"
-        notification_handler(user=request.user, status=status)
-        message = f"new image request made by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        notification_handler(organisation=request.user.organisation,
+                             message=f"New image alert from {request.user.first_name}")
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a image request")
         data = {
             "message": "image request successful"
             
@@ -522,7 +553,7 @@ class GetImageRequestAdmin(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -551,7 +582,7 @@ class GetImageRequestAdmin(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -593,6 +624,8 @@ class NotifficationActions(generics.RetrieveDestroyAPIView):
 class CreateCategory(APIView):
     permission_classes = (IsSuperUser,)
 
+    @swagger_auto_schema(method="post", request_body=CatgorySerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = CatgorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -634,10 +667,9 @@ class LocationIncidentCount(APIView):
                 return Response({"error": "not found"}, status=404)
             data = []
             for location in locations:
-                locate = location.state
-                panic = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False).count()
-                resolved = PanicRequest.objects.filter(state=location.lower(), is_deleted=False, is_reviewed=True).count()
-                unresolved = PanicRequest.objects.filter(state=location.lower(), is_deleted=False, is_reviewed=False).count()
+                panic = PanicRequest.objects.filter(user_location=location.state, is_deleted=False).count()
+                resolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=True).count()
+                unresolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=False).count()
                 request_data = {
                     "state": location.state,
                     "panic_count": panic,
@@ -653,10 +685,9 @@ class LocationIncidentCount(APIView):
                 return Response({"error": "not found"}, status=404)
             data = []
             for location in locations:
-                locate = location.state
-                panic = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False).count()
-                resolved = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False, is_reviewed=True).count()
-                unresolved = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False, is_reviewed=False).count()
+                panic = PanicRequest.objects.filter(user_location=location.state, is_deleted=False).count()
+                resolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=True).count()
+                unresolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=False).count()
                 request_data = {
                     "state": location.state,
                     "panic_count": panic,
@@ -671,6 +702,8 @@ class LocationIncidentCount(APIView):
 class EmergencyContactView(APIView):
     permission_classes = (IsSuperUser,)
 
+    @swagger_auto_schema(method="post", request_body=EmergencySerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = EmergencySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

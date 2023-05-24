@@ -11,11 +11,11 @@ def generate_password():
 
 def generate_admin_password():
     a = []
-    for _ in range(4):
+    for _ in range(6):
         a.append(random.choice(string.digits))
     random.shuffle(a)
     pin = "".join(a)
-    return "resolute" + pin
+    return pin
 
 
 def split(str):

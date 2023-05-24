@@ -10,6 +10,7 @@ from django.db.models import Count
 from django.utils import timezone
 import random
 from django.db.models import Q
+from django.forms import model_to_dict
 
 
 
@@ -20,9 +21,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last_name'), max_length=250)
     phone = models.CharField(_('phone'), max_length=200, unique=True, null=True, validators=[phone_regex])
     email = models.EmailField(_('email'), unique=True, null=True, blank=False)
-    location = models.ForeignKey(_('location'), max_length=300, null=True)
-    state = models.CharField(_('state'), max_length=300, null=True)
-    organisation = models.ForeignKey(_('organisation'), max_length=300, null=True)
+    location = models.ForeignKey("main.StaffLocation", on_delete=models.CASCADE, null=True)
+    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)
@@ -52,8 +52,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.phone = self.phone + f"--deleted--{timezone.now()}"
         self.email = f"{random.randint()}-deleted-{self.email}"
         self.save()
-
-
+  
+    
     @property
     def total_admin_panic(self):
         user_requests_count = self.mapped_users.annotate(user_request_count=Count('user_request'))
@@ -79,18 +79,41 @@ class User(AbstractBaseUser, PermissionsMixin):
         return total_user_genuine_requests_count
 
 
+    @property
+    def organisation_data(self):
+        return model_to_dict(self.organisation)
+    
+    @property
+    def location_data(self):
+        return model_to_dict(self.location)
+
 
 class Organisations(models.Model):
-    name = models.CharField(max_length=250, null=True)
-    category = models.CharField(max_length=200, null=True)
+    name = models.CharField(max_length=250, null=True, unique=True)
+    category = models.ForeignKey("main.Category", on_delete=models.CASCADE)
     contact_admin = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="admin_users")
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
-
+    
+    def __str__(self):
+        return self.name
+    
+    def delete(self):
+        self.is_deleted=True
+        self.save()
+        #TODO: get all the corresponding users, admins and soft delete their accounts -- FEMI!
+        
+    @property
+    def admin_data(self):
+        return model_to_dict(self.contact_admin)
+    
+    @property
+    def category_data(self):
+        return model_to_dict(self.category)
     
 class UserActivity(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="users_activity")
-    organisation = models.CharField(max_length=250, null=True)
+    organisation = models.CharField(max_length=250, null=True) #take this out
     timeline = models.CharField(max_length=300, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     

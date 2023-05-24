@@ -3,3 +3,4 @@
 db.sqlite3
 *.json
 venv
+new_env
