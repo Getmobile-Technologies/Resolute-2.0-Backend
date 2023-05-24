@@ -19,7 +19,7 @@ def geocoding(lat, long):
     url = "https://maps.googleapis.com/maps/api/geocode/json"
     params = {
         "latlng": f"{lat},{long}",
-        "key": f"{api_key}"
+        "key": api_key
     }
     response  = requests.get(url=url, params=params)
     result = response.json()['results'][0]

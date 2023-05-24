@@ -11,7 +11,7 @@ from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from main import models
-from .serializers import LoginSerializer, ChangePasswordSerializer, ActivitySerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, ActivitySerializer, OrganisationSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
@@ -42,6 +42,7 @@ class UserRegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['user'] = request.user
         serializer.validated_data['password'] = password
+        serializer.validated_data['role'] = "staff"
 
         if request.user.role == 'admin':
             serializer.validated_data['organisation'] = request.user.organisation
@@ -59,7 +60,7 @@ class UserRegisterView(APIView):
         data['email'] = account.email
         data['password'] = password
         data['location'] = account.location.city
-        data['organisation'] = account.organisation
+        data['organisation'] = account.organisation.name
 
         return Response(data)
 
@@ -77,8 +78,7 @@ class AdminRegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         admin = serializer.validated_data.pop('admin')
         organisation = serializer.validated_data.pop('organisation')
-        category = organisation['category']
-        user = User.objects.create(is_admin=True, is_staff=True, **admin)
+        user = User.objects.create(is_admin=True, is_staff=True, role="admin", **admin)
         password = generate_admin_password()
         user.set_password(password)
         user.save()
@@ -110,17 +110,17 @@ class UserActions(generics.RetrieveUpdateDestroyAPIView):
     
 class UserProfile(APIView):
     permission_classes = (IsAuthenticated,)
-    
+
     def get(self, request):
         try:
-            user = User.objects.get(id=request.user.id, is_deleted=False)
-        except User.DoesNotExist:
+            user = get_object_or_404(User, id=request.user.id)
+        except Http404:
             return Response({"error": "user not found"}, status=404)
         serializer = UserDetailSerializer(user)
-        data = {
-            "user": serializer.data
-        }
-        return Response(data, status=200)
+        return Response(serializer.data, status=200)
+   
+    
+    
 
 class SuperAdminRegisterView(APIView):
     permission_classes = (IsSuperUser,)
@@ -304,43 +304,20 @@ class OrganizationView(APIView):
 
     def get(self, request):
         orgs = Organisations.objects.filter(is_deleted=False).order_by('-id')
-        data = []
-        for org in orgs:
-            user = User.objects.get(id=org.contact_admin_id)
-            sum = User.objects.filter(organisation=org.name, is_deleted=False).count()
-            incidents = models.PanicRequest.objects.filter(organisation=org.name, is_deleted=False).count()
-            resolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=True, is_deleted=False).count()
-            unresolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=False, is_deleted=False).count()
-            ingenuine = models.PanicRequest.objects.filter(organisation=org.name, is_genuine=False, is_deleted=False).count()
-            locations = models.StaffLocation.objects.filter(organisation=org.name, is_deleted=False).count()
-            captures = models.Images.objects.filter(organisation=org.name, is_deleted=False).count()
-            track = models.TrackMeRequest.objects.filter(organisation=org.name, is_deleted=False).count()
-            call = models.CallRequest.objects.filter(organisation=org.name, is_deleted=False).count()
+        serializer = OrganisationSerializer(orgs, many=True)
+        return Response(serializer.data, 200)
 
-            request_data = {
-                "id": org.id,
-                "organisation": org.name,
-                "category": org.category,
-                "total_registered_users": sum,
-                "total_reported_incidents": incidents,
-                "total_resolved_incidents": resolved,
-                "total_unresolved_incidents": unresolved,
-                "total_ingenuine_incidents": ingenuine,
-                "total_locations": locations,
-                "total_capture": captures,
-                "total_track": track,
-                "total_call": call,
-
-                "contact_admin": {
-                    "id": user.id,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "phone": user.phone,
-                    "email": user.email
-                }
-            }
-            data.append(request_data)
-        return Response(data, status=200)
+        # for org in orgs:
+            # user = User.objects.get(id=org.contact_admin_id)
+            # sum = User.objects.filter(organisation=org.name, is_deleted=False).count()
+            # incidents = models.PanicRequest.objects.filter(organisation=org.name, is_deleted=False).count()
+            # resolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=True, is_deleted=False).count()
+            # unresolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=False, is_deleted=False).count()
+            # ingenuine = models.PanicRequest.objects.filter(organisation=org.name, is_genuine=False, is_deleted=False).count()
+            # locations = models.StaffLocation.objects.filter(organisation=org.name, is_deleted=False).count()
+            # captures = models.Images.objects.filter(organisation=org.name, is_deleted=False).count()
+            # track = models.TrackMeRequest.objects.filter(organisation=org.name, is_deleted=False).count()
+            # call = models.CallRequest.objects.filter(organisation=org.name, is_deleted=False).count()
 
 
 class AllUsersView(APIView):
@@ -348,34 +325,35 @@ class AllUsersView(APIView):
 
     def get(self, request):
         if request.user.role == 'admin':
-            try:
-                objs = User.objects.filter(organisation=request.user.organisation, is_admin=False, is_superuser=False, is_deleted=False).order_by('-id')
-            except User.DoesNotExist:
-                return Response({"error": "users not found"}, status=404)
+            objs = User.objects.filter(organisation=request.user.organisation, is_admin=False, is_superuser=False, is_deleted=False).order_by('-id')
             serializer = UserDetailSerializer(objs, many=True)
-            data = {
-                "staffs": serializer.data
-            }
-            return Response(data, status=200)
+                
+            return Response(serializer.data, status=200)
         else:
-            users = User.objects.filter(is_deleted=False).order_by('-id')
+            users = User.objects.filter(is_deleted=False, is_admin=False, is_superuser=False).order_by('-id')
             data = []
             for user in users:
-                orgs = Organisations.objects.filter(name=user.organisation, is_deleted=False)
-                for org in orgs:
-                    admin_user = User.objects.get(id=org.contact_admin_id)
-                    request_data = {
-                        "id": user.id,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "email": user.email,
-                        "phone": user.phone,
-                        "location": user.location,
-                        "organisation": org.name,
-                        "contact_admin": {
-                            "first_name": admin_user.first_name,
-                            "last_name": admin_user.last_name,
+                orgs = Organisations.objects.get(id=user.organisation.id, is_deleted=False)
+
+                data_request = {
+                    "contact_admin": {
+                            "organisation": orgs.name,
+                            "id": orgs.contact_admin.id,
+                            "first_name": orgs.contact_admin.first_name,
+                            "last_name": orgs.contact_admin.last_name,
+                            "email": orgs.contact_admin.email,
+                            "phone": orgs.contact_admin.phone
+                        },
+                        "staff": {
+                            "id": user.id,
+                            "first_name": user.first_name,
+                            "last_name": user.last_name,
+                            "email": user.email,
+                            'phone': user.phone,
+                            "location": user.location.city
                         }
                     }
-                    data.append(request_data)
+                data.append(data_request)
+            
+            
             return Response(data, status=200)

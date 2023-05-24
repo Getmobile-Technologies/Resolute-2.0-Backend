@@ -11,18 +11,15 @@ User = get_user_model()
 
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
-    
 
     class Meta():
         model = User
-        fields = ['id', "first_name", "last_name", "phone", "email", 'location', "role"]
+        fields = ["first_name", "last_name", "phone", "email", 'location', "role"]
 
     def create(self, validate_data):
         return User.objects.create_user(**validate_data)
 
 class AdminRegistrationSerializer(serializers.ModelSerializer):
-
-
 
     class Meta:
         model = User
@@ -50,6 +47,7 @@ class SuperAdminSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     location_data = serializers.ReadOnlyField()
     organisation_data = serializers.ReadOnlyField()
+
     
     class Meta:
         model = User
@@ -100,6 +98,8 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
+    admin_data = serializers.ReadOnlyField()
+    category_data = serializers.ReadOnlyField()
 
     class Meta:
         model = Organisations

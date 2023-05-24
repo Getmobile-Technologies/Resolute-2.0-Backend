@@ -22,7 +22,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(_('phone'), max_length=200, unique=True, null=True, validators=[phone_regex])
     email = models.EmailField(_('email'), unique=True, null=True, blank=False)
     location = models.ForeignKey("main.StaffLocation", on_delete=models.CASCADE, null=True)
-    state = models.CharField(_('state'), max_length=300, null=True)
     organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True)
     role = models.CharField(_('role'), max_length=100, null=True)
     is_active = models.BooleanField(_('active'), default=True)
@@ -53,8 +52,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.phone = self.phone + f"--deleted--{timezone.now()}"
         self.email = f"{random.randint()}-deleted-{self.email}"
         self.save()
-
-
+  
+    
     @property
     def total_admin_panic(self):
         user_requests_count = self.mapped_users.annotate(user_request_count=Count('user_request'))
@@ -96,14 +95,21 @@ class Organisations(models.Model):
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return self.name
     
     def delete(self):
         self.is_deleted=True
         self.save()
         #TODO: get all the corresponding users, admins and soft delete their accounts -- FEMI!
         
-        return
-
+    @property
+    def admin_data(self):
+        return model_to_dict(self.contact_admin)
+    
+    @property
+    def category_data(self):
+        return model_to_dict(self.category)
     
 class UserActivity(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="users_activity")

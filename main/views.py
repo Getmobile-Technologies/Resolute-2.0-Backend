@@ -33,10 +33,10 @@ class PanicView(APIView):
         serializer = PanicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
-        serializer.validated_data['state'] = request.user.state
+        serializer.validated_data['user_location'] = request.user.location.state
         serializer.save(user=request.user)
 
-        notification_handler(organization=request.user.organisation,
+        notification_handler(organisation=request.user.organisation,
                              message=f"New panic alert from {request.user.first_name}")
         
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a new panic alert")
@@ -74,7 +74,7 @@ class GetPanicRequests(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -103,7 +103,7 @@ class GetPanicRequests(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -194,10 +194,12 @@ class CallRequestView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user, phone=request.user.phone)
-        status = "new call request"
-        notification_handler(user=request.user, status=status)
-        message = f"new call request made by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+
+        notification_handler(organisation=request.user.organisation,
+                             message=f"New call alert from {request.user.first_name}")
+        
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a call panic alert")
+
         data = {
             "message": "call request successful",
             "id": request.user.id
@@ -231,7 +233,7 @@ class GetCallRequestAdmin(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -344,10 +346,11 @@ class TrackMeRequestView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.save(user=request.user)
-        status = "new track me request"
-        notification_handler(user=request.user, status=status)
-        message = f"new track request made by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        notification_handler(organisation=request.user.organisation,
+                             message=f"New Track alert from {request.user.first_name}")
+        
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a track alert")
+
         data = {
             "message": "tracking request sent",
             "user": {
@@ -387,7 +390,7 @@ class GetTrackMeRequestAdmin(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -513,10 +516,9 @@ class ImageView(APIView):
         serializer.validated_data['organisation'] = request.user.organisation
         serializer.validated_data['user'] = request.user
         serializer.save()
-        status = "new image request"
-        notification_handler(user=request.user, status=status)
-        message = f"new image request made by {request.user.role}"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        notification_handler(organisation=request.user.organisation,
+                             message=f"New image alert from {request.user.first_name}")
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You made a image request")
         data = {
             "message": "image request successful"
             
@@ -551,7 +553,7 @@ class GetImageRequestAdmin(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -580,7 +582,7 @@ class GetImageRequestAdmin(APIView):
                             "first_name": user.first_name,
                             "last_name": user.last_name,
                             "email": user.email,
-                            "location": user.location,
+                            "location": user.location.city,
                             "phone": user.phone,
                             "role": user.role
                         }
@@ -665,10 +667,9 @@ class LocationIncidentCount(APIView):
                 return Response({"error": "not found"}, status=404)
             data = []
             for location in locations:
-                locate = location.state
-                panic = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False).count()
-                resolved = PanicRequest.objects.filter(state=location.lower(), is_deleted=False, is_reviewed=True).count()
-                unresolved = PanicRequest.objects.filter(state=location.lower(), is_deleted=False, is_reviewed=False).count()
+                panic = PanicRequest.objects.filter(user_location=location.state, is_deleted=False).count()
+                resolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=True).count()
+                unresolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=False).count()
                 request_data = {
                     "state": location.state,
                     "panic_count": panic,
@@ -684,10 +685,9 @@ class LocationIncidentCount(APIView):
                 return Response({"error": "not found"}, status=404)
             data = []
             for location in locations:
-                locate = location.state
-                panic = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False).count()
-                resolved = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False, is_reviewed=True).count()
-                unresolved = PanicRequest.objects.filter(state=locate.lower(), is_deleted=False, is_reviewed=False).count()
+                panic = PanicRequest.objects.filter(user_location=location.state, is_deleted=False).count()
+                resolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=True).count()
+                unresolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=False).count()
                 request_data = {
                     "state": location.state,
                     "panic_count": panic,
