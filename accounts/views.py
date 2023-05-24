@@ -283,8 +283,9 @@ class AdminResetPassword(APIView):
         password = generate_password()
         user.set_password(password)
         user.save()
-        message = f"{request.user.role} reset user password"
-        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        
+        UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You reset a user password")
+
         data = {
             "message": "reset successful. please copy this somewhere as you would not have access to it again.",
             "password": password
