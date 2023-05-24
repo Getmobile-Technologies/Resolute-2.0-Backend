@@ -146,21 +146,21 @@ workflows:
   # Name the workflow
   myWorkflow:
     jobs:
-      - setup_db:
-          filters:
-            branches:
-              only:
-                - production  
-      - deploy:
-          filters:
-            branches:
-              only:
-                - production  
-          requires:
-            - setup_db
-
-      # - update_deploy:
+      # - setup_db:
       #     filters:
       #       branches:
-      #           only:
-      #             - main
+      #         only:
+      #           - production  
+      # - deploy:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - production  
+      #     requires:
+      #       - setup_db
+
+      - update_deploy:
+          filters:
+            branches:
+                only:
+                  - production
