@@ -52,13 +52,14 @@ class UserRegisterView(APIView):
     
         message = f"new user created by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+
+        print(password)
         data['response'] = 'successfully registered a new user.'
         data['id'] = account.id
         data['first_name'] = account.first_name
         data['last_name'] = account.last_name
         data['phone'] = account.phone
         data['email'] = account.email
-        data['password'] = password
         data['location'] = account.location.city
         data['organisation'] = account.organisation.name
 
@@ -283,7 +284,7 @@ class AdminResetPassword(APIView):
         password = generate_password()
         user.set_password(password)
         user.save()
-        
+
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You reset a user password")
 
         data = {
