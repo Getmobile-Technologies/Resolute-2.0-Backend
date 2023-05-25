@@ -12,6 +12,7 @@ from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Im
 class PanicSerializer(serializers.ModelSerializer):
     user_data = serializers.ReadOnlyField()
     location_data = serializers.ReadOnlyField()
+    organisation_data = serializers.ReadOnlyField()
 
     class Meta:
         model = PanicRequest
@@ -22,6 +23,7 @@ class PanicSerializer(serializers.ModelSerializer):
 class CallSerializer(serializers.ModelSerializer):
     user_data = serializers.ReadOnlyField()
     location_data = serializers.ReadOnlyField()
+    organisation_data = serializers.ReadOnlyField()
 
     class Meta:
         model = CallRequest
@@ -32,6 +34,7 @@ class CallSerializer(serializers.ModelSerializer):
 class TrackMeSerializer(serializers.ModelSerializer):
     user_data = serializers.ReadOnlyField()
     location_data = serializers.ReadOnlyField()
+    organisation_data = serializers.ReadOnlyField()
 
     class Meta:
         model = TrackMeRequest
@@ -47,7 +50,8 @@ class LocationSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     user_data = serializers.ReadOnlyField()
     location_data = serializers.ReadOnlyField()
-    
+    organisation_data = serializers.ReadOnlyField()
+
     class Meta:
         model = Images
         fields = '__all__'
