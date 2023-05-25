@@ -36,7 +36,6 @@ class UserRegisterView(APIView):
     @action(methods=["post"], detail=True)
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
-        data = {}
         password = generate_password()
         
         serializer.is_valid(raise_exception=True)
@@ -53,17 +52,8 @@ class UserRegisterView(APIView):
         message = f"new user created by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
 
-        print(password)
-        data['response'] = 'successfully registered a new user.'
-        data['id'] = account.id
-        data['first_name'] = account.first_name
-        data['last_name'] = account.last_name
-        data['phone'] = account.phone
-        data['email'] = account.email
-        data['location'] = account.location.city
-        data['organisation'] = account.organisation.name
 
-        return Response(data)
+        return Response(serializer.data, status=200)
 
 
 class AdminRegisterView(APIView):
