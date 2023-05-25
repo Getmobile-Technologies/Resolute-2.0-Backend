@@ -344,26 +344,17 @@ class GetLocations(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
         if request.user.role == "admin":
-            try:
-                locations = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)
-            except StaffLocation.DoesNotExist:
-                return Response({"error": "location not found"}, status=404)
-            serializer = LocationSerializer(locations, many=True)
-            data = {
-                "locations": serializer.data
-            }
+            locations = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)
 
-            return Response(data, status=200)
         else:
-            try:
-                locations = StaffLocation.objects.filter(is_deleted=False)
-            except StaffLocation.DoesNotExist:
-                return Response({"error": "locations not found"}, status=404)
-            serializer = LocationSerializer(locations, many=True)
-            data = {
-                "locations": serializer.data
-            }
-            return Response(data, status=200)
+            locations = StaffLocation.objects.filter(is_deleted=False)
+
+        serializer = LocationSerializer(locations, many=True)
+        
+        data = {
+            "locations": serializer.data
+        }
+        return Response(data, status=200)
 
 
 
