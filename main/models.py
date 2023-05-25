@@ -28,7 +28,7 @@ class PanicRequest(models.Model):
 
     @property
     def user_data(self):
-        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"])
+        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"]) if self.user.is_deleted == False else {}
     
     
     @property
@@ -38,6 +38,7 @@ class PanicRequest(models.Model):
     @property
     def organisation_data(self):
         return model_to_dict(self.organisation, fields=["id","name"])
+    
 
 
 
@@ -57,7 +58,7 @@ class CallRequest(models.Model):
 
     @property
     def user_data(self):
-        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"])
+        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"]) if self.user.is_deleted == False else {}
     
     
     @property
@@ -87,7 +88,7 @@ class TrackMeRequest(models.Model):
 
     @property
     def user_data(self):
-        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"])
+        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"]) if self.user.is_deleted == False else {}
     
 
     @property
@@ -116,8 +117,7 @@ class Images(models.Model):
 
     @property
     def user_data(self):
-        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"])
-    
+        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"]) if self.user.is_deleted == False else {}
     
     @property
     def location_data(self):
