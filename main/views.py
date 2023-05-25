@@ -55,62 +55,14 @@ class GetPanicRequests(APIView):
 
     def get(self, request):
         if request.user.role == 'admin':
-            users = User.objects.filter(organisation=request.user.organisation, is_deleted=False)
-            data = []
-            for user in users:
-                panic_requests = PanicRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
-                for panic_request in panic_requests:
-                    serializer = PanicSerializer(panic_request)
-                    request_data = {
-                        "id": serializer.data['id'],
-                        "longitude": serializer.data['longitude'],
-                        "latitude": serializer.data['latitude'],
-                        "location": serializer.data['location'],
-                        "is_reviewed": serializer.data['is_reviewed'],
-                        "is_genuine": serializer.data['is_genuine'],
-                        "timestamp": serializer.data['timestamp'],
-                        "user": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            "location": user.location.city,
-                            "phone": user.phone,
-                            "role": user.role
-                        }
-                    }
-                    data.append(request_data)
-
-            return Response(data, status=200)
+            panic = PanicRequest.objects.filter(organisation=request.user.organisation, is_deleted=False)
         else:
-            users = User.objects.filter(is_deleted=False)
-            data = []
-            for user in users:
-                panic_requests = PanicRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
-                for panic_request in panic_requests:
-                    serializer = PanicSerializer(panic_request)
-                    request_data = {
-                        "id": serializer.data['id'],
-                        "longitude": serializer.data['longitude'],
-                        "latitude": serializer.data['latitude'],
-                        "location": serializer.data['location'],
-                        "is_reviewed": serializer.data['is_reviewed'],
-                        "is_genuine": serializer.data['is_genuine'],
-                        "timestamp": serializer.data['timestamp'],
-                        "organisation": user.organisation,
-                        "user": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            "location": user.location.city,
-                            "phone": user.phone,
-                            "role": user.role
-                        }
-                    }
-                    data.append(request_data)
+            panic = PanicRequest.objects.filter(is_deleted=False)
 
-            return Response(data, status=200)
+        serializer = PanicSerializer(panic, many=True)
+
+        return Response(serializer.data, status=200)
+            
 
 class PanicActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
@@ -217,56 +169,14 @@ class GetCallRequestAdmin(APIView):
  
     def get(self, request):
         if request.user.role == 'admin':
-            users = User.objects.filter(organisation=request.user.organisation, is_deleted=False)
-            data = []
-            for user in users:
-                call_requests = CallRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
-                for call_request in call_requests:
-                    serializer = CallSerializer(call_request)
-                    request_data = {
-                        "id": serializer.data['id'],
-                        "phone": serializer.data['phone'],
-                        "is_reviewed": serializer.data['is_reviewed'],
-                        "timestamp": serializer.data['timestamp'],
-                        "user": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            "location": user.location.city,
-                            "phone": user.phone,
-                            "role": user.role
-                        }
-                    }
-                    data.append(request_data)
-
-            return Response(data, status=200)
+            call = CallRequest.objects.filter(organisation=request.user.organisation, is_deleted=False)
         else:
-            users = User.objects.filter(is_deleted=False)
-            data = []
-            for user in users:
-                call_requests = CallRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
-                for call_request in call_requests:
-                    serializer = CallSerializer(call_request)
-                    request_data = {
-                        "id": serializer.data['id'],
-                        "phone": serializer.data['phone'],
-                        "is_reviewed": serializer.data['is_reviewed'],
-                        "timestamp": serializer.data['timestamp'],
-                        "organisation": user.organisation,
-                        "user": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            "location": user.location,
-                            "phone": user.phone,
-                            "role": user.role
-                        }
-                    }
-                    data.append(request_data)
+            call = CallRequest.objects.filter(is_deleted=False)
 
-            return Response(data, status=200)
+        serializer = CallSerializer(call, many=True)
+
+        return Response(serializer.data, status=200)
+           
         
 
 class CallReview(APIView):
@@ -372,62 +282,16 @@ class GetTrackMeRequestAdmin(APIView):
  
     def get(self, request):
         if request.user.role == 'admin':
-            users = User.objects.filter(organisation=request.user.organisation, is_deleted=False)
-            data = []
-            for user in users:
-                track_requests = TrackMeRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
-                for track_request in track_requests:
-                    serializer = TrackMeSerializer(track_request)
-                    request_data = {
-                        "id": serializer.data['id'],
-                        "longitude": serializer.data['longitude'],
-                        "latitude": serializer.data['latitude'],
-                        "location": serializer.data['location'],
-                        "is_reviewed": serializer.data['is_reviewed'],
-                        "timestamp": serializer.data['timestamp'],
-                        "user": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            "location": user.location.city,
-                            "phone": user.phone,
-                            "role": user.role
-                        }
-                    }
-                    data.append(request_data)
 
-            return Response(data, status=200)
+            track = TrackMeRequest.objects.filter(organisation=request.user.organisation, is_deleted=False)
         else:
-            users = User.objects.filter(is_deleted=False)
-            data = []
-            for user in users:
-                track_requests = TrackMeRequest.objects.filter(user=user, is_deleted=False).order_by('-id')
-                for track_request in track_requests:
-                    serializer = TrackMeSerializer(track_request)
-                    request_data = {
-                        "id": serializer.data['id'],
-                        "longitude": serializer.data['longitude'],
-                        "latitude": serializer.data['latitude'],
-                        "location": serializer.data['location'],
-                        "is_reviewed": serializer.data['is_reviewed'],
-                        "timestamp": serializer.data['timestamp'],
-                        "organisation": user.organisation,
-                        "user": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            "location": user.location,
-                            "phone": user.phone,
-                            "role": user.role
-                        }
-                    }
-                    data.append(request_data)
+            track = TrackMeRequest.objects.filter(is_deleted=False)
 
-            return Response(data, status=200)
+        serializer = TrackMeSerializer(track, many=True)
 
-
+        return Response(serializer.data, status=200)
+            
+        
 class TrackMeReview(APIView):
     permission_classes = (IsAdmin,)
     def post(self, request, pk):
@@ -474,6 +338,8 @@ class LocationCreateView(APIView):
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
         return Response({"message": "location created"}, status=200)
     
+
+
 class GetLocations(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
@@ -498,6 +364,8 @@ class GetLocations(APIView):
                 "locations": serializer.data
             }
             return Response(data, status=200)
+
+
 
 class LocationActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
@@ -531,67 +399,14 @@ class GetImageRequestAdmin(APIView):
  
     def get(self, request):
         if request.user.role == 'admin':
-                
-            users = User.objects.filter(organisation=request.user.organisation, is_deleted=False)
-            data = []
-            for user in users:
-                image_requests = Images.objects.filter(user=user, is_deleted=False).order_by('-id')
-                for image_request in image_requests:
-                    serializer = ImageSerializer(image_request)
-                    request_data = {
-                        "id": serializer.data['id'],
-                        "image": serializer.data['image'],
-                        "image2": serializer.data['image2'],
-                        "image3": serializer.data['image3'],
-                        "image4": serializer.data['image4'],
-                        "description": serializer.data['description'],
-                        "location": serializer.data['location'],
-                        "is_reviewed": serializer.data['is_reviewed'],
-                        "timestamp": serializer.data['timestamp'],
-                        "user": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            "location": user.location.city,
-                            "phone": user.phone,
-                            "role": user.role
-                        }
-                    }
-                    data.append(request_data)
-
-            return Response(data, status=200)
-        
+            images = Images.objects.filter(organisation=request.user.organisation, is_deleted=False)
         else:
-            users = User.objects.filter(is_deleted=False)
-            data = []
-            for user in users:
-                image_requests = Images.objects.filter(user=user, is_deleted=False).order_by('-id')
-                for image_request in image_requests:
-                    serializer = ImageSerializer(image_request)
-                    request_data = {
-                        "id": serializer.data['id'],
-                        "image": serializer.data['image'],
-                        "description": serializer.data['description'],
-                        "location": serializer.data['location'],
-                        "is_reviewed": serializer.data['is_reviewed'],
-                        "timestamp": serializer.data['timestamp'],
-                        "organisation": user.organisation,
-                        "user": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            "location": user.location.city,
-                            "phone": user.phone,
-                            "role": user.role
-                        }
-                    }
-                    data.append(request_data)
+            images = Images.objects.filter(is_deleted=False)
+            
+        serializer = ImageSerializer(images, many=True)
 
-            return Response(data, status=200)
-        
-
+        return Response(serializer.data, status=200)
+            
 class ImageActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
     queryset = Images.objects.filter(is_deleted=False)

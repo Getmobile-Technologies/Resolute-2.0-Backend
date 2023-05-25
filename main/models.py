@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from accounts.models import Organisations
+from django.forms import model_to_dict
+
 User = get_user_model()
 
 
@@ -24,6 +26,15 @@ class PanicRequest(models.Model):
         self.is_deleted=True
         self.save()
 
+    @property
+    def user_data(self):
+        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"])
+    
+    
+    @property
+    def location_data(self):
+        return model_to_dict(self.user.location, fields=["city", "state"])
+
 
 
 class CallRequest(models.Model):
@@ -38,6 +49,16 @@ class CallRequest(models.Model):
     def delete(self):
         self.is_deleted=True
         self.save()
+    
+
+    @property
+    def user_data(self):
+        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"])
+    
+    
+    @property
+    def location_data(self):
+        return model_to_dict(self.user.location, fields=["city", "state"])
 
 
 class TrackMeRequest(models.Model):
@@ -56,6 +77,17 @@ class TrackMeRequest(models.Model):
         self.save()
 
 
+    @property
+    def user_data(self):
+        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"])
+    
+
+    @property
+    def location_data(self):
+        return model_to_dict(self.user.location, fields=["city", "state"])
+
+
+
 class Images(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="capture_request")
     image = models.ImageField(null=True, upload_to='capture')
@@ -69,6 +101,15 @@ class Images(models.Model):
     def delete(self):
         self.is_deleted=True
         self.save()
+
+    @property
+    def user_data(self):
+        return model_to_dict(self.user, fields=["first_name", "last_name", "email", "phone"])
+    
+    
+    @property
+    def location_data(self):
+        return model_to_dict(self.user.location, fields=["city", "state"])
 
 
 
