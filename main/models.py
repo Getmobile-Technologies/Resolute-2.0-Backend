@@ -34,6 +34,10 @@ class PanicRequest(models.Model):
     @property
     def location_data(self):
         return model_to_dict(self.user.location, fields=["city", "state"])
+    
+    @property
+    def organisation_data(self):
+        return model_to_dict(self.organisation, fields=["id","name"])
 
 
 
@@ -59,6 +63,10 @@ class CallRequest(models.Model):
     @property
     def location_data(self):
         return model_to_dict(self.user.location, fields=["city", "state"])
+    
+    @property
+    def organisation_data(self):
+        return model_to_dict(self.organisation, fields=["id","name"])
 
 
 class TrackMeRequest(models.Model):
@@ -85,6 +93,10 @@ class TrackMeRequest(models.Model):
     @property
     def location_data(self):
         return model_to_dict(self.user.location, fields=["city", "state"])
+    
+    @property
+    def organisation_data(self):
+        return model_to_dict(self.organisation, fields=["id","name"])
 
 
 
@@ -110,6 +122,10 @@ class Images(models.Model):
     @property
     def location_data(self):
         return model_to_dict(self.user.location, fields=["city", "state"])
+    
+    @property
+    def organisation_data(self):
+        return model_to_dict(self.organisation, fields=["id","name"])
 
 
 
