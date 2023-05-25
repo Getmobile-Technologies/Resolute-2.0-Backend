@@ -58,6 +58,8 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
+    organisation_data = serializers.ReadOnlyField()
+
     class Meta:
         model = Notifications
         fields = '__all__'
@@ -70,10 +72,12 @@ class CatgorySerializer(serializers.ModelSerializer):
 
 
 class EmergencySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = EmergencyContact
         fields = '__all__'
 
 
 class FirebaseSerializer(serializers.Serializer):
+    
     fcm_token = serializers.CharField(max_length=6000)

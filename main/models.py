@@ -160,6 +160,9 @@ class Notifications(models.Model):
         self.is_deleted=True
         self.save()
 
+    @property
+    def organisation_data(self):
+        return model_to_dict(self.organisation, fields=["id","name"])
 
 
 class Category(models.Model):
