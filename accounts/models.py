@@ -50,8 +50,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.is_deleted=True
         self.is_active=False
         self.phone = self.phone + f"--deleted--{timezone.now()}"
-        self.email = f"{random.randint()}-deleted-{self.email}"
+        self.email = f"--deleted--{timezone.now()}" + self.email
         self.save()
+
+        
+
   
     
     @property
