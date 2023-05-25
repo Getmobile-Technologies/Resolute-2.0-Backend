@@ -81,11 +81,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def organisation_data(self):
-        return model_to_dict(self.organisation)
+        return model_to_dict(self.organisation, fields=["id","name"])
     
     @property
     def location_data(self):
-        return model_to_dict(self.location)
+        return model_to_dict(self.location, fields=["id", "city", "state"])
+
+
+    @property
+    def contact_admin_data(self):
+        return model_to_dict(self.organisation.contact_admin, fields=["id","first_name", "last_name", "email"])
 
 
 class Organisations(models.Model):
