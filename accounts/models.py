@@ -129,6 +129,26 @@ class Organisations(models.Model):
     def category_data(self):
         return model_to_dict(self.category)
     
+    @property
+    def total_registered_users(self):
+        return self.user_set.filter(role="staff", is_deleted=False).count()
+    
+    @property
+    def total_incidence(self):
+        return self.panicrequest_set.filter(is_deleted=False).count()
+    
+    @property
+    def resolved_incidence(self):
+        return self.panicrequest_set.filter(is_deleted=False, is_reviewed=True).count()
+    
+    @property
+    def unresolved_incidence(self):
+        return self.panicrequest_set.filter(is_deleted=False, is_reviewed=False).count()
+    
+    @property
+    def ingenuine_incidence(self):
+        return self.panicrequest_set.filter(is_deleted=False, is_genuine=False).count()
+    
 class UserActivity(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="users_activity")
     organisation = models.CharField(max_length=250, null=True) #take this out
