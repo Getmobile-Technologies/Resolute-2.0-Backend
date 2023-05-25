@@ -11,6 +11,9 @@ User = get_user_model()
 
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
+    location_data = serializers.ReadOnlyField()
+    organisation_data = serializers.ReadOnlyField()
+    contact_admin_data = serializers.ReadOnlyField()
 
     class Meta():
         model = User
