@@ -38,11 +38,11 @@ def geocoding(lat, long):
 
 def sign_up_sms(number, pin):
     message = f"""
-    Hello!, your account as been created by the admin.
-    Your login details are;
-    Phone: {number}
-    PIN: {pin}
-    Thank you!.
+Hello!, your account as been created by the admin.
+Your login details are;
+Phone: {number}
+PIN: {pin}
+Thank you!.
     """
     request = sms.send_message({
         "from": "Resolute",
