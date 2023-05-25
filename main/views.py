@@ -402,7 +402,7 @@ class GetImageRequestAdmin(APIView):
             images = Images.objects.filter(organisation=request.user.organisation, is_deleted=False)
         else:
             images = Images.objects.filter(is_deleted=False)
-            
+
         serializer = ImageSerializer(images, many=True)
 
         return Response(serializer.data, status=200)
@@ -418,15 +418,13 @@ class GetAdminNotifications(APIView):
     permission_classes = (IsAdmin,)
 
     def get(self, request):
-        users = User.objects.filter(user=request.user)
-        data = []
-        for user in users:
-            notifications = Notifications.objects.filter(user=user, is_deleted=False).order_by('-id')
-            for notification in notifications:
-                serializer = NotificationSerializer(notification)
+        if request.user.role == "admin":
+            notifications = Notifications.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-timestamp')
+        else:
+            notifications = Notifications.objects.filter(is_deleted=False).order_by('-timestamp')
+        serializer = NotificationSerializer(notifications)
 
-                data.append(serializer.data)
-        return Response(data, status=200)
+        return Response(serializer.data, status=200)
 
 
 class NotifficationActions(generics.RetrieveDestroyAPIView):
