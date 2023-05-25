@@ -52,6 +52,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.phone = self.phone + f"--deleted--{timezone.now()}"
         self.email = f"deleted--{timezone.now()}" + self.email if self.email else f"deleted--{timezone.now()}@--no-email-added.com"
         self.save()
+        
+        if self.role == "staff":
+            
+            #Delete corresponding data
+            
+            self.user_request.filter(is_deleted=True).update(is_deleted=True)
+            self.capture_request.filter(is_deleted=True).update(is_deleted=True)
+            self.call_request.filter(is_deleted=True).update(is_deleted=True)
+            self.track_request.filter(is_deleted=True).update(is_deleted=True)
+
 
         
 

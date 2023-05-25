@@ -55,6 +55,10 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        
+        
+class UserDeleteSerializer(serializers.Serializer):
+    current_password = serializers.CharField()
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
