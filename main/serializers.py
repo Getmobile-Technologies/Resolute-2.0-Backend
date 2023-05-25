@@ -42,6 +42,7 @@ class TrackMeSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    organisation_data = serializers.ReadOnlyField()
 
     class Meta:
         model = StaffLocation
@@ -79,5 +80,5 @@ class EmergencySerializer(serializers.ModelSerializer):
 
 
 class FirebaseSerializer(serializers.Serializer):
-    
+
     fcm_token = serializers.CharField(max_length=6000)

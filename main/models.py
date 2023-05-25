@@ -148,7 +148,9 @@ class StaffLocation(models.Model):
         self.save()
 
     
-
+    @property
+    def organisation_data(self):
+        return model_to_dict(self.organisation, fields=["id","name"])
 
 class Notifications(models.Model):
     message = models.CharField(max_length=300, null=True)
