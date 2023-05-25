@@ -116,7 +116,7 @@ class DeleteUserView(generics.DestroyAPIView):
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         
-        raise AuthenticationFailed(detail={"error":"password incorrect"})
+        raise PermissionDenied(detail={"error":"password incorrect"})
             
 
 
