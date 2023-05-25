@@ -105,6 +105,11 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
+    total_registered_users = serializers.ReadOnlyField()
+    total_incidence = serializers.ReadOnlyField()
+    resolved_incidence = serializers.ReadOnlyField()
+    unresolved_incidence = serializers.ReadOnlyField()
+    ingenuine_incidence = serializers.ReadOnlyField()
     admin_data = serializers.ReadOnlyField()
     category_data = serializers.ReadOnlyField()
 
