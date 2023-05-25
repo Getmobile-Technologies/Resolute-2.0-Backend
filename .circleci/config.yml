@@ -163,4 +163,4 @@ workflows:
           filters:
             branches:
                 only:
-                  - production
+                  - staging

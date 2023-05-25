@@ -326,36 +326,13 @@ class AllUsersView(APIView):
     permission_classes = (IsAdmin,)
 
     def get(self, request):
-        if request.user.role == 'admin':
-            objs = User.objects.filter(organisation=request.user.organisation, is_admin=False, is_superuser=False, is_deleted=False).order_by('-id')
-            serializer = UserDetailSerializer(objs, many=True)
-                
-            return Response(serializer.data, status=200)
-        else:
-            users = User.objects.filter(is_deleted=False, is_admin=False, is_superuser=False).order_by('-id')
-            data = []
-            for user in users:
-                orgs = Organisations.objects.get(id=user.organisation.id, is_deleted=False)
 
-                data_request = {
-                    "contact_admin": {
-                            "organisation": orgs.name,
-                            "id": orgs.contact_admin.id,
-                            "first_name": orgs.contact_admin.first_name,
-                            "last_name": orgs.contact_admin.last_name,
-                            "email": orgs.contact_admin.email,
-                            "phone": orgs.contact_admin.phone
-                        },
-                        "staff": {
-                            "id": user.id,
-                            "first_name": user.first_name,
-                            "last_name": user.last_name,
-                            "email": user.email,
-                            'phone': user.phone,
-                            "location": user.location.city
-                        }
-                    }
-                data.append(data_request)
-            
-            
-            return Response(data, status=200)
+        
+        if request.user.role == 'admin':
+            objs = User.objects.filter(organisation=request.user.organisation, is_admin=False, is_superuser=False, is_deleted=False).order_by('-timestamp')
+                
+        else:
+            objs = User.objects.filter(is_deleted=False, is_admin=False, is_superuser=False).order_by('-timestamp')
+        serializer = UserDetailSerializer(objs, many=True)
+                
+        return Response(serializer.data, status=200)
