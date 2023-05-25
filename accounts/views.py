@@ -11,7 +11,7 @@ from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from main import models
-from .serializers import LoginSerializer, ChangePasswordSerializer, ActivitySerializer, OrganisationSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, ActivitySerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
@@ -24,7 +24,8 @@ from .permissions import IsAdmin, IsSuperUser
 from .authentication import phone_authenticate
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
-
+from django.contrib.auth.hashers import check_password
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 User = get_user_model()
 
@@ -92,10 +93,32 @@ class AdminRegisterView(APIView):
         return Response(data)
  
 
-class UserActions(generics.RetrieveUpdateDestroyAPIView):
+class UserActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
     queryset = User.objects.filter(is_deleted=False)
     serializer_class = UserDetailSerializer
+
+
+class DeleteUserView(generics.DestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = (IsAdmin,)
+    queryset = User.objects.filter(is_deleted=False)
+    serializer_class = UserDeleteSerializer
+    
+    @swagger_auto_schema(method="delete", request_body=UserDeleteSerializer())
+    @action(methods=["delete"], detail=True)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        if check_password(serializer.validated_data.get("current_password"), request.user.password):
+            instance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
+        raise AuthenticationFailed(detail={"error":"password incorrect"})
+            
+
 
         
     
