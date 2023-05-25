@@ -25,6 +25,7 @@ from .authentication import phone_authenticate
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from django.contrib.auth.hashers import check_password
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 User = get_user_model()
 
@@ -92,18 +93,20 @@ class AdminRegisterView(APIView):
         return Response(data)
  
 
-class UserActions(generics.RetrieveUpdateDestroyAPIView):
+class UserActions(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAdmin,)
     queryset = User.objects.filter(is_deleted=False)
     serializer_class = UserDetailSerializer
 
 
 class DeleteUserView(generics.DestroyAPIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     queryset = User.objects.filter(is_deleted=False)
     serializer_class = UserDeleteSerializer
     
-    
+    @swagger_auto_schema(method="delete", request_body=UserDeleteSerializer())
+    @action(methods=["delete"], detail=True)
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(data=request.data)
