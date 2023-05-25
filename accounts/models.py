@@ -50,7 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.is_deleted=True
         self.is_active=False
         self.phone = self.phone + f"--deleted--{timezone.now()}"
-        self.email = f"--deleted--{timezone.now()}" + self.email
+        self.email = f"deleted--{timezone.now()}" + self.email if self.email else f"deleted--{timezone.now()}@--no-email-added.com"
         self.save()
 
         
