@@ -123,3 +123,8 @@ class CreateOrganisationSerializer(serializers.Serializer):
     organisation = OrganisationSerializer()
 
    
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+class PasswordResetSerializer(serializers.Serializer):
+    password = serializers.CharField(required=True)

@@ -11,7 +11,7 @@ from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from main import models
-from .serializers import LoginSerializer, ChangePasswordSerializer, ActivitySerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, PasswordResetSerializer, ActivitySerializer, EmailSerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
@@ -19,13 +19,17 @@ from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound, ValidationError
 from .helpers.generator import generate_password, generate_admin_password
 from .helpers.sms import sign_up_sms
-from .helpers.mail import signup_mail
+from .helpers.mail import signup_mail, reset_password
 from .permissions import IsAdmin, IsSuperUser
-from .authentication import phone_authenticate
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from django.contrib.auth.hashers import check_password
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 User = get_user_model()
 
@@ -230,7 +234,8 @@ class UserLoginView(APIView):
             if "email" in data:
                 user = authenticate(request, email = data['email'], password = data['password'], is_deleted=False)
             elif "phone" in data:
-                user = phone_authenticate(phone = data['phone'], password = data['password'])
+                print(data['phone'])
+                user = authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
                 
             else:
                 raise ValidationError("Invalid data. Login with email or phone number")
@@ -272,17 +277,21 @@ class UserLoginView(APIView):
                     }
                 return Response(data, status=status.HTTP_403_FORBIDDEN)
 
-            else:
+            elif "email" in data:
                 data = {
-                    'error': 'Please provide a valid email and a password'
+                    'error': 'Please provide a valid email address or password'
                     }
                 return Response(data, status=status.HTTP_401_UNAUTHORIZED)
-        else:
+            elif "phone" in data:
                 data = {
-                    
+                    'error': 'Please provide a valid phone number or password'
+                }
+                return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            data = {
                     'error': serializer.errors
                     }
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AdminResetPassword(APIView):
@@ -322,17 +331,6 @@ class OrganizationView(APIView):
         serializer = OrganisationSerializer(orgs, many=True)
         return Response(serializer.data, 200)
 
-        # for org in orgs:
-            # user = User.objects.get(id=org.contact_admin_id)
-            # sum = User.objects.filter(organisation=org.name, is_deleted=False).count()
-            # incidents = models.PanicRequest.objects.filter(organisation=org.name, is_deleted=False).count()
-            # resolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=True, is_deleted=False).count()
-            # unresolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=False, is_deleted=False).count()
-            # ingenuine = models.PanicRequest.objects.filter(organisation=org.name, is_genuine=False, is_deleted=False).count()
-            # locations = models.StaffLocation.objects.filter(organisation=org.name, is_deleted=False).count()
-            # captures = models.Images.objects.filter(organisation=org.name, is_deleted=False).count()
-            # track = models.TrackMeRequest.objects.filter(organisation=org.name, is_deleted=False).count()
-            # call = models.CallRequest.objects.filter(organisation=org.name, is_deleted=False).count()
 
 
 class AllUsersView(APIView):
@@ -349,3 +347,46 @@ class AllUsersView(APIView):
         serializer = UserDetailSerializer(objs, many=True)
                 
         return Response(serializer.data, status=200)
+        
+
+
+class PasswordResetView(APIView):
+    serializer_class = EmailSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        email = serializer.validated_data['email']
+        user = User.objects.filter(email=email, is_deleted=False).first()
+        if user:
+            token_generator = PasswordResetTokenGenerator()
+            token = token_generator.make_token(user)
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            referer = request.META.get('HTTP_REFERER')
+            reset_url = f"{referer}/password/confirm/{uidb64}/{token}"
+            reset_password(email=email, url=reset_url)
+            return Response({"message": "an email that contains new password has been sent to you"}, status=200)
+        
+        else:
+            return Response({"error": "user not found"}, status=404)
+        
+
+
+class PasswordResetConfirmView(APIView):
+    def post(self, request, uidb64, token):
+        try:
+            user_id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=user_id)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        
+        if user is not None and PasswordResetTokenGenerator().check_token(user, token):
+            serializer = PasswordResetSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user.set_password(serializer.data.get("password"))
+            user.save()
+            return Response({"message": "password reset successful"}, status=200)
+        
+        else:
+            return Response({"error": "invalid token"}, status=400)

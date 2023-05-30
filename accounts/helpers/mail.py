@@ -22,3 +22,22 @@ def signup_mail(email, password, first_name):
                 }
             }
     )
+
+
+
+def reset_password(email, url):
+ 
+    requests.post(
+        "https://api.useplunk.com/v1/track",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {key}" 
+        },
+        json={
+            "event": "reset_password",
+            "email": email,
+            "data": {
+                "url": url
+                }
+            }
+    )
