@@ -353,6 +353,9 @@ class AllUsersView(APIView):
 class PasswordResetView(APIView):
     serializer_class = EmailSerializer
 
+
+    @swagger_auto_schema(method="post", request_body=EmailSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -374,6 +377,9 @@ class PasswordResetView(APIView):
 
 
 class PasswordResetConfirmView(APIView):
+
+    @swagger_auto_schema(method="post", request_body=PasswordResetSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request, uidb64, token):
         try:
             user_id = force_str(urlsafe_base64_decode(uidb64))
