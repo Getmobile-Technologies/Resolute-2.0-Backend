@@ -274,15 +274,14 @@ class UserLoginView(APIView):
 
             else:
                 data = {
-                    'error': 'Please provide a valid email and a password'
+                    'error': 'Please provide a valid credentials'
                     }
                 return Response(data, status=status.HTTP_401_UNAUTHORIZED)
         else:
-                data = {
-                    
+            data = {
                     'error': serializer.errors
                     }
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AdminResetPassword(APIView):
@@ -322,17 +321,6 @@ class OrganizationView(APIView):
         serializer = OrganisationSerializer(orgs, many=True)
         return Response(serializer.data, 200)
 
-        # for org in orgs:
-            # user = User.objects.get(id=org.contact_admin_id)
-            # sum = User.objects.filter(organisation=org.name, is_deleted=False).count()
-            # incidents = models.PanicRequest.objects.filter(organisation=org.name, is_deleted=False).count()
-            # resolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=True, is_deleted=False).count()
-            # unresolved = models.PanicRequest.objects.filter(organisation=org.name, is_reviewed=False, is_deleted=False).count()
-            # ingenuine = models.PanicRequest.objects.filter(organisation=org.name, is_genuine=False, is_deleted=False).count()
-            # locations = models.StaffLocation.objects.filter(organisation=org.name, is_deleted=False).count()
-            # captures = models.Images.objects.filter(organisation=org.name, is_deleted=False).count()
-            # track = models.TrackMeRequest.objects.filter(organisation=org.name, is_deleted=False).count()
-            # call = models.CallRequest.objects.filter(organisation=org.name, is_deleted=False).count()
 
 
 class AllUsersView(APIView):
