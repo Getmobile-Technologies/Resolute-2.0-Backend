@@ -367,7 +367,7 @@ class PasswordResetView(APIView):
             token = token_generator.make_token(user)
             uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
             referer = request.META.get('HTTP_REFERER')
-            reset_url = f"{referer}/password/confirm/{uidb64}/{token}"
+            reset_url = f"{referer}reset-password/{uidb64}/{token}"
             reset_password(email=email, url=reset_url)
             return Response({"message": "an email that contains new password has been sent to you"}, status=200)
         
