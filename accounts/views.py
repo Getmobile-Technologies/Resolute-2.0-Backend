@@ -353,6 +353,9 @@ class AllUsersView(APIView):
 class PasswordResetView(APIView):
     serializer_class = EmailSerializer
 
+
+    @swagger_auto_schema(method="post", request_body=EmailSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -364,7 +367,7 @@ class PasswordResetView(APIView):
             token = token_generator.make_token(user)
             uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
             referer = request.META.get('HTTP_REFERER')
-            reset_url = f"{referer}/password/confirm/{uidb64}/{token}"
+            reset_url = f"{referer}reset-password/{uidb64}/{token}"
             reset_password(email=email, url=reset_url)
             return Response({"message": "an email that contains new password has been sent to you"}, status=200)
         
@@ -374,6 +377,9 @@ class PasswordResetView(APIView):
 
 
 class PasswordResetConfirmView(APIView):
+
+    @swagger_auto_schema(method="post", request_body=PasswordResetSerializer())
+    @action(methods=["post"], detail=True)
     def post(self, request, uidb64, token):
         try:
             user_id = force_str(urlsafe_base64_decode(uidb64))
