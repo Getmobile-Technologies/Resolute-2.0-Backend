@@ -60,7 +60,6 @@ else:
     CORS_ALLOW_ALL_ORIGINS = True
     CORS_ALLOW_CREDENTIALS = True
     
-        
     DATABASES = {}
     DATABASES['default'] = dj_database_url.config()
     
@@ -232,9 +231,10 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
-        'accounts.authentication.PhoneNumberBackend',
         'django.contrib.auth.backends.AllowAllUsersModelBackend',
         'accounts.authentication.EmailBackend',
+        'accounts.authentication.PhoneNumberBackend'
+
     ]
 
 

@@ -21,7 +21,6 @@ from .helpers.generator import generate_password, generate_admin_password
 from .helpers.sms import sign_up_sms
 from .helpers.mail import signup_mail
 from .permissions import IsAdmin, IsSuperUser
-from .authentication import phone_authenticate
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from django.contrib.auth.hashers import check_password
@@ -230,7 +229,8 @@ class UserLoginView(APIView):
             if "email" in data:
                 user = authenticate(request, email = data['email'], password = data['password'], is_deleted=False)
             elif "phone" in data:
-                user = authenticate(phone = data['phone'], password = data['password'], is_deleted=False)
+                print(data['phone'])
+                user = authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
                 
             else:
                 raise ValidationError("Invalid data. Login with email or phone number")
@@ -272,10 +272,15 @@ class UserLoginView(APIView):
                     }
                 return Response(data, status=status.HTTP_403_FORBIDDEN)
 
-            else:
+            elif "email" in data:
                 data = {
-                    'error': 'Please provide a valid credentials'
+                    'error': 'Please provide a valid email address'
                     }
+                return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+            elif "phone" in data:
+                data = {
+                    'error': 'Please provide a valid phone number'
+                }
                 return Response(data, status=status.HTTP_401_UNAUTHORIZED)
         else:
             data = {
