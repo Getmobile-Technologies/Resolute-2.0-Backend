@@ -4,16 +4,26 @@ import os
 import requests
 from main.models import PanicRequest, CallRequest
 import urllib.parse
+from twilio.rest import Client
 
-Vonage_API_Key = os.getenv("vonage_api_key")
-Vonage_API_Secret = os.getenv("vonage_secret_key")
+
+# Vonage_API_Key = os.getenv("vonage_api_key")
+# Vonage_API_Secret = os.getenv("vonage_secret_key")
 api_key = os.getenv("GEO_API_KEY")
 
 
-nexmo_client = vonage.Client(
-    key=Vonage_API_Key, secret=Vonage_API_Secret
-)
-sms = vonage.Sms(nexmo_client)
+# nexmo_client = vonage.Client(
+#     key=Vonage_API_Key, secret=Vonage_API_Secret
+# )
+# sms = vonage.Sms(nexmo_client)
+
+
+
+account_sid = os.getenv('TWILIO_ID')
+auth_token = os.getenv('TWILIO_TOKEN')
+client = Client(account_sid, auth_token)
+
+
 
 def geocoding(lat, long):
     url = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -44,14 +54,20 @@ Phone: {number}
 PIN: {pin}
 Thank you!.
     """
-    request = sms.send_message({
-        "from": "Resolute",
-        "to": number,
-        "text": message
-    })
+    # request = sms.send_message({
+    #     "from": "Resolute",
+    #     "to": number,
+    #     "text": message
+    # })
+
+    res = client.messages.create(
+    from_="Resolute4.0",
+    body=message,
+    to=number
+        )
 
 
-    return request
+    return res
     
 
 def emergency_sms(panic:PanicRequest, phone):
@@ -61,13 +77,20 @@ def emergency_sms(panic:PanicRequest, phone):
 The situation should be attended to immediately.
 see location: {url},
 Call: {panic.user.phone}"""
-    request = sms.send_message({
-        "from": "Resolute",
-        "to": phone,
-        "text": message
-    })
+    # request = sms.send_message({
+    #     "from": "Resolute",
+    #     "to": phone,
+    #     "text": message
+    # })
+    
+    res = client.messages.create(
+    from_="Resolute4.0",
+    body=message,
+    to=phone
+    )
 
-    return request
+
+    return res
 
 
 
@@ -76,10 +99,17 @@ def call_emergency_sms(panic:CallRequest, phone):
     message = f"""{panic.user.first_name.title()} from {panic.user.location} just made a distress call request.
 The situation should be attended to immediately.
 Call: {panic.phone}"""
-    request = sms.send_message({
-        "from": "Resolute",
-        "to": phone,
-        "text": message
-    })
+    # request = sms.send_message({
+    #     "from": "Resolute",
+    #     "to": phone,
+    #     "text": message
+    # })
 
-    return request
+    res = client.messages.create(
+    from_="Resolute4.0",
+    body=message,
+    to=phone
+    )
+
+
+    return res
