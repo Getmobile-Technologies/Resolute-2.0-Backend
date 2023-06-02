@@ -61,7 +61,7 @@ Thank you!.
     # })
 
     res = client.messages.create(
-    from_="Resolute4.0",
+    from_="Resolute",
     body=message,
     to=number
         )
@@ -84,7 +84,7 @@ Call: {panic.user.phone}"""
     # })
     
     res = client.messages.create(
-    from_="Resolute4.0",
+    from_="Resolute",
     body=message,
     to=phone
     )
@@ -106,7 +106,7 @@ Call: {panic.phone}"""
     # })
 
     res = client.messages.create(
-    from_="Resolute4.0",
+    from_="Resolute",
     body=message,
     to=phone
     )
