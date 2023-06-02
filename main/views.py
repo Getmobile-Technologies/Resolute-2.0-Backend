@@ -55,9 +55,9 @@ class GetPanicRequests(APIView):
 
     def get(self, request):
         if request.user.role == 'admin':
-            panic = PanicRequest.objects.filter(organisation=request.user.organisation, is_deleted=False)
+            panic = PanicRequest.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-timestamp')
         else:
-            panic = PanicRequest.objects.filter(is_deleted=False)
+            panic = PanicRequest.objects.filter(is_deleted=False).order_by('-timestamp')
 
         serializer = PanicSerializer(panic, many=True)
 
@@ -66,7 +66,7 @@ class GetPanicRequests(APIView):
 
 class PanicActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
-    queryset = PanicRequest.objects.filter(is_deleted=False)
+    queryset = PanicRequest.objects.filter(is_deleted=False).order_by('-timestamp')
     serializer_class = PanicSerializer
 
 
