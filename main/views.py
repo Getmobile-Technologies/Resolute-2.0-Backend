@@ -331,7 +331,9 @@ class LocationCreateView(APIView):
         if StaffLocation.objects.filter(city=city, state=state, organisation=request.user.organisation, is_deleted=False).exists():
             return Response({"error": "location already exist"}, status=400)
         
-        serializer.validated_data['organisation'] = request.user.organisation
+        if request.user.role == "admin":
+            serializer.validated_data['organisation'] = request.user.organisation
+        
         serializer.validated_data['admin'] = request.user
         serializer.save(user=request.user)
         message = f"new location created by {request.user.role}"

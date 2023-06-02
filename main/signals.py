@@ -1,6 +1,6 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from . models import PanicRequest, EmergencyContact, CallRequest
+from .models import PanicRequest, EmergencyContact, CallRequest
 from accounts.helpers.sms import emergency_sms, call_emergency_sms
 import random
 from accounts.models import Organisations 
@@ -23,7 +23,7 @@ User = get_user_model()
 @receiver(post_save, sender=PanicRequest)
 def send_emergency_sms(instance, created, **kwargs):
     if created:
-        contacts = list(EmergencyContact.objects.filter(is_deleted=False))
+        contacts = list(EmergencyContact.objects.filter(is_deleted=False).values_list('phone'))
         admin = instance.user.user
         contacts.append(admin.phone)
         for contact in contacts:
@@ -39,7 +39,7 @@ def send_emergency_sms(instance, created, **kwargs):
 @receiver(post_save, sender=CallRequest)
 def call__emergency_sms(instance, created, **kwargs):
     if created:
-        contacts = list(EmergencyContact.objects.filter(is_deleted=False))
+        contacts = list(EmergencyContact.objects.filter(is_deleted=False).values_list('phone'))
         admin = instance.user.user
         contacts.append(admin.phone)
         for contact in contacts:
