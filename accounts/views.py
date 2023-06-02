@@ -42,7 +42,7 @@ class UserRegisterView(APIView):
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
         password = generate_password()
-        
+        data = {}
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['user'] = request.user
         serializer.validated_data['password'] = password
@@ -52,13 +52,15 @@ class UserRegisterView(APIView):
             serializer.validated_data['organisation'] = request.user.organisation
 
         account = serializer.save()
-        print(sign_up_sms(number=account.phone, pin=password))
+        print(account.__dict__)
+        # print(sign_up_sms(number=account.phone, pin=password))
     
         message = f"new user created by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)
+        data = serializer.data.copy()
+        data['password'] = password
 
-
-        return Response(serializer.data, status=200)
+        return Response(data, status=200)
 
 
 class AdminRegisterView(APIView):
