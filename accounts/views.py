@@ -52,8 +52,8 @@ class UserRegisterView(APIView):
             serializer.validated_data['organisation'] = request.user.organisation
 
         account = serializer.save()
-        print(account.__dict__)
-        # print(sign_up_sms(number=account.phone, pin=password))
+
+        sign_up_sms(number=account.phone, pin=password)
     
         message = f"new user created by {request.user.role}"
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline=message)

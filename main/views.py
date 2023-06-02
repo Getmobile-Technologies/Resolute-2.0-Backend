@@ -55,9 +55,9 @@ class GetPanicRequests(APIView):
 
     def get(self, request):
         if request.user.role == 'admin':
-            panic = PanicRequest.objects.filter(organisation=request.user.organisation, is_deleted=False)
+            panic = PanicRequest.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-timestamp')
         else:
-            panic = PanicRequest.objects.filter(is_deleted=False)
+            panic = PanicRequest.objects.filter(is_deleted=False).order_by('-timestamp')
 
         serializer = PanicSerializer(panic, many=True)
 
@@ -66,7 +66,7 @@ class GetPanicRequests(APIView):
 
 class PanicActions(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdmin,)
-    queryset = PanicRequest.objects.filter(is_deleted=False)
+    queryset = PanicRequest.objects.filter(is_deleted=False).order_by('-timestamp')
     serializer_class = PanicSerializer
 
 
@@ -331,7 +331,9 @@ class LocationCreateView(APIView):
         if StaffLocation.objects.filter(city=city, state=state, organisation=request.user.organisation, is_deleted=False).exists():
             return Response({"error": "location already exist"}, status=400)
         
-        serializer.validated_data['organisation'] = request.user.organisation
+        if request.user.role == "admin":
+            serializer.validated_data['organisation'] = request.user.organisation
+        
         serializer.validated_data['admin'] = request.user
         serializer.save(user=request.user)
         message = f"new location created by {request.user.role}"
