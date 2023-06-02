@@ -1,4 +1,9 @@
+aiohttp==3.8.4
+aiohttp-retry==2.8.3
+aiosignal==1.3.1
 asgiref==3.6.0
+async-timeout==4.0.2
+attrs==23.1.0
 CacheControl==0.12.11
 cachetools==5.3.0
 certifi==2022.12.7
@@ -21,6 +26,7 @@ djangorestframework-simplejwt==4.8.0
 djoser==2.1.0
 drf-yasg==1.21.5
 firebase-admin==6.1.0
+frozenlist==1.3.3
 google-api-core==2.11.0
 google-api-python-client==2.86.0
 google-auth==2.18.1
@@ -42,6 +48,7 @@ itypes==1.2.0
 Jinja2==3.1.2
 MarkupSafe==2.1.2
 msgpack==1.0.5
+multidict==6.0.4
 nexmo==2.5.2
 oauthlib==3.2.2
 packaging==23.1
@@ -69,6 +76,7 @@ six==1.16.0
 social-auth-app-django==4.0.0
 social-auth-core==4.4.1
 sqlparse==0.4.3
+twilio==8.2.2
 typing_extensions==4.5.0
 tzdata==2023.3
 uritemplate==4.1.1
@@ -76,3 +84,4 @@ urllib3==1.26.15
 vonage==3.5.0
 whitenoise==6.3.0
 wrapt==1.15.0
+yarl==1.9.2

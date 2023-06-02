@@ -132,6 +132,11 @@ jobs:
             sshpass -p "${SSH_PASSWORD}" rsync -r . ${SSH_USERNAME}@${SERVER_IP}:/home/${PROJECT_FOLDER}
 
       - run:
+          name: update dependencies
+          command: |
+            sshpass -p "${SSH_PASSWORD}" ssh ${SSH_USERNAME}@${SERVER_IP} "cd /home/${PROJECT_FOLDER} && source venv/bin/activate && pip install -r requirements.txt"
+      
+      - run:
           name: Migrate DB
           command: |
             sshpass -p "${SSH_PASSWORD}" ssh ${SSH_USERNAME}@${SERVER_IP} "cd /home/${PROJECT_FOLDER} && source venv/bin/activate && python manage.py migrate"

@@ -131,7 +131,7 @@ class PanicGenuineView(APIView):
 
 
 class AllPanicRequest(generics.ListAPIView):
-    queryset = PanicRequest.objects.filter(is_deleted=False).order_by('-id')
+    queryset = PanicRequest.objects.filter(is_deleted=False).order_by('-timestamp')
     permission_classes = (IsAdmin,)
     serializer_class = PanicSerializer
 
@@ -283,9 +283,9 @@ class GetTrackMeRequestAdmin(APIView):
     def get(self, request):
         if request.user.role == 'admin':
 
-            track = TrackMeRequest.objects.filter(organisation=request.user.organisation, is_deleted=False)
+            track = TrackMeRequest.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-timestamp')
         else:
-            track = TrackMeRequest.objects.filter(is_deleted=False)
+            track = TrackMeRequest.objects.filter(is_deleted=False).order_by('-timestamp')
 
         serializer = TrackMeSerializer(track, many=True)
 
@@ -344,10 +344,10 @@ class GetLocations(APIView):
     permission_classes = (IsAdmin,)
     def get(self, request):
         if request.user.role == "admin":
-            locations = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False)
+            locations = StaffLocation.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-timestamp')
 
         else:
-            locations = StaffLocation.objects.filter(is_deleted=False)
+            locations = StaffLocation.objects.filter(is_deleted=False).order_by('-timestamp')
 
         serializer = LocationSerializer(locations, many=True)
         
@@ -390,9 +390,9 @@ class GetImageRequestAdmin(APIView):
  
     def get(self, request):
         if request.user.role == 'admin':
-            images = Images.objects.filter(organisation=request.user.organisation, is_deleted=False)
+            images = Images.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-timestamp')
         else:
-            images = Images.objects.filter(is_deleted=False)
+            images = Images.objects.filter(is_deleted=False).order_by('-timestamp')
 
         serializer = ImageSerializer(images, many=True)
 
@@ -516,10 +516,7 @@ class EmergencyContactView(APIView):
         return Response({"message": "emergency contact added succesfuly"}, status=200)
     
     def get(self, request):
-        try:
-            contacts = EmergencyContact.objects.filter(is_deleted=False).order_by('-id')
-        except EmergencyContact.DoesNotExist:
-            return Response({"error": "error fetching data"}, status=404)
+        contacts = EmergencyContact.objects.filter(is_deleted=False).order_by('-timestamp')
         serializer = EmergencySerializer(contacts, many=True)
 
         data = {
