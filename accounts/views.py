@@ -398,3 +398,24 @@ class PasswordResetConfirmView(APIView):
         
         else:
             return Response({"error": "invalid token"}, status=400)
+        
+class OrganisationAction(generics.RetrieveUpdateDestroyAPIView):
+
+    permission_classes = (IsSuperUser,)
+    queryset = Organisations.objects.filter(is_deleted=False)
+    serializer_class = OrganisationSerializer
+
+    def update(self, request, pk):
+        try:
+            organisation = Organisations.objects.get(id=pk)
+        except Organisations.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = OrganisationSerializer(organisation, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+

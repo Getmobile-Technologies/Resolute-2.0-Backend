@@ -27,6 +27,7 @@ urlpatterns = [
     path('organizations', views.OrganizationView.as_view()),
     path('reset/password', views.PasswordResetView.as_view()),
     path('reset/password/confirm/<str:uidb64>/<str:token>', views.PasswordResetConfirmView.as_view()),
+    path('organisation/action/<int:pk>', views.OrganisationAction.as_view()),
     
     
 ]
