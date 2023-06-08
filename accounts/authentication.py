@@ -7,13 +7,13 @@ class PhoneNumberBackend(BaseBackend):
     def authenticate(self, request, phone=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
-            users = UserModel.objects.filter(phone=phone)
+            user = UserModel.objects.get(phone=phone, role='staff', **kwargs)
         except UserModel.DoesNotExist:
             return None
 
-        for user in users:
-            if user.check_password(password):
-                return user
+        if user.check_password(password):
+            return user
+        return None
 
     def get_user(self, user_id):
         UserModel = get_user_model()
@@ -27,13 +27,13 @@ class EmailBackend(BaseBackend):
     def authenticate(self, request, email=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
-            users = UserModel.objects.filter(email=email)
+            user = UserModel.objects.get(email=email, role='admin', **kwargs)
         except UserModel.DoesNotExist:
             return None
 
-        for user in users:
-            if user.check_password(password):
-                return user
+        if user.check_password(password):
+            return user
+        return None
 
     def get_user(self, user_id):
         UserModel = get_user_model()

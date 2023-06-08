@@ -240,7 +240,6 @@ class UserLoginView(APIView):
             if "email" in data:
                 user = authenticate(request, email = data['email'], password = data['password'], is_deleted=False)
             elif "phone" in data:
-                print(data['phone'])
                 user = authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
                 
             else:
