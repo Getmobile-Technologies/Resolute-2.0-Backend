@@ -27,7 +27,7 @@ class EmailBackend(BaseBackend):
     def authenticate(self, request, email=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
-            user = UserModel.objects.get(email=email, role='admin', **kwargs)
+            user = UserModel.objects.get(email=email, **kwargs)
         except UserModel.DoesNotExist:
             return None
 
