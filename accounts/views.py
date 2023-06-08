@@ -44,6 +44,8 @@ class UserRegisterView(APIView):
         password = generate_password()
         data = {}
         serializer.is_valid(raise_exception=True)
+        if User.objects.filter(phone=serializer.validated_data['phone'], role="staff").exists():
+            raise ValidationError({"phone": "phone number already exists for a staff"})
         serializer.validated_data['user'] = request.user
         serializer.validated_data['password'] = password
         serializer.validated_data['role'] = "staff"
@@ -76,6 +78,8 @@ class AdminRegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         admin = serializer.validated_data.pop('admin')
         organisation = serializer.validated_data.pop('organisation')
+        if User.objects.filter(phone=admin['phone'], role="admin").exists():
+            raise ValidationError({"phone": "phone number already exists for an admin"})
         user = User.objects.create(is_admin=True, is_staff=True, role="admin", **admin)
         password = generate_admin_password()
         user.set_password(password)
