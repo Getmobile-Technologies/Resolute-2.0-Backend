@@ -5,7 +5,7 @@ import requests
 from main.models import PanicRequest, CallRequest
 import urllib.parse
 from twilio.rest import Client
-
+import logging
 
 # Vonage_API_Key = os.getenv("vonage_api_key")
 # Vonage_API_Secret = os.getenv("vonage_secret_key")
@@ -60,11 +60,16 @@ Thank you!.
     #     "text": message
     # })
 
-    res = client.messages.create(
-    from_="Resolute",
-    body=message,
-    to=number
-        )
+    try:
+        res = client.messages.create(
+        from_="Resolute",
+        body=message,
+        to=number
+            )
+    except Exception as e:
+
+        logging.error("An error occurred: %s", str(e))
+        return
 
 
     return res
@@ -82,12 +87,16 @@ Call: {panic.user.phone}"""
     #     "to": phone,
     #     "text": message
     # })
-    
-    res = client.messages.create(
-    from_="Resolute",
-    body=message,
-    to=phone
-    )
+    try:
+        res = client.messages.create(
+        from_="Resolute",
+        body=message,
+        to=phone
+        )
+    except Exception as e:
+
+        logging.error("An error occurred: %s", str(e))
+        return
 
 
     return res
@@ -105,11 +114,16 @@ Call: {panic.phone}"""
     #     "text": message
     # })
 
-    res = client.messages.create(
-    from_="Resolute",
-    body=message,
-    to=phone
-    )
+    try:
+        res = client.messages.create(
+        from_="Resolute",
+        body=message,
+        to=phone
+        )
+    except Exception as e:
+
+        logging.error("An error occurred: %s", str(e))
+        return
 
 
     return res

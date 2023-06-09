@@ -117,6 +117,16 @@ class OrganisationSerializer(serializers.ModelSerializer):
         model = Organisations
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        contact_admin_data = validated_data.pop('contact_admin', None)
+        if contact_admin_data is not None:
+            contact_admin_serializer = self.fields['contact_admin']
+            contact_admin_instance = instance.contact_admin
+            contact_admin = contact_admin_serializer.update(contact_admin_instance, contact_admin_data)
+            validated_data['contact_admin'] = contact_admin
+
+        return super().update(instance, validated_data)
+
 
 class CreateOrganisationSerializer(serializers.Serializer):
     admin = AdminRegistrationSerializer()

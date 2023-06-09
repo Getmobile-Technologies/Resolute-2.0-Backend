@@ -19,7 +19,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     first_name = models.CharField(_('first_name'), max_length=250)
     last_name = models.CharField(_('last_name'), max_length=250)
-    phone = models.CharField(_('phone'), max_length=200, unique=True, null=True, validators=[phone_regex])
+    phone = models.CharField(_('phone'), max_length=200, null=True, validators=[phone_regex])
     email = models.EmailField(_('email'), unique=True, null=True, blank=False)
     location = models.ForeignKey("main.StaffLocation", on_delete=models.CASCADE, null=True)
     organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True)

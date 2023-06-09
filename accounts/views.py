@@ -44,6 +44,8 @@ class UserRegisterView(APIView):
         password = generate_password()
         data = {}
         serializer.is_valid(raise_exception=True)
+        if User.objects.filter(phone=serializer.validated_data['phone'], role="staff").exists():
+            raise ValidationError({"phone": "phone number already exists for a staff"})
         serializer.validated_data['user'] = request.user
         serializer.validated_data['password'] = password
         serializer.validated_data['role'] = "staff"
@@ -76,6 +78,8 @@ class AdminRegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         admin = serializer.validated_data.pop('admin')
         organisation = serializer.validated_data.pop('organisation')
+        if User.objects.filter(phone=admin['phone'], role="admin").exists():
+            raise ValidationError({"phone": "phone number already exists for an admin"})
         user = User.objects.create(is_admin=True, is_staff=True, role="admin", **admin)
         password = generate_admin_password()
         user.set_password(password)
@@ -236,7 +240,6 @@ class UserLoginView(APIView):
             if "email" in data:
                 user = authenticate(request, email = data['email'], password = data['password'], is_deleted=False)
             elif "phone" in data:
-                print(data['phone'])
                 user = authenticate(request, phone = data['phone'], password = data['password'], is_deleted=False)
                 
             else:
@@ -398,3 +401,24 @@ class PasswordResetConfirmView(APIView):
         
         else:
             return Response({"error": "invalid token"}, status=400)
+        
+class OrganisationAction(generics.RetrieveUpdateDestroyAPIView):
+
+    permission_classes = (IsSuperUser,)
+    queryset = Organisations.objects.filter(is_deleted=False)
+    serializer_class = OrganisationSerializer
+
+    def update(self, request, pk):
+        try:
+            organisation = Organisations.objects.get(id=pk)
+        except Organisations.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = OrganisationSerializer(organisation, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
