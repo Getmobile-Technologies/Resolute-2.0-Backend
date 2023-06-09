@@ -134,7 +134,7 @@ class StaffLocation(models.Model):
     admin = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     city = models.CharField(max_length=500, null=True)
     state = models.CharField(max_length=250, null=True)
-    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True)
+    organisation = models.ForeignKey(Organisations, on_delete=models.CASCADE, null=True)
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -154,7 +154,7 @@ class StaffLocation(models.Model):
 
 class Notifications(models.Model):
     message = models.CharField(max_length=300, null=True)
-    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, null=True, blank=True, related_name="organisation_notifications")
+    organisation = models.ForeignKey("accounts.Organisations", on_delete=models.CASCADE, related_name="organisation_notifications")
     is_deleted = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 

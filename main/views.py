@@ -415,7 +415,7 @@ class GetAdminNotifications(APIView):
             notifications = Notifications.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-timestamp')
         else:
             notifications = Notifications.objects.filter(is_deleted=False).order_by('-timestamp')
-        serializer = NotificationSerializer(notifications)
+        serializer = NotificationSerializer(notifications, many=True)
 
         return Response(serializer.data, status=200)
 
