@@ -24,6 +24,7 @@ User = get_user_model()
 
 
 class PanicView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAuthenticated,)
     
     
@@ -51,6 +52,7 @@ class PanicView(APIView):
     
 
 class GetPanicRequests(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
 
     def get(self, request):
@@ -65,6 +67,7 @@ class GetPanicRequests(APIView):
             
 
 class PanicActions(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     queryset = PanicRequest.objects.filter(is_deleted=False).order_by('-timestamp')
     serializer_class = PanicSerializer
@@ -72,6 +75,7 @@ class PanicActions(generics.RetrieveUpdateDestroyAPIView):
 
 
 class PanicReview(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     
     @swagger_auto_schema(method="post", request_body=PanicSerializer())
@@ -102,6 +106,7 @@ class PanicReview(APIView):
             return Response({"error": "request not reviewed"}, status=400)
 
 class PanicGenuineView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     
     
@@ -131,12 +136,14 @@ class PanicGenuineView(APIView):
 
 
 class AllPanicRequest(generics.ListAPIView):
+    authentication_classes = [JWTAuthentication]
     queryset = PanicRequest.objects.filter(is_deleted=False).order_by('-timestamp')
     permission_classes = (IsAdmin,)
     serializer_class = PanicSerializer
 
     
 class CallRequestView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAuthenticated,)
     
     @swagger_auto_schema(method="post", request_body=CallSerializer())
@@ -159,12 +166,14 @@ class CallRequestView(APIView):
         return Response(data, status=200)
 
 class CallRequestActions(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     queryset = CallRequest.objects.filter(is_deleted=False)
     serializer_class = CallSerializer
 
 
 class GetCallRequestAdmin(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
  
     def get(self, request):
@@ -180,6 +189,7 @@ class GetCallRequestAdmin(APIView):
         
 
 class CallReview(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     
     def post(self, request, pk):
@@ -208,6 +218,7 @@ class CallReview(APIView):
 
 
 class IncidentCounts(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     
     def get(self, request):
@@ -248,6 +259,8 @@ class IncidentCounts(APIView):
 
 
 class TrackMeRequestView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = (IsAuthenticated,)
     
     @swagger_auto_schema(method="post", request_body=TrackMeSerializer())
     @action(methods=["post"], detail=True)
@@ -271,6 +284,7 @@ class TrackMeRequestView(APIView):
     
 
 class TrackActions(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     queryset = TrackMeRequest.objects.filter(is_deleted=False)
     serializer_class = TrackMeSerializer
@@ -278,6 +292,7 @@ class TrackActions(generics.RetrieveUpdateDestroyAPIView):
         
         
 class GetTrackMeRequestAdmin(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
  
     def get(self, request):
@@ -293,6 +308,7 @@ class GetTrackMeRequestAdmin(APIView):
             
         
 class TrackMeReview(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     def post(self, request, pk):
         try:
@@ -319,6 +335,7 @@ class TrackMeReview(APIView):
 
 
 class LocationCreateView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     
     @swagger_auto_schema(method="post", request_body=LocationSerializer())
@@ -343,6 +360,7 @@ class LocationCreateView(APIView):
 
 
 class GetLocations(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     def get(self, request):
         if request.user.role == "admin":
@@ -361,12 +379,14 @@ class GetLocations(APIView):
 
 
 class LocationActions(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     queryset = StaffLocation.objects.filter(is_deleted=False)
     serializer_class = LocationSerializer
 
 
 class ImageView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAuthenticated,)
     
     @swagger_auto_schema(method="post", request_body=ImageSerializer())
@@ -388,6 +408,7 @@ class ImageView(APIView):
 
 
 class GetImageRequestAdmin(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
  
     def get(self, request):
@@ -401,6 +422,7 @@ class GetImageRequestAdmin(APIView):
         return Response(serializer.data, status=200)
             
 class ImageActions(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     queryset = Images.objects.filter(is_deleted=False)
     serializer_class = ImageSerializer
@@ -408,6 +430,7 @@ class ImageActions(generics.RetrieveUpdateDestroyAPIView):
             
 
 class GetAdminNotifications(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
 
     def get(self, request):
