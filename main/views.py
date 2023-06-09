@@ -16,6 +16,8 @@ from accounts.helpers.sms import emergency_sms, geocoding
 from .helpers.notify import notification_handler
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 
 User = get_user_model()
 
