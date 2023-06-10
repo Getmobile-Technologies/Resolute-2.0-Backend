@@ -13,6 +13,7 @@ from rest_framework import permissions, status
 from main import models
 from .serializers import LoginSerializer, ChangePasswordSerializer, PasswordResetSerializer, ActivitySerializer, EmailSerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -35,6 +36,7 @@ User = get_user_model()
 
 
 class UserRegisterView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
 
     @swagger_auto_schema(method="post", request_body=UserRegisterationSerializer())
@@ -66,6 +68,7 @@ class UserRegisterView(APIView):
 
 
 class AdminRegisterView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
 
     @swagger_auto_schema(method="post", request_body=CreateOrganisationSerializer())
@@ -104,6 +107,7 @@ class AdminRegisterView(APIView):
  
 
 class UserActions(generics.RetrieveUpdateAPIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     queryset = User.objects.filter(is_deleted=False)
     serializer_class = UserDetailSerializer
@@ -133,6 +137,7 @@ class DeleteUserView(generics.DestroyAPIView):
         
     
 class UserProfile(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -148,6 +153,7 @@ class UserProfile(APIView):
 
 class SuperAdminRegisterView(APIView):
     permission_classes = (IsSuperUser,)
+    authentication_classes = [JWTAuthentication]
     
     @swagger_auto_schema(method="post", request_body=SuperAdminSerializer())
     @action(methods=["post"], detail=True)
@@ -165,6 +171,7 @@ class SuperAdminRegisterView(APIView):
 
 class GetSuperUserAdmins(APIView):
     permission_classes = (IsSuperUser,)
+    authentication_classes = [JWTAuthentication]
     
     def get(self, request):
         try:
@@ -185,6 +192,7 @@ class ChangePasswordView(generics.GenericAPIView):
         
         serializer_class = ChangePasswordSerializer
         model = User
+        authentication_classes = [JWTAuthentication]
         permission_classes = (IsAuthenticated,)
 
         def get_object(self):
@@ -215,6 +223,7 @@ class ChangePasswordView(generics.GenericAPIView):
 
 class LogoutView(APIView):
     serializer_class = UserLogoutSerializer
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(method="post", request_body=UserLogoutSerializer())
@@ -300,6 +309,7 @@ class UserLoginView(APIView):
 
 
 class AdminResetPassword(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
 
     
@@ -323,12 +333,14 @@ class AdminResetPassword(APIView):
 
 
 class AllUserActivities(generics.ListAPIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
     serializer_class = ActivitySerializer
     queryset = UserActivity.objects.all().order_by('-id')
 
 
 class OrganizationView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsSuperUser,)
 
     def get(self, request):
@@ -339,6 +351,7 @@ class OrganizationView(APIView):
 
 
 class AllUsersView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsAdmin,)
 
     def get(self, request):
@@ -403,7 +416,7 @@ class PasswordResetConfirmView(APIView):
             return Response({"error": "invalid token"}, status=400)
         
 class OrganisationAction(generics.RetrieveUpdateDestroyAPIView):
-
+    authentication_classes = [JWTAuthentication]
     permission_classes = (IsSuperUser,)
     queryset = Organisations.objects.filter(is_deleted=False)
     serializer_class = OrganisationSerializer
