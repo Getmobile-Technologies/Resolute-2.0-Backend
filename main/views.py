@@ -169,9 +169,9 @@ class GetCallRequestAdmin(APIView):
  
     def get(self, request):
         if request.user.role == 'admin':
-            call = CallRequest.objects.filter(organisation=request.user.organisation, is_deleted=False)
+            call = CallRequest.objects.filter(organisation=request.user.organisation, is_deleted=False).order_by('-timestamp')
         else:
-            call = CallRequest.objects.filter(is_deleted=False)
+            call = CallRequest.objects.filter(is_deleted=False).order_by('-timestamp')
 
         serializer = CallSerializer(call, many=True)
 
