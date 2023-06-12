@@ -53,12 +53,12 @@ def call__emergency_sms(instance, created, **kwargs):
 
 
 
-@receiver(post_save, sender=Notifications)
-def send_notification(sender, instance:Notifications, created, *args,**kwargs):
+# @receiver(post_save, sender=Notifications)
+# def send_notification(sender, instance:Notifications, created, *args,**kwargs):
     
-    if created:        
-        if instance.organisation.contact_admin.fcm_token:
+#     if created:        
+#         if instance.organisation.contact_admin.fcm_token:
         
-            notification = messaging.Notification(title="New notiffication", body=instance.message)
-            messaging.send(messaging.Message(notification=notification, token=instance.organisation.contact_admin.fcm_token))
-    return
+#             notification = messaging.Notification(title="New notiffication", body=instance.message)
+#             messaging.send(messaging.Message(notification=notification, token=instance.organisation.contact_admin.fcm_token))
+#     return
