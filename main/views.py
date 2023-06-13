@@ -498,11 +498,11 @@ class LocationIncidentCount(APIView):
                 return Response({"error": "not found"}, status=404)
             data = []
             for location in locations:
-                panic = PanicRequest.objects.filter(user_location=location.state, is_deleted=False).count()
-                resolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=True).count()
-                unresolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=False).count()
+                panic = PanicRequest.objects.filter(user_location=location.state.lower(), is_deleted=False).count()
+                resolved = PanicRequest.objects.filter(user_location=location.state.lower(), is_deleted=False, is_reviewed=True).count()
+                unresolved = PanicRequest.objects.filter(user_location=location.state.lower(), is_deleted=False, is_reviewed=False).count()
                 request_data = {
-                    "state": location.state,
+                    "state": location.state.lower(),
                     "panic_count": panic,
                     "panic_resolved": resolved,
                     "panic_unresolved": unresolved
@@ -516,11 +516,11 @@ class LocationIncidentCount(APIView):
                 return Response({"error": "not found"}, status=404)
             data = []
             for location in locations:
-                panic = PanicRequest.objects.filter(user_location=location.state, is_deleted=False).count()
-                resolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=True).count()
-                unresolved = PanicRequest.objects.filter(user_location=location.state, is_deleted=False, is_reviewed=False).count()
+                panic = PanicRequest.objects.filter(user_location=location.state.lower(), is_deleted=False).count()
+                resolved = PanicRequest.objects.filter(user_location=location.state.lower(), is_deleted=False, is_reviewed=True).count()
+                unresolved = PanicRequest.objects.filter(user_location=location.state.lower(), is_deleted=False, is_reviewed=False).count()
                 request_data = {
-                    "state": location.state,
+                    "state": location.state.lower(),
                     "panic_count": panic,
                     "panic_resolved": resolved,
                     "panic_unresolved": unresolved
