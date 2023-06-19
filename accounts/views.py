@@ -421,13 +421,13 @@ class OrganisationAction(generics.RetrieveUpdateDestroyAPIView):
     queryset = Organisations.objects.filter(is_deleted=False)
     serializer_class = OrganisationSerializer
 
-    def patch(self, request, pk):
+    def put(self, request, pk):
         try:
             organisation = Organisations.objects.get(id=pk)
         except Organisations.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-        serializer = OrganisationSerializer(organisation, data=request.data)
+        serializer = OrganisationSerializer(organisation, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
