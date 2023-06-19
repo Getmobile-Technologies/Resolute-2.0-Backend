@@ -344,7 +344,7 @@ class OrganizationView(APIView):
     permission_classes = (IsSuperUser,)
 
     def get(self, request):
-        orgs = Organisations.objects.filter(is_deleted=False).order_by('-id')
+        orgs = Organisations.objects.filter(is_deleted=False).order_by('-timestamp')
         serializer = OrganisationSerializer(orgs, many=True)
         return Response(serializer.data, 200)
 
@@ -421,7 +421,7 @@ class OrganisationAction(generics.RetrieveUpdateDestroyAPIView):
     queryset = Organisations.objects.filter(is_deleted=False)
     serializer_class = OrganisationSerializer
 
-    def update(self, request, pk):
+    def patch(self, request, pk):
         try:
             organisation = Organisations.objects.get(id=pk)
         except Organisations.DoesNotExist:

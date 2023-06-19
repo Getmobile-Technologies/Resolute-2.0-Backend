@@ -119,6 +119,12 @@ class Organisations(models.Model):
     def delete(self):
         self.is_deleted=True
         self.save()
+        if self.contact_admin:
+            self.contact_admin.is_deleted=True
+            self.contact_admin.save()
+        if self.user_set.filter(role="staff", is_deleted=False).exists():
+            self.user_set.filter(role="staff", is_deleted=False).update(is_deleted=True)
+
         #TODO: get all the corresponding users, admins and soft delete their accounts -- FEMI!
         
     @property
