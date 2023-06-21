@@ -439,7 +439,6 @@ def edit_organization(request, org_id, admin_id):
     
     serializer = CreateOrganisationSerializer(organisation, data=request.data, partial=True)
     serializer.is_valid(raise_exception=True)
-    print("string")
     if (request.user != organisation.contact_admin and organisation.contact_admin != user) or (request.user.role != "superuser"):
         raise PermissionDenied({"error":"you do not have permission to perform this action"})
     
