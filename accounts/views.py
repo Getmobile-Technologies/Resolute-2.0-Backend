@@ -8,7 +8,7 @@ from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from .serializers import LoginSerializer, ChangePasswordSerializer, PasswordResetSerializer, ActivitySerializer, EmailSerializer, UpdateOrganisationSerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, PasswordResetSerializer, ActivitySerializer, EmailSerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth.signals import user_logged_in
@@ -439,8 +439,8 @@ def edit_organization(request, org_id, admin_id):
     
     serializer = CreateOrganisationSerializer(organisation, data=request.data, partial=True)
     serializer.is_valid(raise_exception=True)
-    
-    if (request.user != organisation.contact_admin and organisation.contact_admin != user) or request.user.role != "superuser":
+    print("string")
+    if (request.user != organisation.contact_admin and organisation.contact_admin != user) or (request.user.role != "superuser"):
         raise PermissionDenied({"error":"you do not have permission to perform this action"})
     
     
