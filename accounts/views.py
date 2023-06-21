@@ -1,16 +1,13 @@
-import email
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db import IntegrityError
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework import status, generics
-from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
 from .models import UserActivity, Organisations
 from rest_framework.views import APIView
-from rest_framework import permissions, status
-from main import models
+from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from .serializers import LoginSerializer, ChangePasswordSerializer, PasswordResetSerializer, ActivitySerializer, EmailSerializer, UpdateOrganisationSerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -422,21 +419,34 @@ class OrganisationAction(generics.RetrieveDestroyAPIView):
     serializer_class = OrganisationSerializer
 
 
-class OrganisationUpdate(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = (IsSuperUser,)
 
-    def put(self, request, pk):
-        try:
-            object = Organisations.objects.get(id=pk, is_deleted=False)
-        except Organisations.DoesNotExist:
-            raise NotFound(detail={"message": "Organisation not found"}, status=404)
 
-        serializer = UpdateOrganisationSerializer(object, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+@swagger_auto_schema(method="put", request_body=CreateOrganisationSerializer())
+@api_view(["PUT"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def edit_organization(request, org_id, admin_id):
+    
+    try:
+        organisation = Organisations.objects.get(id=org_id, is_deleted=False)
+        user = User.objects.get(id=admin_id, is_deleted=False)
+    except Organisations.DoesNotExist:
+        raise NotFound(detail={"error":f"organization with id {org_id} not found"})
+    except User.DoesNotExist:
+        raise NotFound(detail={"error":f"user with id {admin_id} not found"})
+    
+    
+    
+    serializer = CreateOrganisationSerializer(organisation, data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    
+    if (request.user != organisation.contact_admin and organisation.contact_admin != user) or request.user.role == "superuser":
+        raise PermissionDenied({"error":"you do not have permission to perform this action"})
+    
+    
+    serializer.update(serializer.validated_data,organisation,user)
+    
+    return Response({"message":"success"}, status=status.HTTP_202_ACCEPTED)
         
         
 

@@ -122,6 +122,34 @@ class OrganisationSerializer(serializers.ModelSerializer):
 class CreateOrganisationSerializer(serializers.Serializer):
     admin = AdminRegistrationSerializer()
     organisation = OrganisationSerializer()
+    
+    
+    def update(self, validated_data, org, user):
+        fields = org.__dict__
+        # update locations
+        organization = validated_data.get('organisation', {})
+        
+        # update product fields
+        for field in fields:
+            if field in organization:
+                setattr(org, field, validated_data['organisation'][field])
+        org.save()
+        
+        
+        # Updating admin
+        fields = user.__dict__
+        # update locations
+        admin = validated_data.get('admin', {})
+        
+        # update product fields
+        for field in fields:
+            if field in admin:
+                setattr(user, field, validated_data['admin'][field])
+        user.save()
+        
+        
+            
+        return 
 
     
 
@@ -133,27 +161,5 @@ class PasswordResetSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
 
-class UpdateOrganisationSerializer(serializers.Serializer):
-    contact_admin = AdminRegistrationSerializer()
-    organisation = serializers.CharField(required=False)
 
-
-    def update(self, instance, validated_data):
-
-        fields = instance.__dict__
-
-        if 'organisation' in validated_data:
-            instance.name = validated_data['organisation']
-
-        
-
-        if 'contact_admin' in validated_data:
-            for field in fields:
-                if field in validated_data.get('contact_admin', {}):
-                    setattr(instance.contact_admin, field, validated_data['contact_admin'][field])
-                    instance.contact_admin.save()
-            
-
-        instance.save()
-        return instance
     

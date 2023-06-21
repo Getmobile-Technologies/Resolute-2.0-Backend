@@ -2,13 +2,6 @@ from rest_framework import serializers
 from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category, EmergencyContact
 
 
-
-
-
-
-
-
-
 class PanicSerializer(serializers.ModelSerializer):
     user_data = serializers.ReadOnlyField()
     location_data = serializers.ReadOnlyField()
