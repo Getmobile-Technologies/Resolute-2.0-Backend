@@ -11,7 +11,7 @@ from .models import UserActivity, Organisations
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from main import models
-from .serializers import LoginSerializer, ChangePasswordSerializer, PasswordResetSerializer, ActivitySerializer, EmailSerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
+from .serializers import LoginSerializer, ChangePasswordSerializer, PasswordResetSerializer, ActivitySerializer, EmailSerializer, UpdateOrganisationSerializer, OrganisationSerializer, UserDeleteSerializer, UserRegisterationSerializer, UserDetailSerializer, UserLogoutSerializer, SuperAdminSerializer, CreateOrganisationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth.signals import user_logged_in
@@ -415,23 +415,30 @@ class PasswordResetConfirmView(APIView):
         else:
             return Response({"error": "invalid token"}, status=400)
         
-class OrganisationAction(generics.RetrieveUpdateDestroyAPIView):
+class OrganisationAction(generics.RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = (IsSuperUser,)
     queryset = Organisations.objects.filter(is_deleted=False)
     serializer_class = OrganisationSerializer
 
+
+class OrganisationUpdate(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = (IsSuperUser,)
+
     def put(self, request, pk):
         try:
-            organisation = Organisations.objects.get(id=pk)
+            object = Organisations.objects.get(id=pk, is_deleted=False)
         except Organisations.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise NotFound(detail={"message": "Organisation not found"}, status=404)
+
+        serializer = UpdateOrganisationSerializer(object, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
         
-        serializer = OrganisationSerializer(organisation, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
 
 

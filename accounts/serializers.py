@@ -112,25 +112,18 @@ class OrganisationSerializer(serializers.ModelSerializer):
     ingenuine_incidence = serializers.ReadOnlyField()
     admin_data = serializers.ReadOnlyField()
     category_data = serializers.ReadOnlyField()
+    
 
     class Meta:
         model = Organisations
         fields = '__all__'
 
-    def update(self, instance, validated_data):
-        contact_admin_data = validated_data.pop('contact_admin', None)
-        if contact_admin_data is not None:
-            contact_admin_serializer = self.fields['contact_admin']
-            contact_admin_instance = instance.contact_admin
-            contact_admin = contact_admin_serializer.update(contact_admin_instance, contact_admin_data)
-            validated_data['contact_admin'] = contact_admin
-
-        return super().update(instance, validated_data)
-
-
+ 
 class CreateOrganisationSerializer(serializers.Serializer):
     admin = AdminRegistrationSerializer()
     organisation = OrganisationSerializer()
+
+    
 
    
 class EmailSerializer(serializers.Serializer):
@@ -138,3 +131,29 @@ class EmailSerializer(serializers.Serializer):
 
 class PasswordResetSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
+
+
+class UpdateOrganisationSerializer(serializers.Serializer):
+    contact_admin = AdminRegistrationSerializer()
+    organisation = serializers.CharField(required=False)
+
+
+    def update(self, instance, validated_data):
+
+        fields = instance.__dict__
+
+        if 'organisation' in validated_data:
+            instance.name = validated_data['organisation']
+
+        
+
+        if 'contact_admin' in validated_data:
+            for field in fields:
+                if field in validated_data.get('contact_admin', {}):
+                    setattr(instance.contact_admin, field, validated_data['contact_admin'][field])
+                    instance.contact_admin.save()
+            
+
+        instance.save()
+        return instance
+    
