@@ -169,7 +169,7 @@ CHANNEL_LAYERS = {
             "CONFIG": {
                 # "hosts": [(os.getenv("REDIS_HOST"), int(os.getenv("REDIS_PORT")))],
                 # "hosts": [f"redis://{os.getenv('REDIS_HOST')}:{int(os.getenv('REDIS_PORT'))}"],
-                "hosts": [os.getenv('REDIS_TLS_URL')],
+                "hosts": [os.getenv("REDIS_URL")],
                 
             },
         },
