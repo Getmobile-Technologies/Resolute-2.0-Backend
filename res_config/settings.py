@@ -168,8 +168,8 @@ CHANNEL_LAYERS = {
             "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
             "CONFIG": {
                 # "hosts": [(os.getenv("REDIS_HOST"), int(os.getenv("REDIS_PORT")))],
-                "hosts": [f"redis://{os.getenv('REDIS_HOST')}:{int(os.getenv('REDIS_PORT'))}"],
-                # "hosts": [os.getenv("REDIS_URL")],
+                # "hosts": [f"redis://{os.getenv('REDIS_HOST')}:{int(os.getenv('REDIS_PORT'))}"],
+                "hosts": [os.getenv("REDIS_URL")],
                 
             },
         },
