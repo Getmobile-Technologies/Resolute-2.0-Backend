@@ -67,7 +67,7 @@ phonenumberslite==8.13.11
 Pillow==9.5.0
 proto-plus==1.22.2
 protobuf==4.23.1
-psycopg2==2.9.6
+psycopg2-binary
 pyasn1==0.5.0
 pyasn1-modules==0.3.0
 pycparser==2.21
