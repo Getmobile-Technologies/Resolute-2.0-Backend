@@ -160,7 +160,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'res_config.wsgi.application'
+# WSGI_APPLICATION = 'res_config.wsgi.application'
 ASGI_APPLICATION = 'res_config.asgi.application'
 
 CHANNEL_LAYERS = {
