@@ -93,11 +93,14 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
         serializer.is_valid(raise_exception=True)
         
         
-        location = serializer.validated_data
+        location = serializer.validated_data.copy()
         
         # Save location data asynchronously
         await self.save_location_data(serializer.validated_data, self.user)
 
+    
+        location['timestamp'] = timezone.now().isoformat()
+        
         # Send location data to the recipient's group
         recipient_group_name = f'{self.staff_id}_tracking'
         await self.channel_layer.group_send(
