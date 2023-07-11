@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound, ValidationError
 from .helpers.generator import generate_password, generate_admin_password
-from .helpers.sms import sign_up_sms
+from .helpers.sms import sign_up_sms, password_reset_sms
 from .helpers.mail import signup_mail, reset_password
 from .permissions import IsAdmin, IsSuperUser
 from drf_yasg.utils import swagger_auto_schema
@@ -319,6 +319,7 @@ class AdminResetPassword(APIView):
         user.set_password(password)
         user.save()
 
+        password_reset_sms(number=user.phone, pin=password)
         UserActivity.objects.create(user=request.user, organisation=request.user.organisation, timeline="You reset a user password")
 
         data = {
