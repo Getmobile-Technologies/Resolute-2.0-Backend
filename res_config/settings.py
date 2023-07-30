@@ -65,14 +65,14 @@ else:
     DATABASES['default'] = dj_database_url.config()
     
     # Configure the logging settings
-    LOG_DIR = os.path.join(BASE_DIR, 'logs')
+    LOG_DIR = os.path.join(BASE_DIR, 'debug_logs')
 
     # Ensure the logs directory exists
     if not os.path.exists(LOG_DIR):
         os.makedirs(LOG_DIR)
 
     # Logging configuration for errors
-    LOG_FILE_ERROR = os.path.join(LOG_DIR, 'error.log')
+    LOG_FILE_ERROR = os.path.join(LOG_DIR, 'errors.log')
     logging.basicConfig(level=logging.ERROR,
                         format='%(asctime)s [%(levelname)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S',
@@ -80,7 +80,7 @@ else:
                         filemode='a')
 
     # Logging configuration for server prints
-    LOG_FILE_SERVER = os.path.join(LOG_DIR, 'server.log')
+    LOG_FILE_SERVER = os.path.join(LOG_DIR, 'servers.log')
     server_logger = logging.getLogger('django.server')
     server_logger.setLevel(logging.DEBUG)
     server_handler = logging.FileHandler(LOG_FILE_SERVER)
