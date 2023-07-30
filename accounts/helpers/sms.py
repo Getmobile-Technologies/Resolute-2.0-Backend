@@ -127,3 +127,25 @@ Call: {panic.phone}"""
 
 
     return res
+
+
+def password_reset_sms(number, pin):
+    message = f"""
+Hello!, your account password as been reset by the admin.
+Your new password is: {pin}
+Thank you!.
+    """
+
+    try:
+        res = client.messages.create(
+        from_="Resolute",
+        body=message,
+        to=number
+            )
+    except Exception as e:
+
+        logging.error("An error occurred: %s", str(e))
+        return
+
+
+    return res
