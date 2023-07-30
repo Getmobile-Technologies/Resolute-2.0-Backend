@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category, EmergencyContact
+from .models import PanicRequest, CallRequest, Tag, TrackMeRequest, StaffLocation, Images, Notifications, Category, EmergencyContact
 
 
 class PanicSerializer(serializers.ModelSerializer):
@@ -75,3 +75,9 @@ class EmergencySerializer(serializers.ModelSerializer):
 class FirebaseSerializer(serializers.Serializer):
 
     fcm_token = serializers.CharField(max_length=6000)
+    
+    
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'

@@ -33,5 +33,6 @@ urlpatterns = [
     path('location/incidents/count', views.LocationIncidentCount.as_view()),
     path('emergency/contacts', views.EmergencyContactView.as_view()),
     path('emergency/contact/<int:pk>', views.EmergencyActions.as_view()),
-    path('fcm/token', views.FireBaseResetToken.as_view())
+    path('fcm/token', views.FireBaseResetToken.as_view()),
+    path("tags/", views.CreateTagView.as_view()),
 ]

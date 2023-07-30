@@ -191,3 +191,18 @@ class EmergencyContact(models.Model):
         self.is_deleted=True
         self.phone = self.phone + f"--deleted--{timezone.now()}"
         self.save()
+
+
+class Tag(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    longitude = models.CharField(max_length=255)
+    latitude = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    desc=models.TextField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
+
+
+    def delete(self):
+        self.is_deleted=True
+        self.save()

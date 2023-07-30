@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PanicSerializer, CallSerializer, TrackMeSerializer, FirebaseSerializer, LocationSerializer, EmergencySerializer, ImageSerializer, NotificationSerializer, CatgorySerializer
-from .models import PanicRequest, CallRequest, TrackMeRequest, StaffLocation, Images, Notifications, Category, EmergencyContact
+from rest_framework.generics import ListCreateAPIView
+from .serializers import PanicSerializer, CallSerializer, TagSerializer, TrackMeSerializer, FirebaseSerializer, LocationSerializer, EmergencySerializer, ImageSerializer, NotificationSerializer, CatgorySerializer
+from .models import PanicRequest, CallRequest, Tag, TrackMeRequest, StaffLocation, Images, Notifications, Category, EmergencyContact
 from django.contrib.auth import get_user_model
 from rest_framework import status, generics
 from accounts.serializers import UserDetailSerializer
@@ -16,6 +17,7 @@ from accounts.helpers.sms import emergency_sms, geocoding
 from .helpers.notify import notification_handler
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
@@ -581,3 +583,38 @@ class FireBaseResetToken(APIView):
         request.user.save()
             
         return Response({"message": "success"}, status=status.HTTP_200_OK)
+    
+    
+class CreateTagView(ListCreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = TagSerializer
+    queryset = Tag.objects.filter(is_deleted=False)
+    
+    
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['user'] = request.user
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response({"message":"success"}, status=status.HTTP_201_CREATED, headers=headers)
+
+    
+    def list(self, request, *args, **kwargs):
+        
+        if request.user.role != "admin" and request.user.is_superuser==False:
+            raise PermissionDenied(detail={"error":"you do not have permission to perform this"})
+        
+        if request.user.is_superuser:
+            queryset = self.filter_queryset(self.get_queryset())
+        else:
+            queryset = self.filter_queryset(self.get_queryset()).filter(user__organisation=request.user.organisation)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
