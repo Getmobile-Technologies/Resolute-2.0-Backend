@@ -280,9 +280,7 @@ class TrackMeRequestView(APIView):
 
         data = {
             "message": "tracking request sent",
-            "user": {
-                "phone": request.user.phone,
-            }
+            "data" : serializer.data
         }
         return Response(data, status=200)
     

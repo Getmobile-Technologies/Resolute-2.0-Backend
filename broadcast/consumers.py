@@ -16,6 +16,8 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
         self.staff_id = self.scope['url_route']['kwargs']['id']
+        self.track_id = self.scope['url_route']['kwargs']['track_id']
+
         self.user = self.scope["user"]
         
         if not self.user.is_authenticated:
@@ -24,7 +26,7 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
         await self.accept()
         
         # Join user-specific group
-        user_group_name = f'{self.staff_id}_tracking'
+        user_group_name = f'{self.staff_id}_tracking_{self.track_id}'
         await self.channel_layer.group_add(
             user_group_name,
             self.channel_name
@@ -79,9 +81,9 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
         count_key = f'{user_group_name}_connections'
         count = redis_client.decr(count_key)
         print(count)
-        if count <= 0:
-            redis_client.delete(user_group_name)
-            redis_client.delete(count_key)
+        # if count <= 0:
+        #     redis_client.delete(user_group_name)
+        #     redis_client.delete(count_key)
         
 
     async def receive(self, text_data):
