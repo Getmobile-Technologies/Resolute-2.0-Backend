@@ -1,5 +1,5 @@
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer, JsonWebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from asgiref.sync import sync_to_async
 from .models import LocationData
@@ -7,7 +7,6 @@ from .serializers import LocationDataSerializer
 from django.utils import timezone
 import redis
 from channels.db import database_sync_to_async
-from channels.exceptions import DenyConnection
 
 User = get_user_model()
 
@@ -40,12 +39,12 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
         else:
             await self.increment_connection_count(redis_client, user_group_name)
             await self.channel_layer.group_send(
-            user_group_name,
-            {
-                'type': 'send_location',
-                'location': {}
-            }
-        )
+                user_group_name,
+                {
+                    'type': 'send_location',
+                    'location': {}
+                }
+            )
 
     async def disconnect(self, close_code):
         # Leave user-specific group
@@ -65,7 +64,7 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def initialize_redis_storage(self, redis_client, user_group_name):
-        redis_client.set(user_group_name, "")
+        redis_client.lpush(user_group_name, "")
         redis_client.set(f'{user_group_name}_connections', 1)
 
     @database_sync_to_async
@@ -88,16 +87,13 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
 
         # location = json.loads(text_data)
 
-
         serializer = LocationDataSerializer(data=eval(text_data))
         serializer.is_valid(raise_exception=True)
-        
         
         location = serializer.validated_data.copy()
         
         # Save location data asynchronously
         await self.save_location_data(serializer.validated_data, self.user)
-
     
         location['timestamp'] = timezone.now().isoformat()
         
@@ -113,7 +109,7 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
         
         # Append the location data to the communication history in Redis
         redis_client = redis.Redis()
-        redis_client.append(recipient_group_name, json.dumps(location))
+        redis_client.lpush(recipient_group_name, json.dumps(location))
     
 
     async def send_location(self, event):
@@ -122,19 +118,22 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
         # Retrieve the communication history from Redis
         redis_client = redis.Redis()
         user_group_name = f'{self.staff_id}_tracking'
-        communication_history = redis_client.get(user_group_name)
+        communication_history = redis_client.lrange(user_group_name, 0, -1)
+
+        # Convert the communication history to a list of dictionaries
+        communication_history_list = [json.loads(item.decode('utf-8')) for item in communication_history]
 
         # Send message to WebSocket along with the communication history
         response = {
             'location': location,
-            'communication_history': communication_history.decode('utf-8')
+            'communication_history': communication_history_list
         }
         await self.send(text_data=json.dumps(response))
         
         
     @staticmethod
     @sync_to_async
-    def save_location_data(data, user:User):
+    def save_location_data(data, user: User):
         print(LocationData.objects.all().count())
         if user.role == "staff":
 
