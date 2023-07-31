@@ -35,6 +35,8 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
         # Check if Redis data storage already exists for the group
         redis_client = redis.Redis()
         storage_exists = await self.check_redis_storage(redis_client, user_group_name)
+        
+        print("Somebody joined", user_group_name)
 
         # If Redis data storage doesn't exist, create it and initialize the connection count
         if not storage_exists:
@@ -51,7 +53,9 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Leave user-specific group
-        user_group_name = f'{self.staff_id}_tracking'
+        user_group_name = f'{self.staff_id}_tracking_{self.track_id}'
+        
+        print("Somebody left", user_group_name)
         await self.channel_layer.group_discard(
             user_group_name,
             self.channel_name
@@ -74,13 +78,13 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
     def increment_connection_count(self, redis_client, user_group_name):
         count_key = f'{user_group_name}_connections'
         count = redis_client.incr(count_key)
-        print(count)
+        print("Somebody joined", count)
 
     @database_sync_to_async
     def decrement_connection_count(self, redis_client, user_group_name):
         count_key = f'{user_group_name}_connections'
         count = redis_client.decr(count_key)
-        print(count)
+        print("Somebody left",count)
         # if count <= 0:
         #     redis_client.delete(user_group_name)
         #     redis_client.delete(count_key)
@@ -103,8 +107,8 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
     
         location['timestamp'] = timezone.now().isoformat()
         
-        # Send location data to the recipient's group
-        recipient_group_name = f'{self.staff_id}_tracking'
+        # Send location data to the recipient's group. Same channel
+        recipient_group_name = f'{self.staff_id}_tracking_{self.track_id}'
         await self.channel_layer.group_send(
             recipient_group_name,
             {
@@ -123,7 +127,7 @@ class TrackMeConsumer(AsyncWebsocketConsumer):
 
         # Retrieve the communication history from Redis
         redis_client = redis.Redis()
-        user_group_name = f'{self.staff_id}_tracking'
+        user_group_name = f'{self.staff_id}_tracking_{self.track_id}'
         communication_history = redis_client.get(user_group_name)
         hist =communication_history.decode('utf-8')
         # Add commas between individual JSON objects to form a valid JSON array.
