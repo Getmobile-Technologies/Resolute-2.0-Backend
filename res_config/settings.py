@@ -254,8 +254,8 @@ REST_FRAMEWORK = {
 AUTHENTICATION_BACKENDS = [
         'accounts.authentication.PhoneNumberBackend',
         'accounts.authentication.EmailBackend',
-        'django.contrib.auth.backends.ModelBackend',
-        'django.contrib.auth.backends.AllowAllUsersModelBackend',
+        # 'django.contrib.auth.backends.ModelBackend',
+        # 'django.contrib.auth.backends.AllowAllUsersModelBackend',
 
     ]
 
